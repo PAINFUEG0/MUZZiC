@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "rootDir": "../../src",
+
+    "target": "ESNext",
+    "moduleDetection": "auto",
+
+    "newLine": "lf",
+    "noEmitOnError": true,
+    "removeComments": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

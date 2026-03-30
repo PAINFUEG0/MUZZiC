@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "outDir": "../../dist/plugins",
+    "rootDir": "../../src/plugins",
+    "moduleResolution": "NodeNext",
+    "tsBuildInfoFile": "../../.tsbuildinfo/plugins.ts-buildinfo"
+  },
+  "include": ["../../src/plugins"],
+  "references": [{ "path": "./tsconfig.shared.json" }]
+}

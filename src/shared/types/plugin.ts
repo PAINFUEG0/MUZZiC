@@ -1,0 +1,67 @@
+import { formats } from "../constants.js";
+
+export interface Plugin {
+  name: string;
+
+  init(): Promise<void>;
+
+  getAlbum(id: string): Promise<Album<true>>;
+  searchAlbums(query: string): Promise<Album[]>;
+
+  getArtist(id: string): Promise<Artist<true>>;
+  searchArtists(query: string): Promise<Artist[]>;
+
+  getPlaylist(id: string): Promise<Playlist<true>>;
+  searchPlaylists(query: string): Promise<Playlist[]>;
+
+  searchTracks(query: string): Promise<Track[]>;
+  getTrack(id: string, quality: keyof typeof formats): Promise<{ uri: string; ext: string; direct: boolean }>;
+}
+
+export type Track<T extends boolean = false> = {
+  id: string;
+  url: string;
+  title: string;
+  thumb: string;
+  duration: number;
+  explicit: boolean;
+  copyright: string;
+  source: "TIDAL" | "SAAVN" | "LOCAL";
+  resolution: "SR" | "CD" | "HR" | "DD";
+  album: { id: string; name: string; thumb: string };
+  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
+} & (T extends true ? { lyrics: string; streamURI: string } : {});
+
+export type Album<T extends boolean = false> = {
+  id: string;
+  url: string;
+  title: string;
+  thumb: string;
+  duration: number;
+  explicit: boolean;
+  copyright: string;
+  releaseDate: string;
+  numberOfTracks: number;
+  version: string | null;
+  type: "ALBUM" | "SINGLE";
+  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
+} & (T extends true ? { tracks: Track[] } : {});
+
+export type Artist<T extends boolean = false> = {
+  id: string;
+  name: string;
+  thumb: string;
+  roles: string[];
+} & (T extends true ? { albums: Album[]; tracks: Track[] } : {});
+
+export type Playlist<T extends boolean = false> = {
+  id: string;
+  url: string;
+  title: string;
+  thumb: string;
+  duration: number;
+  description: string;
+  numberOfTracks: number;
+  lastItemAddedAt: string;
+  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
+} & (T extends true ? { tracks: Track[] } : {});

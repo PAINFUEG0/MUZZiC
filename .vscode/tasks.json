@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build ( TSC : Project refs )",
+      "type": "shell",
+      "command": "npx tsc -b",
+      "problemMatcher": ["$tsc"],
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "Clean and build ( TSC : Project refs )",
+      "type": "shell",
+      "command": "npx tsc -b --clean && npx tsc -b",
+      "problemMatcher": ["$tsc"],
+      "group": { "kind": "build", "isDefault": false }
+    }
+  ]
+}
