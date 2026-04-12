@@ -1,3 +1,2 @@
-process.loadEnvFile();
-
-export const mediaToken = process.env.MEDIA_TOKEN!;
+export const mediaToken =
+  "Aqgnop+DwmXpzq/LbdIjBAG6cPPLqe+eCEi2FBWEAS5vi4Touu2i5YRLsPyqr7YtkOh2gFFDiSYjtf2SJFudA2r+H2Ak+Djg+ZA0EgJojS372EAXBjtZSmPKZBE6L9043nzb6EgkzFSl/VZvOYGBhMJwDfLvUG4VZjExdgXPs/YK2EUbjiVPImKmWQKBPJZWxxyat+WKFbCOnKDkJYwt/9PZjYcpGpmuOUovr9TVybZwgzpvvA==";
