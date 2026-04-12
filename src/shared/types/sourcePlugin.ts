@@ -1,9 +1,13 @@
 import { formats } from "../constants.js";
 
-export interface Plugin {
+export interface SourcePlugin {
   name: string;
 
   init(): Promise<void>;
+
+  getLyrics?(
+    id: string,
+  ): Promise<{ raw: string; synced: true; type: "LRC" | "TTML" } | { raw: string; synced: false; type: null }>;
 
   getAlbum(id: string): Promise<Album<true>>;
   searchAlbums(query: string): Promise<Album[]>;

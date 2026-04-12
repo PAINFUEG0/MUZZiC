@@ -1,7 +1,7 @@
-import { Plugin } from "../../../shared/types/plugin.js";
+import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
-  static album(albums: any[]): Awaited<ReturnType<Plugin["searchAlbums"]>> {
+  static album(albums: any[]): Awaited<ReturnType<SourcePlugin["searchAlbums"]>> {
     return albums.map((album: any) => ({
       url: album.url,
       title: album.title,
@@ -23,7 +23,7 @@ export class Transformers {
     }));
   }
 
-  static artist(artists: any[]): Awaited<ReturnType<Plugin["searchArtists"]>> {
+  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
     return artists.map((artist: any) => ({
       name: artist.name,
       id: artist.id.toString(),
@@ -32,7 +32,7 @@ export class Transformers {
     }));
   }
 
-  static playlist(playlists: any): Awaited<ReturnType<Plugin["searchPlaylists"]>> {
+  static playlist(playlists: any): Awaited<ReturnType<SourcePlugin["searchPlaylists"]>> {
     return playlists.map((playlist: any) => ({
       id: playlist.uuid,
       url: playlist.url,
@@ -51,7 +51,7 @@ export class Transformers {
     }));
   }
 
-  static track(tracks: any[]): Awaited<ReturnType<Plugin["searchTracks"]>> {
+  static track(tracks: any[]): Awaited<ReturnType<SourcePlugin["searchTracks"]>> {
     return tracks.map((track: any) => ({
       source: "TIDAL",
       url: track.url,
