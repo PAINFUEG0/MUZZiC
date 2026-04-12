@@ -28,5 +28,3 @@ if (!fs.existsSync(process.env.FFMPEG) || !fs.existsSync(process.env.FFPROBE))
       err ? reject(err) : resolve(data),
     ),
   );
-
-await import("./test.js");
