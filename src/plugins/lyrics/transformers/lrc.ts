@@ -28,8 +28,17 @@ export class LRCTransformer {
     return { lines, wordSynced: false, transliterationAvailable: false, leadingSilence: lines[0]?.time ?? 0 };
   }
 
-  static parseToLRC(lyrics: Lyrics<false>): string {
-    const lines = lyrics.lines as LineSync[];
+  static parseToLRC(lyrics: Lyrics<boolean>): string {
+    const lines = lyrics.wordSynced
+      ? (<Lyrics<true>>lyrics).lines.map(
+          (l) =>
+            ({
+              start: l[0]!.start,
+              end: l[l.length - 1]!.end,
+              text: `${l.map((w) => w.text).join(" ")}`,
+            }) satisfies LineSync,
+        )
+      : (<Lyrics<false>>lyrics).lines;
 
     const body = lines
       .filter((l) => l.text !== this.emptyLinePlaceholder)
