@@ -2,9 +2,9 @@ import axios from "axios";
 import { Transformers } from "./transformer.js";
 import { formats } from "../../../shared/constants.js";
 
-import type { Plugin } from "../../../shared/types/plugin.js";
+import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
-export class Tidal implements Plugin {
+export class Tidal implements SourcePlugin {
   name = "TIDAL";
 
   #searchApi!: string;
@@ -42,6 +42,14 @@ export class Tidal implements Plugin {
       ...Transformers.album([res.data.data])[0]!,
       tracks: Transformers.track(res.data.data.items.map((i: any) => i.item)),
     };
+  }
+
+  async getLyrics(id: string) {
+    const res = await axios(`${this.#streamApi}/lyrics?id=${id}`);
+    const synced = !!res.data.lyrics.subtitles;
+    return synced
+      ? ({ raw: res.data.lyrics.subtitles, synced, type: "LRC" } as const)
+      : ({ raw: res.data.lyrics.lyrics, synced, type: null } as const);
   }
 
   async searchTracks(query: string) {

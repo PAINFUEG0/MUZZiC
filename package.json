@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^1.13.6",
+    "fast-xml-parser": "^5.5.11",
     "ffbinaries": "^1.1.6"
   }
 }
