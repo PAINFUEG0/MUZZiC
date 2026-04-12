@@ -1,5 +1,6 @@
 bin
 dist
+.env
 tracks
 node_modules
 .tsbuildinfo
