@@ -1,8 +1,9 @@
-import axios from "axios";
 import { safeAwait } from "../../../shared/helpers.js";
 import { mediaToken } from "../../../shared/config.js";
+import { LyricsPlugin } from "../../../shared/types/lyrics.js";
+import axios from "axios";
 
-export class AppleMusic {
+export class AppleMusic implements LyricsPlugin {
   #authToken = "";
   #mediaToken = mediaToken;
 
@@ -35,7 +36,7 @@ export class AppleMusic {
     return res ? (res.data?.results?.songs?.data as any[]) : null;
   }
 
-  async getLyrics(op: { title: string; artist: string; isrc?: string } | { appleMusicPlatformId: string }) {
+  async getLyrics(op: { title: string; artist: string; album?: string; duration?: number; isrc?: string }) {
     const id =
       "appleMusicPlatformId" in op
         ? op.appleMusicPlatformId
@@ -50,7 +51,8 @@ export class AppleMusic {
     if (!id) return;
 
     const uri = `https://amp-api.music.apple.com/v1/catalog/in/songs/${id}/syllable-lyrics?l%5Blyrics%5D=en-US&extend=ttmlLocalizations&l%5Bscript%5D=en-Latn`;
-    const [res] = await safeAwait(axios(uri, { headers: this.headers }));
-    return res?.data?.data?.[0]?.attributes?.ttmlLocalizations;
+    const [res, err] = await safeAwait(axios(uri, { headers: this.headers }));
+    const raw = res?.data?.data?.[0]?.attributes?.ttmlLocalizations;
+    return raw || !err ? raw : undefined;
   }
 }

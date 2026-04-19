@@ -11,9 +11,9 @@ const tidal = new Tidal();
 
 await tidal.init();
 
-const tracks = await tidal.searchTracks("no idea don troliver");
+const tracks = await tidal.searchTracks("ATTRACTION - SUKHA | PRODGK");
 
-const track = tracks.find((t) => t.resolution === "HR")!;
+const track = tracks[0]!;
 
 const priority: string = "LOSSLESS";
 

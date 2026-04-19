@@ -1,60 +1,33 @@
-import { LineSync, Lyrics } from "../../../shared/types/lyrics.js";
+const syncedDotRegex = /^\[(\d{2}):(\d{2})\.(\d{1,3})\]/m;
+const syncedColonRegex = /^\[(\d{2}):(\d{2}):(\d{2,3})\]/m;
 
-export class LRCTransformer {
-  static emptyLinePlaceholder = ". . .";
+function probe(lrc: string): "unsynced" | "colon" | "dot" {
+  const lines = lrc.split("\n").filter((l) => !!l.trim());
 
-  static timestampRegex = /^\[(\d{2}):(\d{2}\.\d+)\](.*)/;
+  if (lines.every((l) => syncedDotRegex.test(l))) return "dot";
+  else if (lines.every((l) => syncedColonRegex.test(l))) return "colon";
+  else return "unsynced";
+}
 
-  static parseFromLRC(lrc: string): Lyrics {
-    let lines: any[] = lrc.split("\n").map((l) => l.trim());
+export function parseLRC(lrc: string) {
+  const type = probe(lrc);
 
-    lines = lines
-      .map((line) => {
-        const match = line.match(this.timestampRegex);
-        if (match)
-          return {
-            text: match[3]!.trim() || this.emptyLinePlaceholder,
-            time: Math.round((parseInt(match[1]!, 10) * 60 + parseFloat(match[2]!)) * 1000),
-          };
-      })
-      .filter(Boolean);
+  let lines = lrc
+    .split("\n")
+    .map((line) => {
+      if (type === "unsynced") return { start: 0, end: 10e10, text: line.trim() || "..." };
 
-    lines = lines.map((entry, i) => ({
-      start: entry.time,
-      text: entry.text || this.emptyLinePlaceholder,
-      end: lines[i + 1]?.time ?? entry.time + 10e10,
-    }));
+      const match = line.match(type === "dot" ? syncedDotRegex : syncedColonRegex);
 
-    return { lines, wordSynced: false, transliterationAvailable: false, leadingSilence: lines[0]?.time ?? 0 };
-  }
+      return {
+        time:
+          parseInt(match![1]!, 10) * 60_000 +
+          parseInt(match![2]!, 10) * 1000 +
+          Math.round(parseInt(match![3]!, 10) * (match![3]!.length === 2 ? 10 : 1)),
+        text: match!.input?.replace(match![0], "")?.trim() || "...",
+      };
+    })
+    .map((line, i, arr) => ({ start: line.time, text: line.text, end: arr[i + 1]?.time ?? 10e10 }));
 
-  static parseToLRC(lyrics: Lyrics<boolean>): string {
-    const lines = lyrics.wordSynced
-      ? (<Lyrics<true>>lyrics).lines.map(
-          (l) =>
-            ({
-              start: l[0]!.start,
-              end: l[l.length - 1]!.end,
-              text: `${l.map((w) => w.text).join(" ")}`,
-            }) satisfies LineSync,
-        )
-      : (<Lyrics<false>>lyrics).lines;
-
-    const body = lines
-      .filter((l) => l.text !== this.emptyLinePlaceholder)
-      .map((l) => `[${this.formatTimestamp(l.start)}]${l.text}`)
-      .join("\n");
-
-    const last = lines.at(-1);
-    const closing = last && last.end < 10e10 ? `\n[${this.formatTimestamp(last.end)}]` : "";
-
-    return body + closing;
-  }
-
-  static formatTimestamp(ms: number): string {
-    const totalSeconds = ms / 1000;
-    const min = Math.floor(totalSeconds / 60);
-    const sec = (totalSeconds % 60).toFixed(2).padStart(5, "0");
-    return `${String(min).padStart(2, "0")}:${sec}`;
-  }
+  return { lines, syncType: "Line", leadingSilence: lines[0]?.start ?? 0 };
 }
