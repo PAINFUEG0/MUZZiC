@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { Lyrics } from "../../../shared/types/lyrics.js";
 
 const parser = new XMLParser({
   textNodeName: "#text",
@@ -6,21 +7,8 @@ const parser = new XMLParser({
   attributeNamePrefix: "@_",
   isArray: (name) => ["div", "p", "span"].includes(name),
 });
-
-export function parseTTML(ttml: string) {
-  const tt = parser.parse(ttml)["tt"];
-  const divs = toArray(tt?.body?.div);
-  const type = tt?.["@_itunes:timing"] ?? tt?.["@_timing"] ?? "None";
-
-  const lines =
-    type === "None"
-      ? divs.map((div) => toArray(div.p).map((p) => ({ start: 0, end: 10e10, text: p }))).flat()
-      : type === "Word"
-        ? divs.map((div) => toArray(div.p).map((p) => toArray(p.span).map(parseEntity))).flat()
-        : divs.map((div) => toArray(div.p).map(parseEntity)).flat();
-
-  return { leadingSilence: ("start" in lines[0]! ? lines[0]!.start : lines[0]![0]!.start) ?? 0, type, lines };
-}
+const parseEntity = (e: any) =>
+  ({ end: time(e["@_end"]), start: time(e["@_begin"]), text: `${e["#text"] || "..."}` }) as const;
 
 function time(raw: string) {
   let res = 0;
@@ -34,4 +22,23 @@ function time(raw: string) {
 
 const toArray = <T>(val: T | T[]) => (Array.isArray(val) ? val : val === undefined || val === null ? [] : [val]);
 
-const parseEntity = (e: any) => ({ end: time(e["@_end"]), start: time(e["@_begin"]), text: e["#text"] || "..." });
+export function parseTTML(ttml: string): Lyrics<"Word"> | Lyrics<"Line"> | Lyrics<"None"> {
+  const tt = parser.parse(ttml)["tt"];
+  const divs = toArray(tt?.body?.div);
+  const syncType = (tt?.["@_itunes:timing"] ?? tt?.["@_timing"] ?? "None") as "None" | "Word" | "Line";
+
+  switch (syncType) {
+    case "Line": {
+      const lines = divs.flatMap((div) => toArray(div.p).map(parseEntity));
+      return { syncType, leadingSilence: lines[0]?.start ?? 0, lines };
+    }
+    case "Word": {
+      const lines = divs.flatMap((div) => toArray(div.p).map((p) => toArray(p.span).map(parseEntity)));
+      return { syncType, leadingSilence: lines[0]?.[0]?.start ?? 0, lines };
+    }
+    case "None": {
+      const lines = divs.flatMap((div) => toArray(div.p).map((p) => ({ start: 0, end: 10e10, text: `${p}` }) as const));
+      return { syncType, leadingSilence: lines[0]?.start ?? 0, lines };
+    }
+  }
+}

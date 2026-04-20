@@ -1,6 +1,7 @@
 import axios from "axios";
 import { safeAwait } from "../../../shared/helpers.js";
 import { LyricsPlugin } from "../../../shared/types/lyrics.js";
+import { parseLRC } from "../transformers/lrc.js";
 
 export class Lrclib implements LyricsPlugin {
   async init() {
@@ -19,6 +20,6 @@ export class Lrclib implements LyricsPlugin {
 
     if (err) return;
 
-    return res.data.syncedLyrics || res.data.plainLyrics;
+    return parseLRC(res.data.syncedLyrics || res.data.plainLyrics);
   }
 }

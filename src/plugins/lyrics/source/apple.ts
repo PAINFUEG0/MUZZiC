@@ -1,7 +1,8 @@
+import axios from "axios";
+import { parseTTML } from "../transformers/ttml.js";
 import { safeAwait } from "../../../shared/helpers.js";
 import { mediaToken } from "../../../shared/config.js";
-import { LyricsPlugin } from "../../../shared/types/lyrics.js";
-import axios from "axios";
+import { Lyrics, LyricsPlugin } from "../../../shared/types/lyrics.js";
 
 export class AppleMusic implements LyricsPlugin {
   #authToken = "";
@@ -53,6 +54,7 @@ export class AppleMusic implements LyricsPlugin {
     const uri = `https://amp-api.music.apple.com/v1/catalog/in/songs/${id}/syllable-lyrics?l%5Blyrics%5D=en-US&extend=ttmlLocalizations&l%5Bscript%5D=en-Latn`;
     const [res, err] = await safeAwait(axios(uri, { headers: this.headers }));
     const raw = res?.data?.data?.[0]?.attributes?.ttmlLocalizations;
-    return raw || !err ? raw : undefined;
+
+    return raw || !err ? (parseTTML(raw) as Lyrics<"Line"> | Lyrics<"Word"> | Lyrics<"None">) : undefined;
   }
 }

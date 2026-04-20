@@ -1,12 +1,3 @@
-export type LineSync = { start: number; end: number; text: string };
-export type WordSync = { start: number; end: number; text: string }[];
-
-export type Lyrics<T extends "NONE" | "WORD" | "LINE"> = {
-  syncType: T;
-  leadingSilence: number;
-  lines: T extends "WORD" ? WordSync[] : T extends "LINE" ? LineSync[] : string;
-};
-
 export type LyricsPlugin = {
   init(): Promise<LyricsPlugin>;
 
@@ -16,5 +7,15 @@ export type LyricsPlugin = {
     album?: string;
     duration?: number;
     isrc?: string;
-  }): Promise<Lyrics<"NONE"> | Lyrics<"WORD"> | Lyrics<"LINE"> | undefined>;
+  }): Promise<Lyrics<"None"> | Lyrics<"Word"> | Lyrics<"Line"> | undefined>;
+};
+
+export type Unsynced = Readonly<{ start: 0; end: 10e10; text: string }>;
+export type LineSync = Readonly<{ start: number; end: number; text: string }>;
+export type WordSync = Readonly<{ start: number; end: number; text: string }[]>;
+
+export type Lyrics<T extends "None" | "Word" | "Line"> = {
+  syncType: T;
+  leadingSilence: number;
+  lines: T extends "Word" ? WordSync[] : T extends "Line" ? LineSync[] : Unsynced[];
 };
