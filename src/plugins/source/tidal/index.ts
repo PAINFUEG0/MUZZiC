@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Transformers } from "./transformer.js";
 import { formats } from "../../../shared/constants.js";
-
+import { parseLRC } from "../../lyrics/transformers/lrc.js";
 import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Tidal implements SourcePlugin {
@@ -32,41 +32,12 @@ export class Tidal implements SourcePlugin {
     );
   }
 
-  async searchAlbums(query: string) {
-    return this.#search(query, "al", (d) => Transformers.album(d.data.albums.items));
-  }
-
-  async getAlbum(id: string) {
-    const res = await this.#retry(() => axios(`${this.searchApi}/album?id=${id}`), id);
-    return {
-      ...Transformers.album([res.data.data])[0]!,
-      tracks: Transformers.track(res.data.data.items.map((i: any) => i.item)),
-    };
-  }
-
-  async getLyrics(id: string) {
-    const res = await axios(`${this.#streamApi}/lyrics?id=${id}`);
-    const synced = !!res.data.lyrics.subtitles;
-    return synced
-      ? ({ raw: res.data.lyrics.subtitles, synced, type: "LRC" } as const)
-      : ({ raw: res.data.lyrics.lyrics, synced, type: null } as const);
-  }
-
   async searchTracks(query: string) {
     return this.#search(query, "s", (d) => Transformers.track(d.data.items));
   }
 
-  async getArtist(id: string) {
-    const res = await this.#retry(
-      () => Promise.all([axios(`${this.searchApi}/artist?id=${id}`), axios(`${this.searchApi}/artist?f=${id}`)]),
-      id,
-    );
-
-    return {
-      tracks: Transformers.track(res[1].data.tracks),
-      ...Transformers.artist([res[0].data.artist])[0]!,
-      albums: Transformers.album(res[1].data.albums.items),
-    };
+  async searchAlbums(query: string) {
+    return this.#search(query, "al", (d) => Transformers.album(d.data.albums.items));
   }
 
   async searchArtists(query: string) {
@@ -77,9 +48,10 @@ export class Tidal implements SourcePlugin {
     return this.#search(query, "p", (d) => Transformers.playlist(d.data.playlists.items));
   }
 
-  async getPlaylist(id: string) {
-    const res = await this.#retry(() => axios(`${this.searchApi}/playlist?id=${id}`), id);
-    return { ...Transformers.playlist([res.data.playlist])[0]!, tracks: Transformers.track(res.data.items) };
+  async getLyrics(id: string) {
+    const res = await axios(`${this.#streamApi}/lyrics?id=${id}`);
+    if (!res.data.lyrics.subtitles && !res.data.lyrics.lyrics) return;
+    return parseLRC(res.data.lyrics.subtitles || res.data.lyrics.lyrics);
   }
 
   async getTrack(id: string, quality: keyof typeof formats = "HIGH") {
@@ -95,6 +67,32 @@ export class Tidal implements SourcePlugin {
     return { uri, ext: formats[quality].ext, direct: !mpd };
   }
 
+  async getAlbum(id: string) {
+    const res = await this.#retry(() => axios(`${this.searchApi}/album?id=${id}`), id);
+    return {
+      ...Transformers.album([res.data.data])[0]!,
+      tracks: Transformers.track(res.data.data.items.map((i: any) => i.item)),
+    };
+  }
+
+  async getArtist(id: string) {
+    const res = await this.#retry(
+      () => Promise.all([axios(`${this.searchApi}/artist?id=${id}`), axios(`${this.searchApi}/artist?f=${id}`)]),
+      id,
+    );
+
+    return {
+      tracks: Transformers.track(res[1].data.tracks),
+      ...Transformers.artist([res[0].data.artist])[0]!,
+      albums: Transformers.album(res[1].data.albums.items),
+    };
+  }
+
+  async getPlaylist(id: string) {
+    const res = await this.#retry(() => axios(`${this.searchApi}/playlist?id=${id}`), id);
+    return { ...Transformers.playlist([res.data.playlist])[0]!, tracks: Transformers.track(res.data.items) };
+  }
+
   async #fetchAPIs() {
     return await axios<{
       api: { url: string; version: string }[];
@@ -106,32 +104,25 @@ export class Tidal implements SourcePlugin {
   async #fetchSearchAPI(query = "skyfall") {
     const APIs = await this.#fetchAPIs();
 
-    this.#searchApi = await Promise.any(
-      APIs.data.api.map((api) =>
-        axios(`${api.url}/search?s=${query}`).then((r) => {
-          if (r?.data?.data?.items) return api.url;
-          throw new Error();
-        }),
-      ),
-    );
-
-    return this.searchApi;
+    return (this.#searchApi = await Promise.any(
+      APIs.data.api.map(async (api) => {
+        const { data } = await axios(`${api.url}/search?s=${query}`);
+        if (data?.data?.items) return api.url;
+        throw 0;
+      }),
+    ));
   }
 
   async #fetchStreamAPI(id = "201802681") {
     const APIs = await this.#fetchAPIs();
 
-    this.#streamApi = await Promise.any(
-      [...APIs.data.streaming, ...APIs.data.api, ...APIs.data.down].map((api) =>
-        axios(`${api.url}/track?id=${id}`).then(async (r) => {
-          if (!r?.data?.data?.manifest) throw new Error();
-
-          if ("version" in api) return api;
-          return { url: api.url, version: await axios(`${api.url}`).then((r) => r.data.version) };
-        }),
-      ),
-    );
-
-    return this.streamApi;
+    return (this.#streamApi = await Promise.any(
+      [...APIs.data.streaming, ...APIs.data.api, ...APIs.data.down].map(async (api) => {
+        const { data } = await axios(`${api.url}/track?id=${id}`);
+        if (!data?.data?.manifest) throw 0;
+        if ("version" in api) return api;
+        return { url: api.url, version: await axios(`${api.url}`).then((r) => r.data.version) };
+      }),
+    ));
   }
 }
