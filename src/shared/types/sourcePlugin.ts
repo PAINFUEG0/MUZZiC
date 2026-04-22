@@ -4,7 +4,7 @@ import { Lyrics } from "./lyrics.js";
 export interface SourcePlugin {
   name: string;
 
-  init(): Promise<void>;
+  init(): Promise<SourcePlugin>;
 
   getLyrics?(platformId: string): Promise<Lyrics<"None"> | Lyrics<"Word"> | Lyrics<"Line"> | undefined>;
 

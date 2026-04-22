@@ -20,6 +20,7 @@ export class Tidal implements SourcePlugin {
 
   async init() {
     await Promise.all([this.#fetchSearchAPI(), this.#fetchStreamAPI()]);
+    return this;
   }
 
   async #retry<T>(task: () => Promise<T>, query?: string): Promise<T> {
