@@ -99,7 +99,7 @@ export class Tidal implements SourcePlugin {
       api: { url: string; version: string }[];
       streaming: { url: string; version: string }[];
       down: { url: string; status: number; error: string }[];
-    }>("https://tidal-uptime.jiffy-puffs-1j.workers.dev");
+    }>("https://tidal-uptime.props-76styles.workers.dev");
   }
 
   async #fetchSearchAPI(query = "skyfall") {
