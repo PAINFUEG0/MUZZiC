@@ -1,7 +1,7 @@
 import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
-  static album(albums: any[]): Awaited<ReturnType<SourcePlugin["searchAlbums"]>> {
+  static album(albums: any[]): (Awaited<ReturnType<SourcePlugin["searchAlbums"]>>[number] & { duration: number })[] {
     return albums.map((album: any) => ({
       url: album.url,
       title: album.title,
@@ -9,7 +9,7 @@ export class Transformers {
       id: album.id.toString(),
       duration: album.duration,
       explicit: !!album.explicit,
-      releaseDate: album.releaseDate,
+      releaseYear: album.releaseDate.substring(0, 4),
       numberOfTracks: album.numberOfTracks,
       type: album.type,
       artists: album.artists.map((a: any) => ({
@@ -19,7 +19,6 @@ export class Transformers {
         thumb: this.generateAssetUrl(a.picture, 750),
       })),
       thumb: this.generateAssetUrl(album.cover, 1280),
-      copyright: album.copyright || "© Unknown copyright holder",
     }));
   }
 

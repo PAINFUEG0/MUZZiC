@@ -40,15 +40,13 @@ export type Album<T extends boolean = false> = {
   url: string;
   title: string;
   thumb: string;
-  duration: number;
   explicit: boolean;
-  copyright: string;
-  releaseDate: string;
+  releaseYear: string;
   numberOfTracks: number;
   version: string | null;
   type: "ALBUM" | "SINGLE";
   artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
-} & (T extends true ? { tracks: Track[] } : {});
+} & (T extends true ? { tracks: Track[]; duration: number } : {});
 
 export type Artist<T extends boolean = false> = {
   id: string;
