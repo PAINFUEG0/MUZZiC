@@ -1,5 +1,5 @@
-import { formats } from "../constants.js";
 import { Lyrics } from "./lyrics.js";
+import { formats } from "../constants.js";
 
 export interface SourcePlugin {
   name: string;
@@ -31,8 +31,8 @@ export type Track<T extends boolean = false> = {
   copyright: string;
   source: "TIDAL" | "SAAVN" | "LOCAL";
   resolution: "SR" | "CD" | "HR" | "DD";
+  artists: (Artist & { type: "MAIN" | "FEAT" })[];
   album: { id: string; name: string; thumb: string };
-  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
 } & (T extends true ? { lyrics: string; streamURI: string } : {});
 
 export type Album<T extends boolean = false> = {
@@ -45,24 +45,20 @@ export type Album<T extends boolean = false> = {
   numberOfTracks: number;
   version: string | null;
   type: "ALBUM" | "SINGLE";
-  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
+  artists: (Artist & { type: "MAIN" | "FEAT" })[];
 } & (T extends true ? { tracks: Track[]; duration: number } : {});
-
-export type Artist<T extends boolean = false> = {
-  id: string;
-  name: string;
-  thumb: string;
-  roles: string[];
-} & (T extends true ? { albums: Album[]; tracks: Track[] } : {});
 
 export type Playlist<T extends boolean = false> = {
   id: string;
   url: string;
   title: string;
   thumb: string;
-  duration: number;
-  description: string;
   numberOfTracks: number;
-  lastItemAddedAt: string;
-  artists: { id: string; name: string; thumb: string; type: "MAIN" | "FEAT" }[];
-} & (T extends true ? { tracks: Track[] } : {});
+  artists: (Artist & { type: "MAIN" | "FEAT" })[];
+} & (T extends true ? { tracks: Track[]; duration: number } : {});
+
+export type Artist<T extends boolean = false> = {
+  id: string;
+  name: string;
+  thumb: string;
+} & (T extends true ? { albums: Album[]; tracks: Track[] } : {});
