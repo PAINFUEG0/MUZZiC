@@ -1,6 +1,23 @@
 import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
+  static fallbackImage = "https://cdn.vectorstock.com/i/500p/33/47/no-photo-available-icon-vector-40343347.jpg";
+
+  static generateAssetUrl(asset?: string, res = 320) {
+    return asset
+      ? `https://resources.tidal.com/images/${asset.replaceAll("-", "/")}/${res}x${res}.jpg`
+      : this.fallbackImage;
+  }
+
+  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
+    return artists.map((artist: any) => ({
+      name: artist.name,
+      id: artist.id.toString(),
+      thumb: this.generateAssetUrl(artist.picture, 750),
+      roles: artist.artistRoles.map((role: any) => `${role.category}`),
+    }));
+  }
+
   static album(albums: any[]): (Awaited<ReturnType<SourcePlugin["searchAlbums"]>>[number] & { duration: number })[] {
     return albums.map((album: any) => ({
       url: album.url,
@@ -19,15 +36,6 @@ export class Transformers {
         thumb: this.generateAssetUrl(a.picture, 750),
       })),
       thumb: this.generateAssetUrl(album.cover, 1280),
-    }));
-  }
-
-  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
-    return artists.map((artist: any) => ({
-      name: artist.name,
-      id: artist.id.toString(),
-      thumb: this.generateAssetUrl(artist.picture, 750),
-      roles: artist.artistRoles.map((role: any) => `${role.category}`),
     }));
   }
 
@@ -80,12 +88,4 @@ export class Transformers {
             : "SR",
     }));
   }
-
-  static generateAssetUrl(asset?: string, res = 320) {
-    return asset
-      ? `https://resources.tidal.com/images/${asset.replaceAll("-", "/")}/${res}x${res}.jpg`
-      : this.fallbackImage;
-  }
-
-  static fallbackImage = "https://cdn.vectorstock.com/i/500p/33/47/no-photo-available-icon-vector-40343347.jpg";
 }

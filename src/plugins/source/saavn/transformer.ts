@@ -1,6 +1,19 @@
 import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
+  static formatImage(image: string) {
+    return image.replace("150x150", "500x500").replaceAll("50x50", "500x500").replaceAll("http://", "https://");
+  }
+
+  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
+    return artists.map((artist: any) => ({
+      roles: [],
+      name: artist.name,
+      id: artist.id.toString(),
+      thumb: this.formatImage(artist.image),
+    }));
+  }
+
   static album(albums: any[]): Awaited<ReturnType<SourcePlugin["searchAlbums"]>> {
     return albums.map((album: any) => ({
       version: null,
@@ -13,15 +26,6 @@ export class Transformers {
       thumb: this.formatImage(album.image),
       explicit: album.explicit_content === "1",
       type: album.song_count > 1 ? "ALBUM" : "SINGLE",
-    }));
-  }
-
-  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
-    return artists.map((artist: any) => ({
-      roles: [],
-      name: artist.name,
-      id: artist.id.toString(),
-      thumb: this.formatImage(artist.image),
     }));
   }
 
@@ -42,10 +46,6 @@ export class Transformers {
         type: artist.type === "MAIN" ? "MAIN" : "FEAT",
       })),
     }));
-  }
-
-  static formatImage(image: string) {
-    return image.replace("150x150", "500x500").replaceAll("50x50", "500x500").replaceAll("http://", "https://");
   }
 
   static track(tracks: any[]): Awaited<ReturnType<SourcePlugin["searchTracks"]>> {
