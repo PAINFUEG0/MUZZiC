@@ -3,8 +3,8 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { util, cipher } from "node-forge";
 import { Transformers } from "./transformer.js";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
+import { existsSync, mkdirSync, write, writeFileSync } from "node:fs";
+import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 // function x<T extends { new (...args: any[]): any }>(c: T) {
 //   console.log("Decorator invoked by", c);
@@ -86,18 +86,23 @@ export class Saavn implements SourcePlugin {
   }
 
   async getPlaylist(id: string) {
-    id;
-    return null as any;
+    const res = await axios(`${this.baseAPI}&__call=playlist.getDetails&listid=${id}`);
+    return {
+      tracks: Transformers.track(res.data.list),
+      duration: 10e3,
+      ...Transformers.playlist([res.data])[0]!,
+    };
   }
 }
 
 const saavn = await new Saavn().init();
 const dir = path.resolve(fileURLToPath(import.meta.url), "../res");
-if (!existsSync(path.resolve(dir))) mkdirSync(path.resolve(dir));
+// if (!existsSync(path.resolve(dir))) mkdirSync(path.resolve(dir));
 // writeFileSync(path.resolve(dir, "search.json"), JSON.stringify(await saavn.searchTracks("skyfall")));
 // writeFileSync(path.resolve(dir, "album.json"), JSON.stringify(await saavn.searchAlbums("skyfall")));
 // writeFileSync(path.resolve(dir, "artist.json"), JSON.stringify(await saavn.searchArtists("the weeknd")));
-writeFileSync(path.resolve(dir, "playlist.json"), JSON.stringify(await saavn.searchPlaylists("arijit singh mix")));
+writeFileSync(path.resolve(dir, "playlist-id.json"), JSON.stringify(await saavn.getPlaylist("1191141029")));
+// writeFileSync(path.resolve(dir, "playlist.json"), JSON.stringify(await saavn.searchPlaylists("arijit singh mix")));
 
 // const x = (await import("./res/search.json")).default;
 // console.log(x.length);

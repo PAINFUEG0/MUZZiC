@@ -1,6 +1,6 @@
 import { Lrclib } from "./source/lrclib.js";
 import { AppleMusic } from "./source/apple.js";
-import { SourcePlugin } from "../../shared/types/sourcePlugin.js";
+import type { SourcePlugin } from "../../shared/types/sourcePlugin.js";
 
 type BaseArguments = { isrc?: string; title: string; artist: string; album?: string; duration?: number };
 

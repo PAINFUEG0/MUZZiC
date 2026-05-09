@@ -179,31 +179,6 @@
         "numsongs": null
       },
       {
-        "id": "109717418",
-        "title": "Icons - Arijit Singh And Pritam",
-        "subtitle": "26 Songs",
-        "type": "playlist",
-        "image": "https://c.saavncdn.com/editorial/LetsPlayPritamArijit_20250109115337_150x150.jpg",
-        "perma_url": "https://www.jiosaavn.com/featured/icons-arijit-singh-and-pritam/eDvgF5-U4uZFo9wdEAzFBA__",
-        "more_info": {
-          "uid": "phulki_user",
-          "firstname": "JioSaavn",
-          "artist_name": ["Pritam", "Arijit Singh"],
-          "entity_type": "playlist",
-          "entity_sub_type": "",
-          "video_available": false,
-          "is_dolby_content": null,
-          "sub_types": null,
-          "images": null,
-          "lastname": "Editor",
-          "song_count": "26",
-          "language": "hindi"
-        },
-        "explicit_content": "0",
-        "mini_obj": true,
-        "numsongs": null
-      },
-      {
         "id": "1297677845",
         "title": "With Love - Arijit",
         "subtitle": "33 Songs",
@@ -222,6 +197,31 @@
           "images": null,
           "lastname": "Editor",
           "song_count": "33",
+          "language": "hindi"
+        },
+        "explicit_content": "0",
+        "mini_obj": true,
+        "numsongs": null
+      },
+      {
+        "id": "109717418",
+        "title": "Icons - Arijit Singh And Pritam",
+        "subtitle": "26 Songs",
+        "type": "playlist",
+        "image": "https://c.saavncdn.com/editorial/LetsPlayPritamArijit_20250109115337_150x150.jpg",
+        "perma_url": "https://www.jiosaavn.com/featured/icons-arijit-singh-and-pritam/eDvgF5-U4uZFo9wdEAzFBA__",
+        "more_info": {
+          "uid": "phulki_user",
+          "firstname": "JioSaavn",
+          "artist_name": ["Pritam", "Arijit Singh"],
+          "entity_type": "playlist",
+          "entity_sub_type": "",
+          "video_available": false,
+          "is_dolby_content": null,
+          "sub_types": null,
+          "images": null,
+          "lastname": "Editor",
+          "song_count": "26",
           "language": "hindi"
         },
         "explicit_content": "0",

@@ -1,4 +1,4 @@
-import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
+import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
   static formatImage(image: string) {
@@ -34,17 +34,11 @@ export class Transformers {
       id: playlist.id,
       url: playlist.perma_url,
       title: playlist.title,
-      duration: playlist.duration,
-      description: "",
-      numberOfTracks: playlist.song_count,
-      lastItemAddedAt: "",
+      numberOfTracks: Number(playlist.list_count || playlist.more_info.song_count),
       thumb: this.formatImage(playlist.image),
-      artists: playlist.promotedArtists.map((artist: any) => ({
-        name: artist.name,
-        id: artist.id.toString(),
-        thumb: (artist.picture, 750),
-        type: artist.type === "MAIN" ? "MAIN" : "FEAT",
-      })),
+      artists: Array.isArray(playlist.more_info.artist_name)
+        ? playlist.more_info.artist_name
+        : playlist.more_info.artists.map((a: any) => a.name),
     }));
   }
 

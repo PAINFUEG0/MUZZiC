@@ -1,4 +1,4 @@
-import { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
+import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers {
   static fallbackImage = "https://cdn.vectorstock.com/i/500p/33/47/no-photo-available-icon-vector-40343347.jpg";

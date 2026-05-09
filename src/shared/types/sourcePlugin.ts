@@ -4,7 +4,7 @@ import { formats } from "../constants.js";
 export interface SourcePlugin {
   name: string;
 
-  init(): Promise<SourcePlugin>;
+  init(): Promise<this>;
 
   getLyrics?(platformId: string): Promise<Lyrics<"None"> | Lyrics<"Word"> | Lyrics<"Line"> | undefined>;
 
@@ -20,6 +20,13 @@ export interface SourcePlugin {
   searchTracks(query: string): Promise<Track[]>;
   getTrack(id: string, quality: keyof typeof formats): Promise<{ uri: string; ext: string; direct: boolean }>;
 }
+
+// export interface Transformer {
+//   track<T extends boolean = false>(tracks: any[]): Track<T>[];
+//   album<T extends boolean = false>(albums: any[]): Album<T>[];
+//   playlist<T extends boolean = false>(playlists: any[]): Playlist<T>[];
+//   artist<T extends boolean = false>(artists: any[]): Artist<T>[];
+// }
 
 export type Track<T extends boolean = false> = {
   id: string;
@@ -54,8 +61,8 @@ export type Playlist<T extends boolean = false> = {
   title: string;
   thumb: string;
   numberOfTracks: number;
-  artists: (Artist & { type: "MAIN" | "FEAT" })[];
-} & (T extends true ? { tracks: Track[]; duration: number } : {});
+  artists: string[];
+} & (T extends true ? { tracks: Track[] } : {});
 
 export type Artist<T extends boolean = false> = {
   id: string;
