@@ -16,17 +16,12 @@ fs.existsSync("./bin") || fs.mkdirSync("./bin");
 
 if (!fs.existsSync(process.env.DLP))
   await fs.promises
-    .writeFile(
-      `${process.env.DLP}${!WIN32 || ".exe"}`,
-      Buffer.from((await axios(YT_DLP_BIN_URL, { responseType: "arraybuffer" })).data),
-    )
+    .writeFile(`${process.env.DLP}${!WIN32 || ".exe"}`, Buffer.from((await axios(YT_DLP_BIN_URL, { responseType: "arraybuffer" })).data))
     .then(async () => void (!WIN32 && (await execute(`chmod +x ${process.env.DLP}`))));
 
 if (!fs.existsSync(process.env.FFMPEG) || !fs.existsSync(process.env.FFPROBE))
   await new Promise((resolve, reject) =>
-    ffbinaries.downloadBinaries(["ffmpeg", "ffprobe"], { destination: "./bin" }, (err, data) =>
-      err ? reject(err) : resolve(data),
-    ),
+    ffbinaries.downloadBinaries(["ffmpeg", "ffprobe"], { destination: "./bin" }, (err, data) => (err ? reject(err) : resolve(data))),
   );
 
 await import("./source.test.js");

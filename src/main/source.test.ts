@@ -32,17 +32,12 @@ const res = await tidal.getTrack(track.id, format);
 const name = `${sanitizeTrackName(track.title)}-( ${format} )`;
 
 if (res.direct)
-  writeFileSync(
-    `./tracks/${name}.${res.ext}`,
-    Buffer.from(await (await axios(res.uri, { responseType: "arraybuffer" })).data),
-  );
+  writeFileSync(`./tracks/${name}.${res.ext}`, Buffer.from(await (await axios(res.uri, { responseType: "arraybuffer" })).data));
 else
   await new Promise<boolean>((resolve, reject) =>
-    spawn(
-      process.env.DLP!,
-      ["-o", `./tracks/${name}.${res.ext}`, "--no-check-certificates", "--concurrent-fragments", "20", res.uri],
-      { stdio: "inherit" },
-    )
+    spawn(process.env.DLP!, ["-o", `./tracks/${name}.${res.ext}`, "--no-check-certificates", "--concurrent-fragments", "20", res.uri], {
+      stdio: "inherit",
+    })
       .on("close", resolve)
       .on("error", reject),
   );

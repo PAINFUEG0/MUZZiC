@@ -7,8 +7,7 @@ const parser = new XMLParser({
   attributeNamePrefix: "@_",
   isArray: (name) => ["div", "p", "span"].includes(name),
 });
-const parseEntity = (e: any) =>
-  ({ end: time(e["@_end"]), start: time(e["@_begin"]), text: `${e["#text"] || "..."}` }) as const;
+const parseEntity = (e: any) => ({ end: time(e["@_end"]), start: time(e["@_begin"]), text: `${e["#text"] || "..."}` }) as const;
 
 function time(raw: string) {
   let res = 0;

@@ -40,9 +40,7 @@ export class Saavn implements SourcePlugin {
     const { data } = await axios(url + "&n=" + maxCount);
     const chunksCount = Math.ceil(Math.min(data.total, maxCount) / perChunk);
     return await Promise.all(
-      Array.from({ length: chunksCount }, (_, i) =>
-        axios(`${url}&n=${perChunk}&p=${i + 1}`).catch(() => ({ data: { results: [] } })),
-      ),
+      Array.from({ length: chunksCount }, (_, i) => axios(`${url}&n=${perChunk}&p=${i + 1}`).catch(() => ({ data: { results: [] } }))),
     );
   }
 
