@@ -21,47 +21,40 @@ export interface SourcePlugin {
   getTrack(id: string, quality: keyof typeof formats): Promise<{ uri: string; ext: string; direct: boolean }>;
 }
 
-// export interface Transformer {
-//   track<T extends boolean = false>(tracks: any[]): Track<T>[];
-//   album<T extends boolean = false>(albums: any[]): Album<T>[];
-//   playlist<T extends boolean = false>(playlists: any[]): Playlist<T>[];
-//   artist<T extends boolean = false>(artists: any[]): Artist<T>[];
-// }
+export interface Transformer {
+  track(tracks: any[]): Track<false>[];
+  album(albums: any[]): Album<false>[];
+  artist(artists: any[]): Artist<false>[];
+  playlist(playlists: any[]): Playlist<false>[];
+}
 
 export type Track<T extends boolean = false> = {
   id: string;
-  url: string;
   title: string;
   thumb: string;
   duration: number;
+  artists: Artist[];
   explicit: boolean;
-  copyright: string;
-  source: "TIDAL" | "SAAVN" | "LOCAL";
   resolution: "SR" | "CD" | "HR" | "DD";
-  artists: (Artist & { type: "MAIN" | "FEAT" })[];
   album: { id: string; name: string; thumb: string };
 } & (T extends true ? { lyrics: string; streamURI: string } : {});
 
 export type Album<T extends boolean = false> = {
   id: string;
-  url: string;
   title: string;
   thumb: string;
+  artists: Artist[];
   explicit: boolean;
   releaseYear: string;
   numberOfTracks: number;
-  version: string | null;
-  type: "ALBUM" | "SINGLE";
-  artists: (Artist & { type: "MAIN" | "FEAT" })[];
 } & (T extends true ? { tracks: Track[]; duration: number } : {});
 
 export type Playlist<T extends boolean = false> = {
   id: string;
-  url: string;
   title: string;
   thumb: string;
-  numberOfTracks: number;
   artists: string[];
+  numberOfTracks: number;
 } & (T extends true ? { tracks: Track[] } : {});
 
 export type Artist<T extends boolean = false> = {

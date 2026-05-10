@@ -1,67 +1,65 @@
-import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
+import type { Album, Artist, Playlist, Track, Transformer } from "../../../shared/types/sourcePlugin.js";
 
-export class Transformers {
-  static formatImage(image: string) {
-    return image.replace("150x150", "500x500").replaceAll("50x50", "500x500").replaceAll("http://", "https://");
+export class Transformers implements Transformer {
+  fallbackImage = "https://cdn.vectorstock.com/i/500p/33/47/no-photo-available-icon-vector-40343347.jpg";
+
+  fmt(image?: string) {
+    return image
+      ? image.replace("150x150", "500x500").replaceAll("50x50", "500x500").replaceAll("http://", "https://")
+      : this.fallbackImage;
   }
 
-  static artist(artists: any[]): Awaited<ReturnType<SourcePlugin["searchArtists"]>> {
-    return artists.map((artist: any) => ({
-      roles: [],
-      name: artist.name,
-      id: artist.id.toString(),
-      thumb: this.formatImage(artist.image),
-    }));
+  artist(artists: any[]) {
+    return artists.map(
+      (artist) => ({ name: artist.name, id: artist.id.toString(), thumb: this.fmt(artist.image) }) satisfies Artist as Artist,
+    );
   }
 
-  static album(albums: any[]): Awaited<ReturnType<SourcePlugin["searchAlbums"]>> {
-    return albums.map((album: any) => ({
-      version: null,
-      title: album.title,
-      url: album.perma_url,
-      id: album.id.toString(),
-      releaseYear: album.year,
-      artists: album.more_info,
-      numberOfTracks: album.song_count,
-      thumb: this.formatImage(album.image),
-      explicit: album.explicit_content === "1",
-      type: album.song_count > 1 ? "ALBUM" : "SINGLE",
-    }));
+  album(albums: any[]) {
+    return albums.map(
+      (album: any) =>
+        ({
+          title: album.title,
+          id: album.id.toString(),
+          releaseYear: album.year,
+          artists: album.more_info,
+          thumb: this.fmt(album.image),
+          numberOfTracks: album.song_count,
+          explicit: album.explicit_content === "1",
+        }) satisfies Album as Album,
+    );
   }
 
-  static playlist(playlists: any): Awaited<ReturnType<SourcePlugin["searchPlaylists"]>> {
-    return playlists.map((playlist: any) => ({
-      id: playlist.id,
-      url: playlist.perma_url,
-      title: playlist.title,
-      numberOfTracks: Number(playlist.list_count || playlist.more_info.song_count),
-      thumb: this.formatImage(playlist.image),
-      artists: Array.isArray(playlist.more_info.artist_name)
-        ? playlist.more_info.artist_name
-        : playlist.more_info.artists.map((a: any) => a.name),
-    }));
+  playlist(playlists: any[]) {
+    return playlists.map(
+      (playlist) =>
+        ({
+          id: playlist.id,
+          title: playlist.title,
+          thumb: this.fmt(playlist.image),
+          artists: Array.isArray(playlist.more_info.artist_name)
+            ? playlist.more_info.artist_name
+            : playlist.more_info.artists.map((a: any) => a.name),
+          numberOfTracks: Number(playlist.list_count || playlist.more_info.song_count),
+        }) satisfies Playlist as Playlist,
+    );
   }
 
-  static track(tracks: any[]): Awaited<ReturnType<SourcePlugin["searchTracks"]>> {
-    return tracks.map((t: any) => ({
-      id: t.id,
-      title: t.title,
-      source: "SAAVN",
-      url: t.perma_url,
-      resolution: "SR",
-      duration: t.more_info.duration,
-      thumb: this.formatImage(t.image),
-      explicit: t.explicit_content === "1",
-      copyright: t.more_info.copyright_text,
-      artists: ["primary_artists", "featured_artists"].flatMap((key) =>
-        t.more_info.artistMap[key].map((artist: any) => ({
-          id: artist.id,
-          name: artist.name,
-          thumb: this.formatImage(artist.image),
-          type: key === "primary_artists" ? "MAIN" : "FEAT",
-        })),
-      ),
-      album: { id: t.more_info.album_id, name: t.more_info.album, thumb: this.formatImage(t.image) },
-    }));
+  track(tracks: any[]) {
+    return tracks.map(
+      (t: any) =>
+        ({
+          id: t.id,
+          title: t.title,
+          resolution: "SR",
+          duration: t.more_info.duration,
+          thumb: this.fmt(t.image),
+          explicit: t.explicit_content === "1",
+          album: { id: t.more_info.album_id, name: t.more_info.album, thumb: this.fmt(t.image) },
+          artists: ["primary_artists", "featured_artists"].flatMap((key) =>
+            t.more_info.artistMap[key].map((artist: any) => ({ id: artist.id, name: artist.name, thumb: this.fmt(artist.image) })),
+          ),
+        }) satisfies Track as Track,
+    );
   }
 }

@@ -3,35 +3,31 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { util, cipher } from "node-forge";
 import { Transformers } from "./transformer.js";
-import { existsSync, mkdirSync, write, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
-// function x<T extends { new (...args: any[]): any }>(c: T) {
-//   console.log("Decorator invoked by", c);
-// }
-
-// @x
 export class Saavn implements SourcePlugin {
   name = "SAAVN";
 
-  iv = util.createBuffer("00000000");
-  key = util.createBuffer("38346591");
-  baseAPI = "https://www.jiosaavn.com/api.php?api_version=4&_format=json&_marker=0&ctx=web6dot0";
+  #transformer = new Transformers();
+  #iv = util.createBuffer("00000000");
+  #key = util.createBuffer("38346591");
+  #baseAPI = "https://www.jiosaavn.com/api.php?api_version=4&_format=json&_marker=0&ctx=web6dot0";
 
   async init() {
     return this;
   }
 
   url(endPoint: string, params: Record<string, string | number>) {
-    const url = new URL(`${this.baseAPI}${endPoint}`);
+    const url = new URL(`${this.#baseAPI}${endPoint}`);
     for (const [K, V] of Object.entries(params)) url.searchParams.append(K, V.toString());
     return url.toString();
   }
 
   createDownloadLink(encryptedMediaUrl: string) {
-    const decipher = cipher.createDecipher("DES-ECB", this.key);
+    const decipher = cipher.createDecipher("DES-ECB", this.#key);
     const encrypted = util.createBuffer(atob(encryptedMediaUrl));
-    decipher.start({ iv: this.iv });
+    decipher.start({ iv: this.#iv });
     decipher.update(encrypted);
     decipher.finish();
 
@@ -51,32 +47,32 @@ export class Saavn implements SourcePlugin {
   }
 
   async searchTracks(query: string) {
-    const results = await this.fetchChunks(`${this.baseAPI}&__call=search.getResults&q=${query}`);
-    return results.map((res) => Transformers.track(res.data.results)).flat();
+    const results = await this.fetchChunks(`${this.#baseAPI}&__call=search.getResults&q=${query}`);
+    return results.map((res) => this.#transformer.track(res.data.results)).flat();
   }
 
   async searchAlbums(query: string) {
-    const results = await this.fetchChunks(`${this.baseAPI}&__call=search.getAlbumResults&q=${query}`);
-    return results.map((res) => Transformers.album(res.data.results)).flat();
+    const results = await this.fetchChunks(`${this.#baseAPI}&__call=search.getAlbumResults&q=${query}`);
+    return results.map((res) => this.#transformer.album(res.data.results)).flat();
   }
 
   async searchArtists(query: string) {
-    const res = await this.fetchChunks(`${this.baseAPI}&__call=search.getArtistResults&q=${query}`);
+    const res = await this.fetchChunks(`${this.#baseAPI}&__call=search.getArtistResults&q=${query}`);
     return res.map((r) => r.data).flat() as any;
   }
 
   async searchPlaylists(query: string) {
-    const res = await this.fetchChunks(`${this.baseAPI}&__call=search.getPlaylistResults&q=${query}`);
+    const res = await this.fetchChunks(`${this.#baseAPI}&__call=search.getPlaylistResults&q=${query}`);
     return res.map((r) => r.data).flat() as any;
   }
 
   async getTrack(id: string) {
-    const res = await axios(`${this.baseAPI}&__call=song.getDetails&pids=${id}`);
+    const res = await axios(`${this.#baseAPI}&__call=song.getDetails&pids=${id}`);
     return { uri: this.createDownloadLink(res.data.songs[0].more_info.encrypted_media_url), ext: "m4a", direct: true };
   }
 
   async getAlbum(id: string) {
-    const res = await axios(`${this.baseAPI}&__call=content.getAlbumDetails&albumid=${id}`);
+    const res = await axios(`${this.#baseAPI}&__call=content.getAlbumDetails&albumid=${id}`);
     return res.data;
   }
 
@@ -86,12 +82,12 @@ export class Saavn implements SourcePlugin {
   }
 
   async getPlaylist(id: string) {
-    const res = await axios(`${this.baseAPI}&__call=playlist.getDetails&listid=${id}`);
-    return {
-      tracks: Transformers.track(res.data.list),
-      duration: 10e3,
-      ...Transformers.playlist([res.data])[0]!,
+    const res = await axios(`${this.#baseAPI}&__call=playlist.getDetails&listid=${id}`);
+    const intermediate = {
+      ...this.#transformer.playlist([res.data])[0]!,
+      tracks: this.#transformer.track(res.data.list),
     };
+    return { ...intermediate, duration: intermediate.tracks.reduce((a, b) => a + b.duration, 0) };
   }
 }
 
