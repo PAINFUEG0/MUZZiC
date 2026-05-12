@@ -7,9 +7,9 @@ type Resolution = "SR" | "CD" | "HR" | "DD";
 export type T = { duration: number; artists: string[]; explicit: boolean; album: string; resolution: Resolution };
 
 export async function extractAudioMetadata(file: string): Promise<T> {
-  const { stdout } = await execFileAsync("ffprobe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file]);
-
-  const data = JSON.parse(stdout);
+  const data = JSON.parse(
+    (await execFileAsync("ffprobe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file])).stdout,
+  );
 
   const tags = data.format.tags || {};
   const stream = data.streams.find((s: any) => s.codec_type === "audio");

@@ -1,16 +1,11 @@
 import * as path from "path";
-import { spawn } from "child_process";
+import { promisify } from "util";
+import { execFile } from "child_process";
 
-export async function buildThumbs(input: string, id: string) {
-  const thumb = path.resolve(process.cwd() || path.dirname(input), `.${id}.jpg`);
-  await extractCover(input, thumb, 750);
+const execFileAsync = promisify(execFile);
+
+export async function extractCover(input: string, id: string) {
+  const thumb = path.resolve(path.resolve(process.cwd(), "./database") || path.dirname(input), `.${id}.jpg`);
+  await execFileAsync("ffmpeg", ["-i", input, "-an", "-vf", `scale=${750}:-1`, "-frames:v", "1", "-q:v", "2", "-y", thumb]);
   return thumb;
-}
-
-async function extractCover(input: string, output: string, size: number) {
-  return new Promise<void>((resolve, reject) =>
-    spawn("ffmpeg", ["-i", input, "-an", "-vf", `scale=${size}:-1`, "-frames:v", "1", "-q:v", "2", "-y", output])
-      .on("close", (code) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited with code ${code}`))))
-      .on("error", reject),
-  );
 }
