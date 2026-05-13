@@ -31,7 +31,7 @@ export class AppleMusic implements LyricsPlugin {
   }
 
   async search(query: string, limit = 50, offset = 0) {
-    const uri = `https://amp-api.music.apple.com/v1/catalog/in/search?types=songs&term=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`;
+    const uri = `https://amp-api.music.apple.com/v1/catalog/id/search?types=songs&term=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`;
     const [res] = await safeAwait(axios(uri, { headers: this.headers }));
     return res ? (res.data?.results?.songs?.data as any[]) : null;
   }
@@ -50,7 +50,7 @@ export class AppleMusic implements LyricsPlugin {
 
     if (!id) return;
 
-    const uri = `https://amp-api.music.apple.com/v1/catalog/in/songs/${id}/syllable-lyrics?l%5Blyrics%5D=en-US&extend=ttmlLocalizations&l%5Bscript%5D=en-Latn`;
+    const uri = `https://amp-api.music.apple.com/v1/catalog/id/songs/${id}/syllable-lyrics?l%5Blyrics%5D=en-US&extend=ttmlLocalizations&l%5Bscript%5D=en-Latn`;
     const [res, err] = await safeAwait(axios(uri, { headers: this.headers }));
     const raw = res?.data?.data?.[0]?.attributes?.ttmlLocalizations;
 
