@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
-import { promisify } from "util";
-import { createHash } from "crypto";
-import { execFile } from "child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { promisify } from "node:util";
+import { createHash } from "node:crypto";
+import { execFile } from "node:child_process";
 import { CoreDatabase } from "@xenodb/server";
 import { chunk } from "../../shared/helpers.js";
 import { scanAudioDir } from "./helpers/scanDir.js";
@@ -11,33 +11,54 @@ import { Track } from "../../shared/types/sourcePlugin.js";
 import { DirNode, File } from "../../shared/types/utils.js";
 import { extractAudioMetadata } from "./helpers/extractMetadata.js";
 
-console.time("scan");
-
-const dir = "D:/Projects/AMDL/Random";
 const execFileAsync = promisify(execFile);
 const thumbDir = path.resolve(process.cwd(), "./.thumbnails");
 const index = new CoreDatabase<DirNode>("./database/tracks/index");
 const tracks = new CoreDatabase<Track>("./database/tracks/tracks");
-const thumbs: { filePath: string; fileId: string; albumId: string }[] = [];
+const lyrics = new CoreDatabase<string>("./database/tracks/lyrics");
+const dir = path.resolve(process.cwd(), "../Projects/AMDL/downloads");
 
+console.log("Scanning directory...");
+const start = performance.now();
 const tree = await scanAudioDir(dir);
 index.set("tracks", tree!);
 
 if (!fs.existsSync(thumbDir)) fs.mkdirSync(thumbDir, { recursive: true });
 
-console.log("Found ", flatten(tree!).length, " tracks");
+let count = 0;
+const flat = flatten(tree!);
 
-for (const fileChunk of chunk(flatten(tree!), 16))
+console.log(`Scanned ${flat.length} tracks in ${(performance.now() - start).toFixed(2)}ms`);
+
+console.log("Indexing . . .");
+const _start = performance.now();
+for (const fileChunk of chunk(flat, 5)) {
+  count += fileChunk.length;
+
+  const start = performance.now();
+
   await Promise.all(
     fileChunk.map(async (file) => {
       if (tracks.has(file.id)) return;
 
-      const meta = await extractAudioMetadata(file.path);
-      const albumId = createHash("sha1").update(meta.album).digest("hex").toString();
+      let thumb = path.resolve(thumbDir, `${file.id}.jpg`);
 
-      const thumb = path.resolve(thumbDir, `${albumId}.jpg`);
-
-      thumbs.push({ filePath: file.path, fileId: file.id, albumId });
+      const [meta] = await Promise.all([
+        extractAudioMetadata(file.path),
+        execFileAsync("./bin/ffmpeg.exe", [
+          "-i",
+          file.path,
+          "-an",
+          "-vf",
+          `scale=${750}:-1`,
+          "-frames:v",
+          "1",
+          "-q:v",
+          "2",
+          "-y",
+          thumb,
+        ]).catch(() => (thumb = fallbackImage)),
+      ]);
 
       const track = {
         thumb,
@@ -47,8 +68,8 @@ for (const fileChunk of chunk(flatten(tree!), 16))
         duration: meta.duration,
         lyrics: "No lyrics found",
         resolution: meta.resolution,
-        album: { name: meta.album, id: albumId, thumb },
         title: path.basename(file.path, path.extname(file.path)),
+        album: { name: meta.album || "Unknown", id: "0", thumb },
         artists: meta.artists.map((a) => ({
           name: a,
           thumb: fallbackImage,
@@ -57,36 +78,20 @@ for (const fileChunk of chunk(flatten(tree!), 16))
       } satisfies Track<true>;
 
       tracks.set(file.id, track);
+      lyrics.set(file.id, meta.lyrics || "");
     }),
   );
 
-const extractionPromises = Object.entries(Object.groupBy(thumbs, (v) => v.albumId)).map(([albumId, entries]) => async () => {
-  const outputPath = path.resolve(thumbDir, `${albumId}.jpg`);
+  const end = performance.now();
 
-  if (fs.existsSync(outputPath)) return;
-
-  await execFileAsync("ffmpeg", [
-    "-i",
-    entries![0]!.filePath,
-    "-an",
-    "-vf",
-    `scale=${750}:-1`,
-    "-frames:v",
-    "1",
-    "-q:v",
-    "2",
-    "-y",
-    outputPath,
-  ]).catch(() =>
-    tracks.setMany(tracks.getMany(entries!.map((t) => t.fileId)).map((v) => ({ key: v!.id, value: { ...v!, thumb: fallbackImage } }))),
+  console.log(
+    `[${count}/${flat.length}] Extracted ${fileChunk.length} tracks in ${(end - start).toFixed(2)}ms - ${((fileChunk.length / (end - start)) * 1000).toFixed(2)}/s`,
   );
-});
+}
 
-for (const promiseChunk of chunk(extractionPromises, 10)) await Promise.all(promiseChunk.map((fn) => fn()));
+console.log(`Indexed ${count} tracks in ${(performance.now() - _start).toFixed(2)}ms`);
 
 function flatten(node: typeof tree): File[] {
   if (!node) return [];
   return [...node.files, ...node.dirs.flatMap(flatten)];
 }
-
-console.timeEnd("scan");

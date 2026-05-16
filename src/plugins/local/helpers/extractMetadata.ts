@@ -4,11 +4,11 @@ import { execFile } from "node:child_process";
 const execFileAsync = promisify(execFile);
 
 type Resolution = "SR" | "CD" | "HR" | "DD";
-export type T = { duration: number; artists: string[]; explicit: boolean; album: string; resolution: Resolution };
+export type T = { duration: number; artists: string[]; explicit: boolean; album?: string; resolution: Resolution; lyrics: string | null };
 
 export async function extractAudioMetadata(file: string): Promise<T> {
   const data = JSON.parse(
-    (await execFileAsync("ffprobe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file])).stdout,
+    (await execFileAsync("./bin/ffprobe.exe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file])).stdout,
   );
 
   const tags = data.format.tags || {};
@@ -28,8 +28,14 @@ export async function extractAudioMetadata(file: string): Promise<T> {
 
   return {
     resolution,
+    lyrics:
+      tags["LYRICS"] ?? // FLAC / OGG (Vorbis)
+      tags["lyrics"] ?? // lowercase variant
+      tags["UNSYNCEDLYRICS"] ?? // some MP3 taggers write this directly
+      tags["lyrics-eng"] ?? // iTunes / M4A locale-suffixed
+      null,
     duration: Number(data.format.duration),
-    album: tags.album || tags.ALBUM || "Unknown",
+    album: tags.album || tags.ALBUM,
     artists: (tags.artist || tags.ARTIST || "Unknown")
       .split(/,|;| feat\.?| ft\.?| & /i)
       .map((v: any) => `${v}`.trim())
