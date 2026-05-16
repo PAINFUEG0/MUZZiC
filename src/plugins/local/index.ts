@@ -5,11 +5,18 @@ import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { CoreDatabase } from "@xenodb/server";
 import { chunk } from "../../shared/helpers.js";
+import { setTimeout } from "node:timers/promises";
 import { scanAudioDir } from "./helpers/scanDir.js";
 import { fallbackImage } from "../../shared/constants.js";
 import { Track } from "../../shared/types/sourcePlugin.js";
 import { DirNode, File } from "../../shared/types/utils.js";
 import { extractAudioMetadata } from "./helpers/extractMetadata.js";
+
+process.on("SIGINT", async () => {
+  console.log("Exiting...");
+  setTimeout(500);
+  process.exit();
+});
 
 const execFileAsync = promisify(execFile);
 const thumbDir = path.resolve(process.cwd(), "./.thumbnails");
