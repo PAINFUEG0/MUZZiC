@@ -8,7 +8,17 @@ const regex = /,|;| feat\.?| ft\.?| & /i;
 
 export async function probe(path: string) {
   const data = JSON.parse(
-    (await execFileAsync("./bin/ffprobe.exe", ["-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", path])).stdout,
+    (
+      await execFileAsync("./bin/ffprobe.exe", [
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
+        "-show_entries",
+        "format=duration:format_tags:stream=codec_name,sample_rate,bits_per_sample,bits_per_raw_sample",
+        path,
+      ])
+    ).stdout,
   );
 
   const tags = data.format.tags || {};
