@@ -17,12 +17,12 @@ export async function probe(path: string) {
         "-show_entries",
         "format=duration:format_tags:stream=codec_name,sample_rate,bits_per_sample,bits_per_raw_sample",
         path,
-      ])
+      ]).catch(() => ({ stdout: "{}" }))
     ).stdout,
   );
 
-  const tags = data.format.tags || {};
-  const stream = data.streams.find((s: any) => s.codec_type === "audio");
+  const tags = data?.format?.tags || {};
+  const stream = data?.streams?.find((s: any) => s.codec_type === "audio");
 
   const sampleRate = Number(stream?.sample_rate || 0);
   const codec = (stream?.codec_name || "").toLowerCase();
@@ -36,7 +36,7 @@ export async function probe(path: string) {
 
   return {
     resolution,
-    duration: Number(data.format.duration),
+    duration: Number(data?.format?.duration),
     album: (tags.album || tags.ALBUM || "Unknown") as string,
     artists: (tags.artist || tags.ARTIST || "Unknown")
       .split(regex)
