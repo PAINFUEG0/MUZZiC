@@ -1,104 +1,87 @@
-import fs from "node:fs";
-import path from "node:path";
-import { promisify } from "node:util";
-import { createHash } from "node:crypto";
-import { execFile } from "node:child_process";
+import * as path from "node:path";
+import { walk } from "./helpers/walk.js";
+import { probe } from "./helpers/probe.js";
+import { finger } from "./helpers/finger.js";
 import { CoreDatabase } from "@xenodb/server";
 import { chunk } from "../../shared/helpers.js";
-import { setTimeout } from "node:timers/promises";
-import { scanAudioDir } from "./helpers/scanDir.js";
-import { fallbackImage } from "../../shared/constants.js";
+import { DirNode } from "../../shared/types/utils.js";
 import { Track } from "../../shared/types/sourcePlugin.js";
-import { DirNode, File } from "../../shared/types/utils.js";
-import { extractAudioMetadata } from "./helpers/extractMetadata.js";
+import { existsSync, mkdirSync } from "node:fs";
+import { thumb } from "./helpers/thumb.js";
 
-process.on("SIGINT", async () => {
-  console.log("Exiting...");
-  setTimeout(500);
-  process.exit();
-});
+type State = "WALKED" | "FINGERED" | "PROBED";
 
-const execFileAsync = promisify(execFile);
-const thumbDir = path.resolve(process.cwd(), "./.thumbnails");
-const index = new CoreDatabase<DirNode>("./database/tracks/index");
-const tracks = new CoreDatabase<Track>("./database/tracks/tracks");
-const lyrics = new CoreDatabase<string>("./database/tracks/lyrics");
-const dir = path.resolve(process.cwd(), "../Projects/AMDL/downloads");
+const dir = "../Projects/AMDL/downloads";
 
-console.log("Scanning directory...");
-const start = performance.now();
-const tree = await scanAudioDir(dir);
-index.set("tracks", tree!);
+const state = new CoreDatabase<State>("./database/tracks/state");
+const tracks = new CoreDatabase<any>("./database/tracks/tracks");
+const index = new CoreDatabase<DirNode<boolean>>("./database/tracks/index");
 
-if (!fs.existsSync(thumbDir)) fs.mkdirSync(thumbDir, { recursive: true });
+console.time("total");
+console.time("walk");
+const tree = await walk(dir);
+if (!tree) throw new Error("Tree is empty");
+index.set("tree", tree);
+state.set("state", "WALKED");
+console.timeEnd("walk");
 
-let count = 0;
-const flat = flatten(tree!);
+console.time("finger");
+const indexedTree = await finger(tree);
+index.set("tree", indexedTree);
+state.set("state", "FINGERED");
+console.timeEnd("finger");
 
-console.log(`Scanned ${flat.length} tracks in ${(performance.now() - start).toFixed(2)}ms`);
+const flat = flatten(indexedTree);
 
-console.log("Indexing . . .");
-const _start = performance.now();
-for (const fileChunk of chunk(flat, 5)) {
-  count += fileChunk.length;
-
-  const start = performance.now();
-
+console.time("probe");
+const perChunk = 10;
+const data: Parameters<typeof tracks.setMany>[0] = [];
+const fileChunks = chunk(flat, perChunk);
+for (let i = 0; i < fileChunks.length; i++) {
+  console.time(`[${i * perChunk + fileChunks[i]!.length}/${flat.length}] probe`);
   await Promise.all(
-    fileChunk.map(async (file) => {
-      if (tracks.has(file.id)) return;
-
-      let thumb = path.resolve(thumbDir, `${file.id}.jpg`);
-
-      const [meta] = await Promise.all([
-        extractAudioMetadata(file.path),
-        execFileAsync("./bin/ffmpeg.exe", [
-          "-i",
-          file.path,
-          "-an",
-          "-vf",
-          `scale=${750}:-1`,
-          "-frames:v",
-          "1",
-          "-q:v",
-          "2",
-          "-y",
-          thumb,
-        ]).catch(() => (thumb = fallbackImage)),
-      ]);
-
-      const track = {
-        thumb,
-        id: file.id,
-        streamURI: file.path,
-        explicit: meta.explicit,
-        duration: meta.duration,
-        lyrics: "No lyrics found",
-        resolution: meta.resolution,
-        title: path.basename(file.path, path.extname(file.path)),
-        album: { name: meta.album || "Unknown", id: "0", thumb },
-        artists: meta.artists.map((a) => ({
-          name: a,
-          thumb: fallbackImage,
-          id: createHash("sha1").update(a).digest("hex").toString(),
-        })),
-      } satisfies Track<true>;
-
-      tracks.set(file.id, track);
-      lyrics.set(file.id, meta.lyrics || "");
-    }),
+    fileChunks[i]!.map((file) =>
+      probe(file.path).then((meta) =>
+        data.push({
+          key: file.id,
+          value: {
+            id: file.id,
+            streamURI: file.path,
+            thumb: `${file.id}.jpg`,
+            explicit: meta.explicit,
+            duration: meta.duration,
+            lyrics: "No lyrics found",
+            resolution: meta.resolution,
+            title: path.basename(file.path, path.extname(file.path)),
+            album: { name: meta.album, id: "0", thumb: `${file.id}.jpg` },
+            artists: meta.artists.map((name) => ({ name, thumb: "", id: "" })),
+          } satisfies Track<true>,
+        }),
+      ),
+    ),
   );
-
-  const end = performance.now();
-
-  console.log(
-    `[${count}/${flat.length}] Extracted ${fileChunk.length} tracks in ${(end - start).toFixed(2)}ms - ${((fileChunk.length / (end - start)) * 1000).toFixed(2)}/s`,
-  );
+  console.timeEnd(`[${i * perChunk + fileChunks[i]!.length}/${flat.length}] probe`);
 }
+tracks.setMany(data);
+state.set("state", "PROBED");
+console.timeEnd("probe");
 
-console.log(`Indexed ${count} tracks in ${(performance.now() - _start).toFixed(2)}ms`);
+if (!existsSync("./.thumbnails")) mkdirSync("./.thumbnails");
 
-function flatten(node: typeof tree): File[] {
+console.time("thumb");
+const _perChunk = 10;
+const _fileChunks = chunk(flat, _perChunk);
+for (let i = 0; i < _fileChunks.length; i++) {
+  console.time(`[${i * _perChunk + _fileChunks[i]!.length}/${flat.length}] thumb`);
+  await Promise.all(_fileChunks[i]!.map((file) => thumb(file.path, `./.thumbnails/${file.id}.jpg`)));
+  console.timeEnd(`[${i * _perChunk + _fileChunks[i]!.length}/${flat.length}] thumb`);
+}
+console.timeEnd("thumb");
+console.timeEnd("total");
+
+function flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
   if (!node) return [];
   return [...node.files, ...node.dirs.flatMap(flatten)];
 }
+
+process.on("SIGINT", () => setTimeout(() => process.exit(), 500));

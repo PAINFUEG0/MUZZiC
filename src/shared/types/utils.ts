@@ -1,5 +1,5 @@
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-export type File = { path: string; name: string; id: string };
+export type File<T extends boolean = false> = { path: string; name: string } & (T extends true ? { id: string } : {});
 
-export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode[] };
+export type DirNode<T extends boolean = false> = { name: string; path: string; files: File<T>[]; dirs: DirNode<T>[] };
