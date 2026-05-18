@@ -7,6 +7,7 @@ import { exec } from "node:child_process";
 process.env.DLP = "./bin/yt-dlp";
 process.env.FFMPEG = "./bin/ffmpeg";
 process.env.FFPROBE = "./bin/ffprobe";
+
 export const WIN32 = process.platform === "win32";
 export const YT_DLP_BIN_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${WIN32 ? ".exe" : ""}`;
 
@@ -24,4 +25,4 @@ if (!fs.existsSync(process.env.FFMPEG) || !fs.existsSync(process.env.FFPROBE))
     ffbinaries.downloadBinaries(["ffmpeg", "ffprobe"], { destination: "./bin" }, (err, data) => (err ? reject(err) : resolve(data))),
   );
 
-await import("./source.test.js");
+await import("./local.test.js");

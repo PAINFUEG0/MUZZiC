@@ -9,7 +9,7 @@ const regex = /,|;| feat\.?| ft\.?| & /i;
 export async function probe(path: string) {
   const data = JSON.parse(
     (
-      await execFileAsync("./bin/ffprobe.exe", [
+      await execFileAsync(process.env.FFPROBE!, [
         "-v",
         "quiet",
         "-print_format",
