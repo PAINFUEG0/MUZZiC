@@ -2,6 +2,7 @@ bin
 dist
 .env
 tracks
+database
 node_modules
 .tsbuildinfo
 .thumbnails
