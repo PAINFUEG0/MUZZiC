@@ -17,9 +17,9 @@ export class LocalResourceProvider {
 
   async init() {}
 
-  #flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
+  flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
     if (!node) return [];
-    return [...node.files, ...node.dirs.flatMap((e) => this.#flatten(e))];
+    return [...node.files, ...node.dirs.flatMap((e) => this.flatten(e))];
   }
 
   async scan(dir: string) {
@@ -71,7 +71,7 @@ export class LocalResourceProvider {
   }
 
   async probe(tree: DirNode<true>) {
-    const flattenedTree = this.#flatten(tree);
+    const flattenedTree = this.flatten(tree);
     const filtered = flattenedTree.filter((f) => !this.meta.has(f.id));
     const chunks = chunk(filtered, 10);
 
@@ -85,7 +85,7 @@ export class LocalResourceProvider {
 
   async buildThumbnails(tree: DirNode<true>) {
     if (!fs.existsSync("./.thumbnails")) fs.mkdirSync("./.thumbnails");
-    const flattenedTree = this.#flatten(tree);
+    const flattenedTree = this.flatten(tree);
     const chunks = chunk(flattenedTree, 10);
     const failed: string[] = [];
 
@@ -98,5 +98,14 @@ export class LocalResourceProvider {
       );
 
     this.meta.setMany(this.meta.getMany(failed).map((track) => ({ key: track!.id, value: { ...track!, thumb: this.#defaultThumbnail } })));
+  }
+
+  async list(tree: DirNode<true>, categorize: "artist" | "album" | "track" = "track") {
+    const flattenedTree = this.flatten(tree);
+    const meta = this.meta.getMany(flattenedTree.map((e) => e.id));
+
+    if (categorize === "track") return meta.filter(Boolean);
+    if (categorize === "album") return Object.groupBy(meta, (e) => e!.album.name);
+    if (categorize === "artist") return Object.groupBy(meta, (e) => e!.artists[0]!.name);
   }
 }
