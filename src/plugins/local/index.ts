@@ -19,7 +19,7 @@ export class LocalResourceProvider {
 
   #flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
     if (!node) return [];
-    return [...node.files, ...node.dirs.flatMap(this.#flatten)];
+    return [...node.files, ...node.dirs.flatMap((e) => this.#flatten(e))];
   }
 
   async scan(dir: string) {
