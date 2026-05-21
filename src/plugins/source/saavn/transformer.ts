@@ -11,7 +11,8 @@ export class Transformers implements Transformer {
 
   artist(artists: any[]) {
     return artists.map(
-      (artist) => ({ name: artist.name, id: artist.id.toString(), thumb: this.fmt(artist.image) }) satisfies Artist as Artist,
+      (artist) =>
+        ({ name: artist.name, id: (artist.id || artist.artistId).toString(), thumb: this.fmt(artist.image) }) satisfies Artist as Artist,
     );
   }
 
@@ -22,9 +23,13 @@ export class Transformers implements Transformer {
           title: album.title,
           id: album.id.toString(),
           releaseYear: album.year,
-          artists: album.more_info,
+          artists: album.more_info.artistMap.primary_artists.map((a: any) => ({
+            name: a.name,
+            id: a.id.toString(),
+            thumb: this.fmt(a.image),
+          })),
           thumb: this.fmt(album.image),
-          numberOfTracks: album.song_count,
+          numberOfTracks: album.song_count || album.list_count,
           explicit: album.explicit_content === "1",
         }) satisfies Album as Album,
     );

@@ -1,9 +1,6 @@
 import axios from "axios";
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 import { util, cipher } from "node-forge";
 import { Transformers } from "./transformer.js";
-import { writeFileSync } from "node:fs";
 import type { SourcePlugin } from "../../../shared/types/sourcePlugin.js";
 
 export class Saavn implements SourcePlugin {
@@ -56,12 +53,12 @@ export class Saavn implements SourcePlugin {
 
   async searchArtists(query: string) {
     const res = await this.fetchChunks(`${this.#baseAPI}&__call=search.getArtistResults&q=${query}`);
-    return res.map((r) => r.data).flat() as any;
+    return res.map((r) => this.#transformer.artist(r.data.results)).flat();
   }
 
   async searchPlaylists(query: string) {
     const res = await this.fetchChunks(`${this.#baseAPI}&__call=search.getPlaylistResults&q=${query}`);
-    return res.map((r) => r.data).flat() as any;
+    return res.map((r) => this.#transformer.playlist(r.data.results)).flat();
   }
 
   async getTrack(id: string) {
@@ -71,32 +68,33 @@ export class Saavn implements SourcePlugin {
 
   async getAlbum(id: string) {
     const res = await axios(`${this.#baseAPI}&__call=content.getAlbumDetails&albumid=${id}`);
-    return res.data;
+    const intermediate = { ...this.#transformer.album([res.data])[0]!, tracks: this.#transformer.track(res.data.list) };
+    return { ...intermediate, duration: intermediate.tracks.reduce((a, b) => a + b.duration, 0) };
   }
 
   async getArtist(id: string) {
-    id;
-    return null as any;
+    const url = `${this.#baseAPI}&__call=artist.getArtistPageDetails&artistId=${id}`;
+
+    const albums = (
+      await Promise.all(
+        Array.from({ length: 1000 / 10 }, (_, i) => axios(`${url}&n_album=${10}&page=${i + 1}`).then((res) => res.data.topAlbums)),
+      )
+    ).flat();
+
+    const tracks = (
+      await Promise.all(
+        Array.from({ length: 1500 / 50 }, (_, i) => axios(`${url}&n_song=${50}&page=${i + 1}`).then((res) => res.data.topSongs)),
+      )
+    ).flat();
+
+    const { data } = await axios(`${this.#baseAPI}&__call=artist.getArtistPageDetails&artistId=${id}&n_song=1000`);
+
+    return { ...this.#transformer.artist([data])[0]!, tracks: this.#transformer.track(tracks), albums: this.#transformer.album(albums) };
   }
 
   async getPlaylist(id: string) {
     const res = await axios(`${this.#baseAPI}&__call=playlist.getDetails&listid=${id}`);
-    const intermediate = {
-      ...this.#transformer.playlist([res.data])[0]!,
-      tracks: this.#transformer.track(res.data.list),
-    };
+    const intermediate = { ...this.#transformer.playlist([res.data])[0]!, tracks: this.#transformer.track(res.data.list) };
     return { ...intermediate, duration: intermediate.tracks.reduce((a, b) => a + b.duration, 0) };
   }
 }
-
-const saavn = await new Saavn().init();
-const dir = path.resolve(fileURLToPath(import.meta.url), "../res");
-// if (!existsSync(path.resolve(dir))) mkdirSync(path.resolve(dir));
-// writeFileSync(path.resolve(dir, "search.json"), JSON.stringify(await saavn.searchTracks("skyfall")));
-// writeFileSync(path.resolve(dir, "album.json"), JSON.stringify(await saavn.searchAlbums("skyfall")));
-// writeFileSync(path.resolve(dir, "artist.json"), JSON.stringify(await saavn.searchArtists("the weeknd")));
-writeFileSync(path.resolve(dir, "playlist-id.json"), JSON.stringify(await saavn.getPlaylist("1191141029")));
-// writeFileSync(path.resolve(dir, "playlist.json"), JSON.stringify(await saavn.searchPlaylists("arijit singh mix")));
-
-// const x = (await import("./res/search.json")).default;
-// console.log(x.length);
