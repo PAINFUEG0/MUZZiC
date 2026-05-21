@@ -1,42 +1,34 @@
-import fs from "fs";
 import path from "path";
+import { Spinner } from "./writer.js";
 import { DirNode } from "../shared/types/utils.js";
+import { setTimeout as sleep } from "timers/promises";
 import { LocalResourceProvider } from "../plugins/local/index.js";
 
-console.log("Initializing Local Resource Provider");
-
-const dir = "../music";
+const dir = "../music/old";
 const provider = new LocalResourceProvider();
 
+const spinner = new Spinner();
+spinner.start("Initializing Local Resource Provider");
 await provider.init();
+await sleep(500);
+spinner.end("√ Initializing Local Resource Provider");
 
-console.log("Scanning directory (%s)", dir);
+spinner.start(`Scanning directory (${dir})`);
 const unIndexedTree = (await provider.scan(dir)) || ({ name: path.basename(dir), path: dir, files: [], dirs: [] } as DirNode<false>);
 provider.tree.set("local", unIndexedTree);
+spinner.end(`√ Scanning directory (${dir})`);
 
-console.log("Fingering directory (%s)", dir);
+spinner.start(`Fingering directory (${dir})`);
 const indexedTree = await provider.finger(unIndexedTree);
 provider.tree.set("local", indexedTree);
+spinner.end(`√ Fingering directory (${dir})`);
 
-console.log("Probing directory (%s)", dir);
+spinner.start(`Probing directory (${dir})`);
 await provider.probe(indexedTree);
+spinner.end(`√ Probing directory (${dir})`);
 
-console.log("Building thumbnails (%s)", dir);
+spinner.start(`Building thumbnails (${dir})`);
 await provider.buildThumbnails(indexedTree);
-
-fs.writeFileSync("./tracks.json", JSON.stringify(await provider.list(indexedTree, "track"), null, 2));
-fs.writeFileSync("./albums.json", JSON.stringify(await provider.list(indexedTree, "album"), null, 2));
-fs.writeFileSync("./artists.json", JSON.stringify(await provider.list(indexedTree, "artist"), null, 2));
-
-const artistSorted = await provider.list(indexedTree, "artist");
-console.log(
-  Object.keys(artistSorted!)
-    //@ts-expect-error none
-    .filter((e) => artistSorted[e].length > 1)
-    //@ts-expect-error none
-    .sort((a, b) => artistSorted[b].length - artistSorted[a].length)
-    //@ts-expect-error none
-    .map((e) => `[${artistSorted[e].length}] ${e}`),
-);
+spinner.end(`√ Building thumbnails (${dir})`);
 
 process.on("SIGINT", () => setTimeout(() => process.exit(), 500));
