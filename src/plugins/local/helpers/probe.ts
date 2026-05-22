@@ -1,25 +1,10 @@
-import { promisify } from "node:util";
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 import { Track } from "../../../shared/types/sourcePlugin.js";
-
-const execFileAsync = promisify(execFile);
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 
 export async function probe(path: string) {
-  const data = JSON.parse(
-    (
-      await execFileAsync(process.env.FFPROBE!, [
-        "-v",
-        "quiet",
-        "-print_format",
-        "json",
-        "-show_entries",
-        "format=duration:format_tags:stream=codec_name,sample_rate,bits_per_sample,bits_per_raw_sample",
-        path,
-      ]).catch(() => ({ stdout: "{}" }))
-    ).stdout,
-  );
+  const data = JSON.parse(await ffprobe(path).catch(() => "{}"));
 
   const tags = data?.format?.tags || {};
   const stream = data?.streams?.find((s: any) => s.codec_type === "audio");
@@ -45,4 +30,27 @@ export async function probe(path: string) {
     lyrics: (tags["LYRICS"] || tags["lyrics"] || tags["UNSYNCEDLYRICS"] || tags["lyrics-eng"] || null) as string | null,
     explicit: ["1", "true", "yes", "explicit"].includes(String(tags.explicit || tags.ITUNESADVISORY || tags.EXPLICIT).toLowerCase()),
   };
+}
+
+function ffprobe(path: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const args = [
+      "-v",
+      "quiet",
+      "-print_format",
+      "json",
+      "-show_entries",
+      "format=duration:format_tags:stream=codec_name,sample_rate,bits_per_sample,bits_per_raw_sample",
+      path,
+    ];
+
+    let stdout = "";
+    let stderr = "";
+    const child = spawn(process.env.FFPROBE!, args, { stdio: ["ignore", "pipe", "pipe"] });
+
+    child.on("error", reject);
+    child.stdout.on("data", (chunk) => (stdout += chunk.toString()));
+    child.stderr.on("data", (chunk) => (stderr += chunk.toString()));
+    child.on("close", (code) => (code !== 0 ? reject(new Error(`ffprobe exited with code ${code}\n${stderr}`)) : resolve(stdout)));
+  });
 }
