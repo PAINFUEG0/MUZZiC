@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { Track } from "../../../shared/types/sourcePlugin.js";
+import { FFPROBE } from "../../../shared/constants.js";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 
@@ -46,7 +47,7 @@ function ffprobe(path: string): Promise<string> {
 
     let stdout = "";
     let stderr = "";
-    const child = spawn(process.env.FFPROBE!, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(FFPROBE, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     child.on("error", reject);
     child.stdout.on("data", (chunk) => (stdout += chunk.toString()));

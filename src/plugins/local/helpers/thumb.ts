@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { FFMPEG } from "../../../shared/constants";
 
 export async function thumb(source: string, dest: string) {
   return new Promise((resolve, reject) => {
@@ -6,7 +7,7 @@ export async function thumb(source: string, dest: string) {
 
     let stdout = "";
     let stderr = "";
-    const child = spawn(process.env.FFMPEG!, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(FFMPEG, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     child.on("error", reject);
     child.stdout.on("data", (chunk) => (stdout += chunk.toString()));
