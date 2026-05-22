@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "../../dist/renderer",
+    "rootDir": "../../src/renderer",
+    "types": ["react", "react-dom"],
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "tsBuildInfoFile": "../../.tsbuildinfo/renderer.ts-buildinfo",
+
+    "strict": true,
+    "noEmit": true,
+    "target": "ES2020",
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true
+  },
+  "include": ["../../src/renderer"],
+  "references": [{ "path": "./tsconfig.shared.json" }]
+}

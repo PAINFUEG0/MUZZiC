@@ -1,10 +1,10 @@
 {
   "files": [],
   "references": [
-    { "path": "./config/typescript/tsconfig.main.json" },
-    { "path": "./config/typescript/tsconfig.shared.json" },
-    { "path": "./config/typescript/tsconfig.plugins.json" },
-    { "path": "./config/typescript/tsconfig.preload.json" },
-    { "path": "./config/typescript/tsconfig.renderer.json" }
+    { "path": "./configs/typescript/tsconfig.main.json" },
+    { "path": "./configs/typescript/tsconfig.shared.json" },
+    { "path": "./configs/typescript/tsconfig.plugins.json" },
+    { "path": "./configs/typescript/tsconfig.preload.json" },
+    { "path": "./configs/typescript/tsconfig.renderer.json" }
   ]
 }
