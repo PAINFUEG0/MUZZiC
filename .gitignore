@@ -1,6 +1,8 @@
 bin
+out
 dist
 .env
+.vite
 tracks
 database
 node_modules
