@@ -40,10 +40,11 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
     }),
     new VitePlugin({
-      renderer: [{ name: "renderer", config: "./configs/vite/vite.config.ts" }],
+      renderer: [{ name: "", config: "./configs/vite/vite.renderer.config.ts" }],
       build: [
-        { target: "main", entry: "./src/main/index.ts", config: "./configs/vite/vite.main.config.ts" },
-        { target: "preload", entry: "./src/preload/index.ts", config: "./configs/vite/vite.preload.config.ts" },
+        { entry: "./src/main/index.ts", config: "./configs/vite/vite.main.config.ts" },
+        { entry: "./src/plugins/index.ts", config: "./configs/vite/vite.plugins.config.ts" },
+        { entry: "./src/preload/index.ts", config: "./configs/vite/vite.preload.config.ts" },
       ],
     }),
   ],

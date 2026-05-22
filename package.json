@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "muzzic",
-  "type": "module",
   "version": "1.0.0",
   "main": "./.vite/build/muzzic.js",
   "description": "A music player I guess",
