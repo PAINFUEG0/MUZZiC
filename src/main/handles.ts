@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
-import { setupBinaries } from "./setupBinaries";
-import { getLocalFileList } from "./local";
+import { getLocalFileList } from "./helpers/local";
+import { setupBinaries } from "./helpers/setupBinaries";
 
 export function registerHandlers() {
   ipcMain.handle("ping", () => "pong");

@@ -1,5 +1,5 @@
-import * as plugins from "../plugins/index";
-import { DirNode } from "../shared/types/utils";
+import * as plugins from "../../plugins/index";
+import { DirNode } from "../../shared/types/utils";
 
 let initiated = false;
 let tree = {} as DirNode<true>;

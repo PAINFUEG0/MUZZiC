@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { registerHandlers } from "./handlers";
+import { registerHandlers } from "./handles";
 import { BrowserWindow, Menu, app, screen } from "electron";
 
 registerHandlers();
