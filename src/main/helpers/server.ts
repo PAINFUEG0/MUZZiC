@@ -1,5 +1,5 @@
-import ws from "ws";
 import express from "express";
+import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
 
 import type { Message } from "../../shared/types/utils";
@@ -9,7 +9,7 @@ const server = createServer(app);
 
 app.get("/", (_, res) => res.sendStatus(200));
 
-const wss = new ws.Server({ server, path: "/ws" });
+const wss = new WebSocketServer({ server, path: "/ws" });
 wss.on("connection", (ws) => ws.on("message", (message) => console.log("Received message:", message)));
 
 export const api = {

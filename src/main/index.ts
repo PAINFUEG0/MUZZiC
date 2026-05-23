@@ -15,9 +15,13 @@ import { BrowserWindow, Menu, app, screen } from "electron";
 
   app.once("ready", async () => {
     const { width, height } = screen.getPrimaryDisplay().workArea;
-    const win = new BrowserWindow({ width, height, webPreferences: { backgroundThrottling: false, preload } });
-    !app.isPackaged ? win.loadURL("http://localhost:5173") : win.loadFile(path.join(__dirname, "../renderer/index.html"));
+    const win = new BrowserWindow({
+      width,
+      height,
+      webPreferences: { backgroundThrottling: false, preload, contextIsolation: true, nodeIntegration: false },
+    });
     win.webContents.openDevTools();
+    !app.isPackaged ? win.loadURL("http://localhost:5173") : win.loadFile(path.join(__dirname, "../renderer/index.html"));
   });
 
   app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
