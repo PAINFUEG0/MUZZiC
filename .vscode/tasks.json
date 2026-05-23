@@ -10,9 +10,8 @@
     },
     {
       "type": "shell",
-      "label": "Run main",
-      "command": "npx tsc -b && node ./dist/main/index.js",
-      "problemMatcher": ["$node-sass"],
+      "label": "Run test task",
+      "command": "npm run start",
       "group": { "kind": "test", "isDefault": true }
     }
   ]
