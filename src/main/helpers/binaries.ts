@@ -3,13 +3,11 @@ import * as fs from "node:fs";
 import ffbinaries from "ffbinaries";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-import { FFMPEG, FFPROBE, DLP } from "../shared/constants";
+import { DLP, FFMPEG, FFPROBE, WIN32, YT_DLP_BIN_URL } from "../../shared/constants";
 
 const execute = promisify(exec);
-const WIN32 = process.platform === "win32";
-const YT_DLP_BIN_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${WIN32 ? ".exe" : ""}`;
 
-export async function setupBinaries() {
+export async function ensureBinaries() {
   fs.existsSync("./bin") || fs.mkdirSync("./bin");
 
   if (!fs.existsSync(DLP))

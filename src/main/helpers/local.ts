@@ -3,7 +3,6 @@ import { DirNode } from "../../shared/types/utils";
 
 let initiated = false;
 let tree = {} as DirNode<true>;
-// const dir = "D:/music/old";
 const dir = "D:/projects/amdl/downloads/lithe";
 export const plugin = new plugins.LocalResourceProvider();
 

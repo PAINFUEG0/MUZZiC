@@ -1,9 +1,9 @@
 import { ipcMain } from "electron";
 import { getLocalFileList } from "./helpers/local";
-import { setupBinaries } from "./helpers/setupBinaries";
+import { ensureBinaries } from "./helpers/binaries";
 
 export function registerHandlers() {
   ipcMain.handle("ping", () => "pong");
-  ipcMain.handle("ensureBinaries", setupBinaries);
+  ipcMain.handle("ensureBinaries", ensureBinaries);
   ipcMain.handle("list", () => getLocalFileList());
 }
