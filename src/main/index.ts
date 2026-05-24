@@ -7,9 +7,15 @@ import { BrowserWindow, Menu, app, screen } from "electron";
   await api.startServer();
 
   registerHandles();
+
   Menu.setApplicationMenu(null);
+  app.disableHardwareAcceleration();
   app.setName("com.painfuego.muzzic");
+  app.commandLine.appendSwitch("disable-gpu");
   app.setAppUserModelId("com.painfuego.muzzic");
+  app.commandLine.appendSwitch("disable-gpu-compositing");
+  app.commandLine.appendSwitch("disable-software-rasterizer");
+  app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
 
   const preload = path.resolve(__dirname, "./preload.js");
 

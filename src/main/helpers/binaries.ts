@@ -11,26 +11,24 @@ const execute = promisify(exec);
 export async function ensureBinaries() {
   fs.existsSync("./bin") || fs.mkdirSync("./bin");
 
-  if (fs.existsSync(DLP)) api.broadcast({ op: "status", data: "YTDLP already exists" });
-  else {
-    api.broadcast({ op: "status", data: "Downloading YTDLP" });
-    await fs.promises
-      .writeFile(DLP, Buffer.from((await axios(YT_DLP_BIN_URL, { responseType: "arraybuffer" })).data))
-      .then(async () => !WIN32 && (await execute(`chmod +x ${DLP}`)));
-    api.broadcast({ op: "status", data: "Downloaded YTDLP" });
-  }
+  const promises = <(() => Promise<any>)[]>[];
 
-  if (fs.existsSync(FFMPEG)) api.broadcast({ op: "status", data: "FFMPEG already exists" });
-  else {
-    api.broadcast({ op: "status", data: "Downloading FFMPEG" });
-    await promisify(ffbinaries.downloadBinaries.bind(ffbinaries, ["ffmpeg"], { destination: "./bin" }))();
-    api.broadcast({ op: "status", data: "Downloaded FFMPEG" });
-  }
+  if (!fs.existsSync(DLP))
+    promises.push(async () =>
+      fs.promises
+        .writeFile(DLP, Buffer.from((await axios(YT_DLP_BIN_URL, { responseType: "arraybuffer" })).data))
+        .then(async () => !WIN32 && (await execute(`chmod +x ${DLP}`))),
+    );
 
-  if (fs.existsSync(FFPROBE)) api.broadcast({ op: "status", data: "FFMPEG already exists" });
-  else {
-    api.broadcast({ op: "status", data: "Downloading FFPROBE" });
-    await promisify(ffbinaries.downloadBinaries.bind(ffbinaries, ["ffprobe"], { destination: "./bin" }))();
-    api.broadcast({ op: "status", data: "Downloaded FFPROBE" });
-  }
+  if (!fs.existsSync(FFPROBE))
+    promises.push(promisify(ffbinaries.downloadBinaries.bind(ffbinaries, ["ffprobe"], { destination: "./bin" })));
+
+  if (!fs.existsSync(FFMPEG)) promises.push(promisify(ffbinaries.downloadBinaries.bind(ffbinaries, ["ffmpeg"], { destination: "./bin" })));
+
+  if (!promises.length) return api.broadcast({ op: "status", data: "Binary validation successful" });
+
+  const start = performance.now();
+  api.broadcast({ op: "status", data: `Found ${promises.length} missing binaries, downloading...` });
+  await Promise.all(promises.map((p) => p()));
+  api.broadcast({ op: "status", data: `Binary validation successful [${((performance.now() - start) / 1000).toFixed(2)}s]` });
 }
