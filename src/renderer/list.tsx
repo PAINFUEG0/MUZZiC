@@ -1,20 +1,7 @@
-import { useEffect, useState } from "react";
 import type { Track } from "../shared/types/sourcePlugin";
 import { FaBackward, FaCompactDisc, FaMusic, FaPlay, FaSearch } from "react-icons/fa";
 
-export function List() {
-  const [data, setData] = useState<any>(null);
-
-  useEffect(() => {
-    (async () => {
-      //@ts-ignore
-      await window.api.ensureBinaries();
-      //@ts-ignore
-      setData(await window.api.list());
-      console.log(data);
-    })();
-  }, []);
-
+export function List({ data }: { data: any }) {
   return (
     <div className="flex flex-col p-5 bg-[#1f1f1f] h-screen overflow-hidden gap-5">
       <div className="flex gap-3 flex-row px-5 border-[#4a4a4a] bg-[#303030] border rounded-sm items-center py-2 text-[#F0F0F0] opacity-60 ">

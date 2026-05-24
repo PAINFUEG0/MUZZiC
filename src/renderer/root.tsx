@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 
 import type { Message } from "../shared/types/utils";
+import { List } from "./list";
 
 export function Root() {
+  const [list, setList] = useState<any>(null);
   const [data, setData] = useState<Message | null>(null);
 
   useEffect(() => {
@@ -22,11 +24,15 @@ export function Root() {
         console.log("Connected !!! Requesting binary validation");
         //@ts-ignore
         await window.api.ensureBinaries();
+        //@ts-ignore
+        setList(await window.api.list());
       };
     })();
   }, []);
 
-  return (
+  return list ? (
+    <List data={list} />
+  ) : (
     <div className="px-3 py-2 bg-[#232323] rounded-sm text-sm text-[#eee]">
       <div className="font-medium mb-1">Backend Status</div>
       {data ? (
