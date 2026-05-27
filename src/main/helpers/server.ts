@@ -2,7 +2,7 @@ import express from "express";
 import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
 
-import type { Message } from "../../shared/types/utils";
+import type { PopupPayload } from "../../shared/types/utils";
 
 const app = express();
 const server = createServer(app);
@@ -16,7 +16,7 @@ export const api = {
   get port() {
     return (server.address() as any)?.port;
   },
-  broadcast(message: Message) {
+  broadcast(message: PopupPayload) {
     wss.clients.forEach((client) => client.send(JSON.stringify(message)));
   },
   startServer() {

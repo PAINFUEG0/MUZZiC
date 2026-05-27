@@ -43,6 +43,7 @@
     "express": "^5.2.1",
     "fast-xml-parser": "^5.8.0",
     "ffbinaries": "^1.1.6",
+    "framer-motion": "^12.40.0",
     "node-forge": "^1.4.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -50,6 +51,7 @@
     "react-router-dom": "^7.15.1",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
-    "ws": "^8.21.0"
+    "ws": "^8.21.0",
+    "zustand": "^5.0.13"
   }
 }

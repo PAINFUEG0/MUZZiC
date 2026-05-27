@@ -9,14 +9,14 @@ export const plugin = new plugins.LocalResourceProvider();
 
 export async function registerLocalFilePlugin() {
   await plugin.init();
-  api.broadcast({ op: "status", data: `Scanning ${dir} . . .` });
+  api.broadcast({ type: "INFO_POPUP", data: `Scanning ${dir} . . .` });
   const scanned = await plugin.scan(dir);
-  api.broadcast({ op: "status", data: "Fingerprinting files . . ." });
+  api.broadcast({ type: "INFO_POPUP", data: "Fingerprinting files . . ." });
   tree = await plugin.finger(scanned!);
-  api.broadcast({ op: "status", data: "Probing files . . ." });
+  api.broadcast({ type: "INFO_POPUP", data: "Probing files . . ." });
   await plugin.probe(tree);
   initiated = true;
-  api.broadcast({ op: "status", data: "Complete" });
+  api.broadcast({ type: "ERROR_POPUP", data: "Complete" });
 }
 
 export async function getLocalFileList() {

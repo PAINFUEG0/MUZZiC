@@ -25,10 +25,10 @@ export async function ensureBinaries() {
 
   if (!fs.existsSync(FFMPEG)) promises.push(promisify(ffbinaries.downloadBinaries.bind(ffbinaries, ["ffmpeg"], { destination: "./bin" })));
 
-  if (!promises.length) return api.broadcast({ op: "status", data: "Binary validation successful" });
+  if (!promises.length) return api.broadcast({ type: "SUCCESS_POPUP", data: "Binary validation successful" });
 
   const start = performance.now();
-  api.broadcast({ op: "status", data: `Found ${promises.length} missing binaries, downloading...` });
+  api.broadcast({ type: "WARNING_POPUP", data: `Found ${promises.length} missing binaries, downloading...` });
   await Promise.all(promises.map((p) => p()));
-  api.broadcast({ op: "status", data: `Binary validation successful [${((performance.now() - start) / 1000).toFixed(2)}s]` });
+  api.broadcast({ type: "SUCCESS_POPUP", data: `Binary validation successful [${((performance.now() - start) / 1000).toFixed(2)}s]` });
 }
