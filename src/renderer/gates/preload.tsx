@@ -45,14 +45,11 @@ export function Preload() {
 
       if (!mediaFolder) {
         setTask("Setting media folder");
+        await new Promise((r) => setTimeout(r, 100));
+
         let selected;
-
-        while (!selected) {
-          selected = await window.api.openFolderDialog();
-          console.log(selected);
-        }
-
-        if (selected) await window.api.setMediaFolder(selected);
+        while (!selected) selected = await window.api.openFolderDialog();
+        await window.api.setMediaFolder(selected);
       }
       setProgress(60);
 
