@@ -1,6 +1,6 @@
+import { Root } from "./layouts/Root";
+import { Preload } from "./gates/Preload";
 import { createHashRouter } from "react-router-dom";
-import Preload from "./gates/preload";
-import { Root } from "./layouts/root";
 
 export const router = createHashRouter([
   {

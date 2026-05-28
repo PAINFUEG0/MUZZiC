@@ -12,5 +12,10 @@ contextBridge.exposeInMainWorld("api", {
   checkFFPROBE: () => ipcRenderer.invoke("checkFFPROBE"),
   downloadFFPROBE: () => ipcRenderer.invoke("downloadFFPROBE"),
 
+  getMediaFolder: () => ipcRenderer.invoke("getMediaFolder"),
+  setMediaFolder: (dir: string) => ipcRenderer.invoke("setMediaFolder", dir),
+
+  openFolderDialog: () => ipcRenderer.invoke("open-folder-dialog"),
+
   list: () => ipcRenderer.invoke("list"),
 } satisfies Window["api"]);

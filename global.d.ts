@@ -16,6 +16,11 @@ declare global {
       checkFFPROBE: () => Promise<boolean>;
       downloadFFPROBE: () => Promise<void>;
 
+      getMediaFolder: () => Promise<string | null>;
+      setMediaFolder: (dir: string) => Promise<void>;
+
+      openFolderDialog: () => Promise<string | null>;
+
       list: () => Promise<DirNode<true>>;
     };
   }

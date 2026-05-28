@@ -1,4 +1,4 @@
-import { Popup } from "../components/pop";
+import { Popup } from "../components/Popup";
 
 export function Root() {
   return (

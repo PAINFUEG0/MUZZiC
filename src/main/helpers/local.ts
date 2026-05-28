@@ -1,11 +1,20 @@
+import { api } from "./server";
+import { settings } from "../database";
 import * as plugins from "../../plugins/index";
 import { DirNode } from "../../shared/types/utils";
-import { api } from "./server";
 
 let initiated = false;
 let tree = {} as DirNode<true>;
 const dir = "D:/projects/amdl/downloads/lithe";
 export const plugin = new plugins.LocalResourceProvider();
+
+export async function getMediaFolder() {
+  return settings.get("mediaFolder") as string | null;
+}
+
+export async function setMediaFolder(dir: string) {
+  settings.set("mediaFolder", dir);
+}
 
 export async function registerLocalFilePlugin() {
   await plugin.init();
