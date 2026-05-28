@@ -1,64 +1,79 @@
-import { FaBackward, FaCompactDisc, FaMusic, FaPlay, FaSearch } from "react-icons/fa";
+import { useState } from "react";
 import { treeStore } from "../utils/Store";
+import { RiHome2Line } from "react-icons/ri";
+import { IoIosArrowBack } from "react-icons/io";
+import { LuFile, LuFolder } from "react-icons/lu";
+import { File } from "../../shared/types/utils.js";
+import { Track } from "../../shared/types/sourcePlugin.js";
 
 export function List() {
   const [data] = treeStore.use();
 
-  const files = data?.dirs[0]?.files;
+  const [path, setPath] = useState([data]);
+  const current = path[path.length - 1]!;
 
   return (
-    <div className="flex flex-col p-5 bg-[#1f1f1f] h-screen w-full overflow-hidden gap-5">
-      <div className="flex gap-3 flex-row px-5 border-[#4a4a4a] bg-[#303030] border rounded-sm items-center py-2 text-[#F0F0F0] opacity-60 ">
-        <FaSearch />
-        <div className="font-medium">Search songs . . . </div>
-      </div>
-
-      <div className="flex flex-row p-3 border-[#4a4a4a] bg-[#262626] border rounded-sm items-center gap-2">
-        <div className="flex items-center justify-center h-15 w-15 border-[#4a4a4a] bg-[#4a4a4a55] border rounded-sm shrink-0">
-          <FaCompactDisc className="text-[#f5f5f5aa] text-2xl" />
-        </div>
-
-        <div className="flex items-center justify-end  h-15 w-full  border-[#4a4a4a] bg-[#4a4a4a55] border rounded-sm"></div>
-
-        <div className="flex items-center justify-end h-15 rounded-sm gap-2">
-          <button className="flex items-center justify-center h-full aspect-square border-[#4a4a4a] bg-[#4a4a4a55] border rounded-sm">
-            <FaBackward className="text-[#f5f5f5aa] text-2xl" />
+    <div className="flex h-full w-full flex-col">
+      <div className="flex h-fit items-center gap-5 p-5 border-b">
+        <div className="flex flex-row gap-2">
+          <button
+            disabled={path.length === 1}
+            onClick={() => setPath((path) => [...path.slice(0, path.length - 1)])}
+            className="flex items-center justify-center rounded-full border-2 p-1 text-sm text-black"
+          >
+            <IoIosArrowBack />
           </button>
-          <button className="flex items-center justify-center h-full aspect-square border-[#4a4a4a] bg-[#4a4a4a55] border rounded-sm">
-            <FaPlay className="text-[#f5f5f5aa] text-2xl" />
-          </button>
-          <button className="flex items-center justify-center h-full aspect-square border-[#4a4a4a] bg-[#4a4a4a55] border rounded-sm">
-            <FaBackward className="text-[#f5f5f5aa] text-2xl -scale-x-100" />
+          <button
+            onClick={() => setPath((path) => [...path.slice(0, 1)])}
+            className="flex items-center justify-center rounded-full border-2 p-1 text-sm text-black"
+          >
+            <RiHome2Line />
           </button>
         </div>
+
+        <div className="flex flex-row gap-2">
+          {path.map((dir, i) => (
+            <span key={i} className="flex items-center gap-1  font-bold text-sm">
+              <span className="cursor-pointer hover:underline" onClick={() => setPath(path.slice(0, i + 1))}>
+                {dir.name.charAt(0).toUpperCase() + dir.name.slice(1)}
+              </span>
+
+              {i < path.length - 1 && <span>/</span>}
+            </span>
+          ))}
+        </div>
       </div>
 
-      <div className="flex flex-col bg-[#1f1f1f] h-screen overflow-auto gap-1 scrollbar-none">
-        {files?.map((t, i) => {
-          return (
+      <div className="flex h-full w-full flex-col gap-2 overflow-auto p-5">
+        {current.dirs.map((dir, i) => (
+          <div
+            key={dir.name}
+            onClick={() => setPath([...path, current.dirs[i]!])}
+            className="flex h-fit w-full cursor-pointer flex-row items-center gap-1"
+          >
+            <LuFolder className="text-yellow-600" />
+            <div className="text-xs font-medium" children={dir.name} />
+            <div className="text-xs font-medium" children={`( ${dir.files.length + dir.dirs.length} items )`} />
+          </div>
+        ))}
+
+        {current.files.map((e: Track<true> | File<true>) => (
+          <div key={e.id} className="flex h-fit w-full flex-row items-center gap-1">
+            <LuFile />
+            <div className="text-xs font-medium" children={"title" in e ? e.title : e.name} />
+            -
+            <div className="text-xs font-medium" children={"resolution" in e ? e.resolution : "Unknown Resolution"} />
+            -
+            <div className="text-xs font-medium" children={"duration" in e ? e.duration : "Unknown duration"} />
+            -
             <div
-              key={t.id}
-              // onClick={() => console.log(t.streamURI)}
-              className="flex flex-row items-center h-fit gap-4 text-[#f5f5f5] cursor-pointer hover:bg-[#3c3c3c33] rounded-sm px-3 py-2"
-            >
-              <div className="text-[#4a4a4a] w-3">{i + 1}</div>
-
-              <div className="flex items-center justify-center gap-2 h-8 w-8 bg-[#262626] rounded-md border-[#4a4a4a]">
-                <FaMusic />
-              </div>
-
-              <div className="flex flex-col w-fit ">
-                <div className="flex flex-row items-center gap-5">
-                  <div className="text-sm font-bold">{t.name}</div>
-                  <div className="flex flex-row py-px px-1  h-fit w-fit text-xs rounded-md bg-[#3c3c3c]">{"SR" || "t.resolution"}</div>
-                </div>
-                <div className="flex flex-row gap-3">
-                  <div className="text-xs opacity-70">Artist - {t.artists?.map((a) => a.name).join(", ") || "Unknown"}</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              className="text-xs font-medium"
+              children={"artists" in e && Array.isArray(e.artists) ? e.artists.map((a) => a.name).join(", ") : "Unknown Artists"}
+            />
+            -
+            <div className="text-xs font-medium" children={"album" in e ? e.album.name : "Unknown Album"} />
+          </div>
+        ))}
       </div>
     </div>
   );
