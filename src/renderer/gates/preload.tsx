@@ -1,7 +1,10 @@
 import { Outlet } from "react-router-dom";
+import { treeStore } from "../utils/Store";
+import { Popup } from "../components/Popup";
 import { useState, useEffect } from "react";
 
 export function Preload() {
+  const [, setTree] = treeStore.use();
   const [progress, setProgress] = useState(0);
   const [task, setTask] = useState<string>("Initializing");
   const [step, setStep] = useState<"INIT" | "DEPS" | "MEDIA" | "READY">("INIT");
@@ -41,17 +44,23 @@ export function Preload() {
 
       setStep("MEDIA");
       setTask("Media folder validation");
+      await new Promise((r) => setTimeout(r, 150));
       const mediaFolder = await window.api.getMediaFolder();
 
       if (!mediaFolder) {
         setTask("Setting media folder");
-        await new Promise((r) => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 150));
 
         let selected;
         while (!selected) selected = await window.api.openFolderDialog();
         await window.api.setMediaFolder(selected);
       }
       setProgress(60);
+
+      setTask("Fetching media file tree");
+      await new Promise((r) => setTimeout(r, 500));
+      setTree(await window.api.list());
+      setProgress(80);
 
       let i = 60;
       setTask("Optimizing everything");
@@ -74,7 +83,8 @@ export function Preload() {
   if (step === "READY") return <Outlet />;
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10">
+    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10 ">
+      <Popup />
       <div
         style={{
           width: 150,
@@ -92,10 +102,6 @@ export function Preload() {
       <div className="flex h-1 w-[25dvw] rounded-full bg-gray-400">
         <div className="bg-black rounded-full" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
       </div>
-
-      {/* <Modal setOpen={setShowSelectionModal} open={showSelectionModal} onClose={() => setMediaFolder(null)}>
-        <input></input>
-      </Modal> */}
     </div>
   );
 }

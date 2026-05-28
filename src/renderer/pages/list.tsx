@@ -1,7 +1,11 @@
-import type { Track } from "../../shared/types/sourcePlugin";
 import { FaBackward, FaCompactDisc, FaMusic, FaPlay, FaSearch } from "react-icons/fa";
+import { treeStore } from "../utils/Store";
 
-export function List({ data }: { data: any }) {
+export function List() {
+  const [data] = treeStore.use();
+
+  const files = data?.dirs[0]?.files;
+
   return (
     <div className="flex flex-col p-5 bg-[#1f1f1f] h-screen w-full overflow-hidden gap-5">
       <div className="flex gap-3 flex-row px-5 border-[#4a4a4a] bg-[#303030] border rounded-sm items-center py-2 text-[#F0F0F0] opacity-60 ">
@@ -30,11 +34,11 @@ export function List({ data }: { data: any }) {
       </div>
 
       <div className="flex flex-col bg-[#1f1f1f] h-screen overflow-auto gap-1 scrollbar-none">
-        {data?.map((t: Track<true>, i: number) => {
+        {files?.map((t, i) => {
           return (
             <div
               key={t.id}
-              onClick={() => console.log(t.streamURI)}
+              // onClick={() => console.log(t.streamURI)}
               className="flex flex-row items-center h-fit gap-4 text-[#f5f5f5] cursor-pointer hover:bg-[#3c3c3c33] rounded-sm px-3 py-2"
             >
               <div className="text-[#4a4a4a] w-3">{i + 1}</div>
@@ -45,11 +49,11 @@ export function List({ data }: { data: any }) {
 
               <div className="flex flex-col w-fit ">
                 <div className="flex flex-row items-center gap-5">
-                  <div className="text-sm font-bold">{t.title}</div>
-                  <div className="flex flex-row py-px px-1  h-fit w-fit text-xs rounded-md bg-[#3c3c3c]">{t.resolution}</div>
+                  <div className="text-sm font-bold">{t.name}</div>
+                  <div className="flex flex-row py-px px-1  h-fit w-fit text-xs rounded-md bg-[#3c3c3c]">{"SR" || "t.resolution"}</div>
                 </div>
                 <div className="flex flex-row gap-3">
-                  <div className="text-xs opacity-70">Artist - {t.artists.map((a) => a.name).join(", ")}</div>
+                  <div className="text-xs opacity-70">Artist - {t.artists?.map((a) => a.name).join(", ") || "Unknown"}</div>
                 </div>
               </div>
             </div>

@@ -23,5 +23,5 @@ export function registerHandles() {
     return canceled ? null : filePaths[0];
   });
 
-  ipcMain.handle("list", () => local.getLocalFileList());
+  ipcMain.handle("list", () => local.getMediaFilesTree());
 }

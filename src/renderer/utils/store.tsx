@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { DirNode } from "../../shared/types/utils";
 
 export function createGlobalStore<T extends boolean | null | number | object | string | undefined>(initial: T) {
   type Store = { data: T; update: (newValue: T) => void };
@@ -22,3 +23,5 @@ export function createGlobalStore<T extends boolean | null | number | object | s
     },
   };
 }
+
+export const treeStore = createGlobalStore<DirNode<true>>({} as DirNode<true>);

@@ -10,19 +10,23 @@ export function Popup() {
   const [popups, setPopups] = popupStore.use();
 
   useEffect(() => {
+    let ws: WebSocket;
+
     (async () => {
       const port = await window.api.getPort();
-      const ws = new WebSocket(`http://localhost:${port}/ws`);
+      ws = new WebSocket(`http://localhost:${port}/ws`);
 
       ws.onmessage = (e) => {
         const message = JSON.parse(e.data);
 
         if (!["INFO_POPUP", "ERROR_POPUP", "WARNING_POPUP", "SUCCESS_POPUP"].includes(message.type)) return;
 
-        setPopups((prev) => [...prev, message]);
+        setPopups((prev) => [...prev.slice(0, 7), message]);
         setTimeout(() => setPopups((prev) => prev.filter((p) => p !== message)), 3000);
       };
     })();
+
+    return () => ws.close();
   }, []);
 
   return (

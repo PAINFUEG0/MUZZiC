@@ -1,4 +1,3 @@
-export * from "./local/index.js";
 export * from "./lyrics/index.js";
 export * from "./source/tidal/index.js";
 export * from "./source/saavn/index.js";
