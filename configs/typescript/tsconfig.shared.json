@@ -10,5 +10,5 @@
     "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../.tsbuildinfo/shared.ts-buildinfo"
   },
-  "include": ["../../src/shared"]
+  "include": ["../../src/shared", "../../global.d.ts"]
 }

@@ -10,6 +10,6 @@
     "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../.tsbuildinfo/plugins.ts-buildinfo"
   },
-  "include": ["../../src/plugins"],
+  "include": ["../../src/plugins", "../../global.d.ts"],
   "references": [{ "path": "./tsconfig.shared.json" }]
 }

@@ -1,4 +1,4 @@
-import type { Track } from "../shared/types/sourcePlugin";
+import type { Track } from "../../shared/types/sourcePlugin";
 import { FaBackward, FaCompactDisc, FaMusic, FaPlay, FaSearch } from "react-icons/fa";
 
 export function List({ data }: { data: any }) {

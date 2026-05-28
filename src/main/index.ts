@@ -1,14 +1,15 @@
 import * as path from "node:path";
 import { api } from "./helpers/server";
 import { registerHandles } from "./handles";
-import { BrowserWindow, Menu, app, screen } from "electron";
+import { BrowserWindow, app, screen } from "electron";
+// import { BrowserWindow, Menu, app, screen } from "electron";
 
 (async () => {
   await api.startServer();
 
   registerHandles();
 
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(null);
   app.disableHardwareAcceleration();
   app.setName("com.painfuego.muzzic");
   app.commandLine.appendSwitch("disable-gpu");
@@ -22,7 +23,7 @@ import { BrowserWindow, Menu, app, screen } from "electron";
   app.once("ready", async () => {
     const { width, height } = screen.getPrimaryDisplay().workArea;
     const win = new BrowserWindow({ width, height, webPreferences: { backgroundThrottling: false, preload } });
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     !app.isPackaged ? win.loadURL("http://localhost:5173") : win.loadFile(path.join(__dirname, "../renderer/index.html"));
   });
 

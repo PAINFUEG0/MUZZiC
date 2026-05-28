@@ -10,6 +10,6 @@
     "moduleResolution": "NodeNext",
     "tsBuildInfoFile": "../../.tsbuildinfo/preload.ts-buildinfo"
   },
-  "include": ["../../src/preload"],
+  "include": ["../../src/preload", "../../global.d.ts"],
   "references": [{ "path": "./tsconfig.shared.json" }]
 }

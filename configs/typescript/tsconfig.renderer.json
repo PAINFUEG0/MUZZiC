@@ -12,12 +12,11 @@
     "tsBuildInfoFile": "../../.tsbuildinfo/renderer.ts-buildinfo",
 
     "strict": true,
-    "noEmit": true,
     "target": "ES2020",
     "skipLibCheck": true,
     "isolatedModules": true,
     "useDefineForClassFields": true
   },
-  "include": ["../../src/renderer"],
+  "include": ["../../src/renderer", "../../global.d.ts"],
   "references": [{ "path": "./tsconfig.shared.json" }]
 }
