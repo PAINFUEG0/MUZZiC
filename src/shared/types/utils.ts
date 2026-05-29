@@ -15,3 +15,7 @@ export type MessagePayload =
   | { type: "MODAL"; data: string }
   | { type: "FULLSCREEN"; data: string }
   | { type: "PROGRESS"; current: number; total: number; data: string };
+
+// utils/semaphore.ts
+
+// Tune this — ffprobe is I/O bound, not CPU, so you can go higher than cores

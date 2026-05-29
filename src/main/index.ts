@@ -4,6 +4,8 @@ import { registerHandles } from "./handles";
 import { BrowserWindow, app, screen } from "electron";
 // import { BrowserWindow, Menu, app, screen } from "electron";
 
+// process.env.UV_THREADPOOL_SIZE = "64";
+
 (async () => {
   await api.startServer();
 

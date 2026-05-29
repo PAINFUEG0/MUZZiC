@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
-import { chunk } from "../../../shared/helpers.js";
-import { DirNode } from "../../../shared/types/utils.js";
+import { chunk } from "../../shared/helpers.js";
+import { DirNode } from "../../shared/types/utils.js";
 
 export async function finger(tree: DirNode<false>): Promise<DirNode<true>> {
   const promises: (() => Promise<void>)[] = [];

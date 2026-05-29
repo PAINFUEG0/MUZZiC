@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { DirNode } from "../../../shared/types/utils.js";
-import { AUDIO_EXTENSIONS } from "../../../shared/constants.js";
+import { DirNode } from "../../shared/types/utils.js";
+import { AUDIO_EXTENSIONS } from "../../shared/constants.js";
 
 export async function walk(entrypoint: string) {
   const name = path.basename(entrypoint);
