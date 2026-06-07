@@ -7,6 +7,7 @@ import { meta, settings, tree } from "../database";
 import { Track } from "../../shared/types/sourcePlugin";
 import { DirNode, File } from "../../shared/types/utils";
 import { AUDIO_EXTENSIONS } from "../../shared/constants";
+import { api } from "./server";
 
 export async function setMediaFolder(dir: string) {
   settings.set("mediaFolder", dir);
@@ -16,18 +17,37 @@ export async function getMediaFolder() {
   return settings.get("mediaFolder") as string | null;
 }
 
-export async function getMediaFilesTree() {
-  if (!tree.get("local")) {
-    const mediaFolder = (await getMediaFolder())!;
+export async function getTree(K: string) {
+  return tree.get(K);
+}
 
-    const scanned = await scanMediaFolder(mediaFolder);
-    if (!scanned) return { dirs: [], files: [], name: path.basename(mediaFolder), path: mediaFolder };
+export async function setTree(K: string, V: DirNode<true>) {
+  return tree.set(K, V);
+}
 
-    const fingerprinted = await fingerprintMediaFiles(scanned);
-    tree.set("local", fingerprinted);
-  }
+export async function getMeta(K: string | string[]) {
+  if (Array.isArray(K)) return meta.getMany(K);
+  return meta.get(K);
+}
 
-  return tree.get("local") as DirNode<true>;
+export async function deleteMeta(K: string | string[]) {
+  if (Array.isArray(K)) return meta.deleteMany(K);
+  return meta.delete(K);
+}
+
+export async function setMeta(K: string, V: Track<true>): Promise<void>;
+export async function setMeta(data: { key: string; value: Track<true> }[]): Promise<void>;
+export async function setMeta(K: any, V?: Track<true>) {
+  if (typeof K === "object") return meta.setMany(K);
+  return meta.set(K, V);
+}
+
+export async function scan(dir: string) {
+  const scanned = await scanMediaFolder(dir);
+  if (!scanned) return { dirs: [], files: [], name: path.basename(dir), path: dir };
+
+  const fingerprinted = await fingerprintMediaFiles(scanned);
+  return fingerprinted;
 }
 
 export async function scanMediaFolder(dir: string) {
@@ -65,18 +85,20 @@ export async function fingerprintMediaFiles(tree: DirNode<false>): Promise<DirNo
 
 const sem = new Semaphore(16);
 
-function flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
-  if (!node) return [];
-  return [...node.files, ...node.dirs.flatMap((e) => flatten(e))];
-}
-
-async function extractMetadata(tree: DirNode<true>) {
-  const flat = flatten(tree);
-  console.log(flat.length);
+export async function extractMetadata(flat: File<true>[]) {
+  let count = 1;
   const results = await Promise.all(
-    flat.map((file) => sem.run(() => probe(file.path).then((meta) => ({ key: file.id, value: transform(file, meta) })))),
+    flat.map((file) =>
+      sem.run(() =>
+        probe(file.path).then((meta) => {
+          api.broadcast({ type: "PROGRESS", data: "PROBE", current: count++, total: flat.length });
+          return { key: file.id, value: transform(file, meta) };
+        }),
+      ),
+    ),
   );
-  meta.setMany(results);
+  // meta.setMany(results);
+  return results;
 }
 
 function transform(file: File<true>, metadata: Awaited<ReturnType<typeof probe>>) {
@@ -94,15 +116,15 @@ function transform(file: File<true>, metadata: Awaited<ReturnType<typeof probe>>
   } satisfies Track<true>;
 }
 
-(async () => {
-  // setMediaFolder("D:/projects/amdl/favorites");
-  setMediaFolder("D:/music");
-  tree.delete("local");
-  const t = await getMediaFilesTree();
-  console.time("Probing");
-  await extractMetadata(t);
-  console.timeEnd("Probing");
-})();
+// (async () => {
+//   // setMediaFolder("D:/projects/amdl/favorites");
+//   setMediaFolder("D:/music");
+//   tree.delete("local");
+//   const t = await getMediaFilesTree();
+//   console.time("Probing");
+//   await extractMetadata(t);
+//   console.timeEnd("Probing");
+// })();
 
 // async buildThumbnails(tree: DirNode<true>) {
 //     if (!fs.existsSync("./.thumbnails")) fs.mkdirSync("./.thumbnails");

@@ -2,6 +2,8 @@ import { Outlet } from "react-router-dom";
 import { treeStore } from "../utils/Store";
 import { Popup } from "../components/Popup";
 import { useState, useEffect } from "react";
+import { flatten } from "../../shared/helpers";
+import { MessagePayload } from "../../shared/types/utils";
 
 export function Preload() {
   const [, setTree] = treeStore.use();
@@ -45,21 +47,57 @@ export function Preload() {
       setStep("MEDIA");
       setTask("Media folder validation");
       await new Promise((r) => setTimeout(r, 150));
-      const mediaFolder = await window.api.getMediaFolder();
+      let mediaFolder = await window.api.getMediaFolder();
 
       if (!mediaFolder) {
         setTask("Setting media folder");
-        await new Promise((r) => setTimeout(r, 150));
-
-        let selected;
-        while (!selected) selected = await window.api.openFolderDialog();
-        await window.api.setMediaFolder(selected);
+        while (!mediaFolder) mediaFolder = await window.api.openFolderDialog();
+        await window.api.setMediaFolder(mediaFolder);
       }
       setProgress(60);
 
       setTask("Fetching media file tree");
+
       await new Promise((r) => setTimeout(r, 500));
-      setTree(await window.api.list());
+      const current = await window.api.scan(mediaFolder);
+      const previous = await window.api.getTree("mediaFolder");
+
+      setTree(current);
+
+      if (JSON.stringify(previous) !== JSON.stringify(current)) {
+        await window.api.setTree("mediaFolder", current);
+
+        const _current = flatten(current);
+        const _previous = previous ? flatten(previous) : [];
+        const currentMap = new Map(_current.map((x) => [x.id, x]));
+        const previousMap = new Map(_previous.map((x) => [x.id, x]));
+        const added = _current.filter(({ id }) => !previousMap.has(id));
+        const deleted = _previous.filter(({ id }) => !currentMap.has(id));
+
+        if (added.length) {
+          const port = await window.api.getPort();
+          const ws = new WebSocket(`http://localhost:${port}/ws`);
+
+          ws.onmessage = (m) => {
+            const data = JSON.parse(m.data) as MessagePayload;
+
+            if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
+            setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
+          };
+
+          await new Promise((r) => (ws.onopen = r));
+
+          console.time("Extracting metadata");
+          const res = await window.api.extractMetadata(added);
+          await window.api.setMeta(res.map((e) => ({ key: e.id, value: e })));
+          console.timeEnd("Extracting metadata");
+          ws.close();
+        }
+
+        if (deleted.length) {
+          await window.api.deleteMeta(deleted.map((e) => e.id));
+        }
+      }
       setProgress(80);
 
       let i = 60;

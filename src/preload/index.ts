@@ -13,9 +13,18 @@ contextBridge.exposeInMainWorld("api", {
   downloadFFPROBE: () => ipcRenderer.invoke("downloadFFPROBE"),
 
   getMediaFolder: () => ipcRenderer.invoke("getMediaFolder"),
-  setMediaFolder: (dir: string) => ipcRenderer.invoke("setMediaFolder", dir),
+  setMediaFolder: (dir) => ipcRenderer.invoke("setMediaFolder", dir),
 
   openFolderDialog: () => ipcRenderer.invoke("open-folder-dialog"),
 
-  list: () => ipcRenderer.invoke("list"),
+  scan: (dir: string) => ipcRenderer.invoke("scan", dir),
+
+  getTree: (K) => ipcRenderer.invoke("getTree", K),
+  setTree: (K, V) => ipcRenderer.invoke("setTree", K, V),
+
+  extractMetadata: (flat) => ipcRenderer.invoke("extractMetadata", flat),
+
+  getMeta: (K) => ipcRenderer.invoke("getMeta", K),
+  setMeta: (K, V) => ipcRenderer.invoke("setMeta", K, V),
+  deleteMeta: (K) => ipcRenderer.invoke("deleteMeta", K),
 } satisfies Window["api"]);

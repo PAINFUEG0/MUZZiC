@@ -18,10 +18,15 @@ export function registerHandles() {
   ipcMain.handle("getMediaFolder", () => local.getMediaFolder());
   ipcMain.handle("setMediaFolder", (_, dir) => local.setMediaFolder(dir));
 
-  ipcMain.handle("open-folder-dialog", async () => {
-    const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ["openDirectory"] });
-    return canceled ? null : filePaths[0];
-  });
+  ipcMain.handle("open-folder-dialog", async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0]);
 
-  ipcMain.handle("list", () => local.getMediaFilesTree());
+  ipcMain.handle("scan", (_, dir) => local.scan(dir));
+
+  ipcMain.handle("getTree", (_, K) => local.getTree(K));
+  ipcMain.handle("setTree", (_, K, V) => local.setTree(K, V));
+
+  ipcMain.handle("extractMetadata", (_, flat) => local.extractMetadata(flat));
+
+  ipcMain.handle("getMeta", (_, K) => local.getMeta(K));
+  ipcMain.handle("setMeta", (_, K, V) => local.setMeta(K, V));
 }
