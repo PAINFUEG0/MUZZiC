@@ -17,3 +17,7 @@ export function flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"
   if (!node) return [];
   return [...node.files, ...node.dirs.flatMap((e) => flatten(e))];
 }
+
+export function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}

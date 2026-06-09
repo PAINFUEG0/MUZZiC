@@ -7,66 +7,51 @@ import { MessagePayload } from "../../shared/types/utils";
 
 export function Preload() {
   const [, setTree] = treeStore.use();
+  const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [task, setTask] = useState<string>("Initializing");
-  const [step, setStep] = useState<"INIT" | "DEPS" | "MEDIA" | "READY">("INIT");
 
   useEffect(() => {
     const run = async () => {
-      setStep("INIT");
-      await new Promise((r) => setTimeout(r, 1000));
-      setProgress(5);
+      setTask("Preparing connections & dependencies");
 
-      setStep("DEPS");
-      setTask("Checking for dependencies");
+      const port = await window.api.getPort();
+      const ws = new WebSocket(`http://localhost:${port}/ws`);
+      await new Promise((r) => (ws.onopen = r));
+
       const DLP = await window.api.checkDLP();
       const FFMPEG = await window.api.checkFFMPEG();
       const FFPROBE = await window.api.checkFFPROBE();
+      setProgress(5);
 
-      await new Promise((r) => setTimeout(r, 250));
+      !FFMPEG && setTask("Downloading missing dependency (FFMPEG)");
+      !FFMPEG && (await window.api.downloadFFMPEG());
+      setProgress(10);
+
+      !FFPROBE && setTask("Downloading missing dependency (FFPROBE)");
+      !FFPROBE && (await window.api.downloadFFPROBE());
       setProgress(15);
 
-      if (!FFMPEG) {
-        setTask("Downloading missing dependency (FFMPEG)");
-        await window.api.downloadFFMPEG();
-      }
+      !DLP && setTask("Downloading missing dependency (YT-DLP)");
+      !DLP && (await window.api.downloadDLP());
+      setProgress(20);
+
+      setTask("Checking for media folder");
+      let mediaFolder = await window.api.getMediaFolder();
+      !mediaFolder && setTask("Media folder not set! Please select a folder");
+      while (!mediaFolder) mediaFolder = await window.api.openFolderDialog();
+      await window.api.setMediaFolder(mediaFolder);
       setProgress(25);
 
-      if (!FFPROBE) {
-        setTask("Downloading missing dependency (FFPROBE)");
-        await window.api.downloadFFPROBE();
-      }
-      setProgress(35);
-
-      if (!DLP) {
-        setTask("Downloading missing dependency (DLP)");
-        await window.api.downloadDLP();
-      }
-      setProgress(50);
-
-      setStep("MEDIA");
-      setTask("Media folder validation");
-      await new Promise((r) => setTimeout(r, 150));
-      let mediaFolder = await window.api.getMediaFolder();
-
-      if (!mediaFolder) {
-        setTask("Setting media folder");
-        while (!mediaFolder) mediaFolder = await window.api.openFolderDialog();
-        await window.api.setMediaFolder(mediaFolder);
-      }
-      setProgress(60);
-
-      setTask("Fetching media file tree");
-
-      await new Promise((r) => setTimeout(r, 500));
+      setTask("Preparing library (Scanning)");
       const current = await window.api.scan(mediaFolder);
       const previous = await window.api.getTree("mediaFolder");
-
+      await window.api.setTree("mediaFolder", current);
       setTree(current);
+      setProgress(35);
 
+      setTask("Preparing library (Checking for changes)");
       if (JSON.stringify(previous) !== JSON.stringify(current)) {
-        await window.api.setTree("mediaFolder", current);
-
         const _current = flatten(current);
         const _previous = previous ? flatten(previous) : [];
         const currentMap = new Map(_current.map((x) => [x.id, x]));
@@ -75,50 +60,40 @@ export function Preload() {
         const deleted = _previous.filter(({ id }) => !currentMap.has(id));
 
         if (added.length) {
-          const port = await window.api.getPort();
-          const ws = new WebSocket(`http://localhost:${port}/ws`);
+          setTask(`Preparing to process ${added.length} newly added files`);
 
-          ws.onmessage = (m) => {
+          const listener = (m: MessageEvent) => {
             const data = JSON.parse(m.data) as MessagePayload;
-
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
             setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
+            setProgress(Math.floor(30 * (data.current / data.total)) + 35);
           };
 
-          await new Promise((r) => (ws.onopen = r));
+          ws.onmessage = listener;
 
-          console.time("Extracting metadata");
           const res = await window.api.extractMetadata(added);
           await window.api.setMeta(res.map((e) => ({ key: e.id, value: e })));
-          console.timeEnd("Extracting metadata");
-          ws.close();
+          ws.onmessage = null;
+          setProgress(65);
         }
 
         if (deleted.length) {
+          setTask(`Removing index for ${deleted.length} deleted files`);
           await window.api.deleteMeta(deleted.map((e) => e.id));
+          setProgress(70);
         }
       }
-      setProgress(80);
 
-      let i = 60;
-      setTask("Optimizing everything");
-
-      while (i < 100) {
-        setProgress(i);
-        i += Math.floor(Math.random() * 16) + 5;
-        await new Promise((r) => setTimeout(r, 100));
-      }
-
+      setTask("All done!");
       setProgress(100);
-      await new Promise((r) => setTimeout(r, 250));
-
-      setStep("READY");
+      setReady(true);
+      ws.close();
     };
 
     run();
   }, []);
 
-  if (step === "READY") return <Outlet />;
+  if (ready) return <Outlet />;
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10 ">

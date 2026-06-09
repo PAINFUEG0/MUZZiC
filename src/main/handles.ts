@@ -29,4 +29,5 @@ export function registerHandles() {
 
   ipcMain.handle("getMeta", (_, K) => local.getMeta(K));
   ipcMain.handle("setMeta", (_, K, V) => local.setMeta(K, V));
+  ipcMain.handle("deleteMeta", (_, K) => local.deleteMeta(K));
 }
