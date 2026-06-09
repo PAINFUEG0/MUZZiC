@@ -72,7 +72,7 @@ export function Preload() {
           ws.onmessage = listener;
 
           const res = await window.api.extractMetadata(added);
-          await window.api.setMeta(res.map((e) => ({ key: e.id, value: e })));
+          await window.api.setMeta(res);
           ws.onmessage = null;
           setProgress(65);
         }

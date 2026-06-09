@@ -30,9 +30,8 @@ export async function getMeta(K: string | string[]) {
   return meta.get(K);
 }
 
-export async function deleteMeta(K: string | string[]) {
-  if (Array.isArray(K)) return meta.deleteMany(K);
-  return meta.delete(K);
+export async function deleteMeta<T extends string | string[]>(K: T): Promise<T extends string ? boolean : boolean[]> {
+  return (Array.isArray(K) ? meta.deleteMany(K) : meta.delete(K)) as any;
 }
 
 export async function setMeta(K: string, V: Track<true>): Promise<void>;

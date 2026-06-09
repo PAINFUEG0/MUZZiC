@@ -1,16 +1,38 @@
-import { useState } from "react";
 import { treeStore } from "../utils/Store";
+import { useEffect, useState } from "react";
 import { RiHome2Line } from "react-icons/ri";
+import { flatten } from "../../shared/helpers";
 import { IoIosArrowBack } from "react-icons/io";
 import { LuFile, LuFolder } from "react-icons/lu";
-import { File } from "../../shared/types/utils.js";
+import { DirNode, File } from "../../shared/types/utils.js";
 import { Track } from "../../shared/types/sourcePlugin.js";
 
 export function List() {
-  const [data] = treeStore.use();
-
+  const [data, setData] = treeStore.use();
   const [path, setPath] = useState([data]);
+  const [ready, setReady] = useState(false);
+
   const current = path[path.length - 1]!;
+
+  useEffect(() => {
+    (async () => {
+      const flat = flatten(data);
+      const metas = Object.fromEntries((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean).map((e) => [e!.id, e]));
+
+      const populate = (node: DirNode<true>) => {
+        for (let i = 0; i < node.files.length; i++) (node.files[i] as any) = { ...node.files[i], ...(metas[node.files[i]!.id] || {}) };
+        node.dirs.forEach((e) => populate(e));
+      };
+
+      populate(data);
+      console.log(data);
+
+      setData({ ...data });
+      setReady(true);
+    })();
+  }, []);
+
+  if (!ready) return <div className="flex h-full w-full items-center justify-center">Loading...</div>;
 
   return (
     <div className="flex h-full w-full flex-col">
