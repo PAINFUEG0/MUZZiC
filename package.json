@@ -2,10 +2,12 @@
   "private": true,
   "name": "muzzic",
   "version": "1.0.0",
+  "icon": "./public/logo.ico",
   "main": "./.vite/build/muzzic.js",
+  "appUserModelId": "com.painfuego.music",
   "description": "A music player I guess",
   "author": {
-    "name": "1sT-Services/painfuego",
+    "name": "1sT-Services",
     "email": "contact@painfuego.xyz"
   },
   "scripts": {

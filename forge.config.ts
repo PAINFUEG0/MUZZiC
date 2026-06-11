@@ -1,3 +1,4 @@
+import * as pkg from "./package.json";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";
 import { VitePlugin } from "@electron-forge/plugin-vite";
@@ -5,29 +6,19 @@ import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 
-const config: ForgeConfig = {
-  packagerConfig: {
-    asar: true,
-    executableName: "MUZZiC",
-    // icon: "./public/logo.ico"
-  },
+const ui = { chooseDirectory: true };
 
-  makers: [
-    new MakerWix({
-      exe: "MUZZiC",
-      name: "MUZZiC",
-      // icon: "./public/logo.ico",
-      manufacturer: "1sT-Services",
-      ui: { chooseDirectory: true },
-      programFilesFolderName: "MUZZiC",
-      description: "A music player I guess",
-      appUserModelId: "com.painfuego.music",
-      beforeCreate: (creator) => {
-        creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"');
-      },
-    }),
-    new MakerZIP({}, ["linux", "darwin"]),
-  ],
+const icon = pkg.icon;
+const name = pkg.name.toUpperCase();
+const description = pkg.description;
+const manufacturer = pkg.author.name;
+const appUserModelId = pkg.appUserModelId;
+
+const beforeCreate = (creator: any) =>
+  (creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"'));
+
+export default {
+  packagerConfig: { asar: true, executableName: name, icon },
 
   plugins: [
     new FusesPlugin({
@@ -48,6 +39,9 @@ const config: ForgeConfig = {
       ],
     }),
   ],
-};
 
-export default config;
+  makers: [
+    new MakerZIP({}, ["linux", "darwin"]),
+    new MakerWix({ name, icon, exe: name, description, manufacturer, programFilesFolderName: name, ui, appUserModelId, beforeCreate }),
+  ],
+} satisfies ForgeConfig;
