@@ -1,5 +1,5 @@
+import path from "node:path";
 import { probe } from "./probe";
-import * as path from "node:path";
 import { File } from "../../shared/types/utils";
 import { Track } from "../../shared/types/sourcePlugin";
 

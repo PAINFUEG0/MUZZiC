@@ -1,7 +1,7 @@
 import { api } from "./server";
+import * as local from "./helpers/local";
 import * as bin from "./helpers/binaries";
 import { dialog, ipcMain } from "electron";
-import * as local from "./helpers/local";
 import * as settings from "./helpers/settings";
 
 export function registerHandles() {

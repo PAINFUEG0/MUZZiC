@@ -5,10 +5,7 @@ export class Semaphore {
   constructor(private max: number) {}
 
   async acquire() {
-    if (this.#active < this.max) {
-      this.#active++;
-      return;
-    }
+    if (this.#active < this.max) return this.#active++;
     await new Promise<void>((r) => this.#queue.push(r));
     this.#active++;
   }

@@ -1,15 +1,15 @@
-import * as path from "node:path";
-import { Track } from "../../shared/types/sourcePlugin";
-import { DirNode } from "../../shared/types/utils";
-import { tree, meta } from "../database";
 import { api } from "../server";
-import { Semaphore } from "../utils/sepmaphore";
-import { fingerprintMediaFiles } from "../utils/finger";
-import { probe } from "../utils/probe";
-import { scanMediaFolder } from "../utils/scan";
+import path from "node:path";
 import { thumb } from "../utils/thumb";
+import { probe } from "../utils/probe";
+import { tree, meta } from "../database";
 import { transform } from "../utils/transform";
+import { scanMediaFolder } from "../utils/scan";
 import { File } from "../../shared/types/utils";
+import { Semaphore } from "../utils/sepmaphore";
+import { DirNode } from "../../shared/types/utils";
+import { Track } from "../../shared/types/sourcePlugin";
+import { fingerprintMediaFiles } from "../utils/finger";
 
 const sem = new Semaphore(16);
 

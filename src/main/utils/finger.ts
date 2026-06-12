@@ -1,4 +1,4 @@
-import * as fs from "node:fs";
+import fs from "node:fs";
 import { chunk } from "../../shared/helpers.js";
 import { DirNode } from "../../shared/types/utils.js";
 

@@ -1,5 +1,5 @@
+import fs from "node:fs";
 import axios from "axios";
-import * as fs from "node:fs";
 import ffbinaries from "ffbinaries";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";

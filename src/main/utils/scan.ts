@@ -1,5 +1,5 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 import { DirNode } from "../../shared/types/utils";
 import { AUDIO_EXTENSIONS } from "../../shared/constants";
 

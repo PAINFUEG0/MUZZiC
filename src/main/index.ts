@@ -1,32 +1,27 @@
-import { api } from "./server";
-import * as path from "node:path";
-import { registerHandles } from "./handles";
-import { BrowserWindow, app, screen } from "electron";
-// import { BrowserWindow, Menu, app, screen } from "electron";
-
-// process.env.UV_THREADPOOL_SIZE = "64";
+process.env.UV_THREADPOOL_SIZE = "64";
 
 (async () => {
+  const path = await import("node:path");
+  const { api } = await import("./server.js");
+  const { BrowserWindow, app } = await import("electron");
+  const { registerHandles } = await import("./handles.js");
+  const { appUserModelId } = (await import("../../package.json")).default;
+
   await api.startServer();
 
   registerHandles();
 
   // Menu.setApplicationMenu(null);
-  app.disableHardwareAcceleration();
-  app.setName("com.painfuego.muzzic");
-  app.commandLine.appendSwitch("disable-gpu");
-  app.setAppUserModelId("com.painfuego.muzzic");
-  app.commandLine.appendSwitch("disable-gpu-compositing");
-  app.commandLine.appendSwitch("disable-software-rasterizer");
-  app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
 
+  app.setName(appUserModelId);
+  app.disableHardwareAcceleration();
+  app.setAppUserModelId(appUserModelId);
   const preload = path.resolve(__dirname, "./preload.js");
 
   app.once("ready", async () => {
-    const { width, height } = screen.getPrimaryDisplay().workArea;
-    const win = new BrowserWindow({ width, height, webPreferences: { backgroundThrottling: false, preload } });
-    // win.webContents.openDevTools();
+    const win = new BrowserWindow({ show: false, webPreferences: { backgroundThrottling: false, preload } });
     !app.isPackaged ? win.loadURL("http://localhost:5173") : win.loadFile(path.join(__dirname, "../renderer/index.html"));
+    win.once("ready-to-show", () => (win.maximize(), win.show(), win.focus));
   });
 
   app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
