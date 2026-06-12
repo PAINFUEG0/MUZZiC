@@ -60,21 +60,31 @@ export function Preload() {
         const deleted = _previous.filter(({ id }) => !currentMap.has(id));
 
         if (added.length) {
-          setTask(`Preparing to process ${added.length} newly added files`);
+          setTask(`Preparing to extract metadata of ${added.length} newly added files`);
 
-          const listener = (m: MessageEvent) => {
+          ws.onmessage = (m: MessageEvent) => {
             const data = JSON.parse(m.data) as MessagePayload;
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
             setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
             setProgress(Math.floor(30 * (data.current / data.total)) + 35);
           };
 
-          ws.onmessage = listener;
-
           const res = await window.api.extractMetadata(added);
           await window.api.setMeta(res);
-          ws.onmessage = null;
           setProgress(65);
+
+          setTask(`Preparing to extract thumbnails of ${added.length} newly added files`);
+
+          ws.onmessage = (m: MessageEvent) => {
+            const data = JSON.parse(m.data) as MessagePayload;
+            if (data.type !== "PROGRESS" || data.data !== "THUMB") return;
+            setTask("Extracting thumbnail [ " + data.current + "/" + data.total + " ]");
+            setProgress(Math.floor(30 * (data.current / data.total)) + 65);
+          };
+
+          await window.api.extractThumbnail(added);
+          ws.onmessage = null;
+          setProgress(95);
         }
 
         if (deleted.length) {

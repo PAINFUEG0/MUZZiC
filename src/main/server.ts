@@ -1,4 +1,6 @@
+import fs from "node:fs";
 import express from "express";
+import { resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
 
@@ -6,8 +8,18 @@ import type { MessagePayload } from "../shared/types/utils";
 
 const app = express();
 const server = createServer(app);
+if (!fs.existsSync("./.thumbnails")) fs.mkdirSync("./.thumbnails");
 
 app.get("/", (_, res) => res.sendStatus(200));
+
+app.get("/thumb/:id", (req, res) => {
+  const { id } = req.params;
+  const path = `./.thumbnails/${id}.jpg`;
+  res.sendFile(fs.existsSync(resolve(".", path)) ? path : "./public/logo.png", {
+    root: ".",
+    headers: { "Cache-Control": "public, max-age=31536000, immutable" },
+  });
+});
 
 const wss = new WebSocketServer({ server, path: "/ws" });
 wss.on("connection", (ws) => ws.on("message", (message) => console.log("Received message:", message)));

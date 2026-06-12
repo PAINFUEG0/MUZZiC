@@ -1,5 +1,5 @@
-import { api } from "../server";
 import path from "node:path";
+import { api } from "../server";
 import { thumb } from "../utils/thumb";
 import { probe } from "../utils/probe";
 import { tree, meta } from "../database";
@@ -68,7 +68,7 @@ export async function extractThumbnail(flat: File<true>[]) {
   const results = await Promise.all(
     flat.map((file) =>
       sem.run(() =>
-        thumb(file.path, `${file.id}.jpg`)
+        thumb(file.path, `./.thumbnails/${file.id}.jpg`)
           .then(() => ({ id: file.id, thumbnail: `${file.id}.jpg` }))
           .catch(() => ({ id: file.id, thumbnail: null }))
           .finally(() => api.broadcast({ type: "PROGRESS", data: "THUMB", current: count++, total: flat.length })),

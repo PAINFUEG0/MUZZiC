@@ -23,8 +23,9 @@ contextBridge.exposeInMainWorld("api", {
   setTree: (K, V) => ipcRenderer.invoke("setTree", K, V),
 
   extractMetadata: (flat) => ipcRenderer.invoke("extractMetadata", flat),
+  extractThumbnail: (flat) => ipcRenderer.invoke("extractThumbnail", flat),
 
   getMeta: (K) => ipcRenderer.invoke("getMeta", K),
-  setMeta: (K, V) => ipcRenderer.invoke("setMeta", K, V),
   deleteMeta: (K) => ipcRenderer.invoke("deleteMeta", K),
+  setMeta: (...args) => ipcRenderer.invoke("setMeta", ...args),
 } satisfies Window["api"]);
