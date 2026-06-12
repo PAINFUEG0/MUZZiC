@@ -3,7 +3,7 @@ import { treeStore } from "../utils/Store";
 import { Popup } from "../components/Popup";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
-import { MessagePayload } from "../../shared/types/utils";
+import { DirNode, MessagePayload } from "../../shared/types/utils";
 
 export function Preload() {
   const [, setTree] = treeStore.use();
@@ -44,16 +44,15 @@ export function Preload() {
       setProgress(25);
 
       setTask("Preparing library (Scanning)");
-      const current = await window.api.scan(mediaFolder);
-      const previous = await window.api.getTree("mediaFolder");
-      await window.api.setTree("mediaFolder", current);
-      setTree(current);
+      const currentTree = await window.api.scan(mediaFolder);
+      const previousTree = await window.api.getTree("mediaFolder");
+      await window.api.setTree("mediaFolder", currentTree);
       setProgress(35);
 
       setTask("Preparing library (Checking for changes)");
-      if (JSON.stringify(previous) !== JSON.stringify(current)) {
-        const _current = flatten(current);
-        const _previous = previous ? flatten(previous) : [];
+      if (JSON.stringify(previousTree) !== JSON.stringify(currentTree)) {
+        const _current = flatten(currentTree);
+        const _previous = previousTree ? flatten(previousTree) : [];
         const currentMap = new Map(_current.map((x) => [x.id, x]));
         const previousMap = new Map(_previous.map((x) => [x.id, x]));
         const added = _current.filter(({ id }) => !previousMap.has(id));
@@ -73,7 +72,7 @@ export function Preload() {
           await window.api.setMeta(res);
           setProgress(65);
 
-          setTask(`Preparing to extract thumbnails of ${added.length} newly added files`);
+          setTask(`Preparing to extract .thumbnails of ${added.length} newly added files`);
 
           ws.onmessage = (m: MessageEvent) => {
             const data = JSON.parse(m.data) as MessagePayload;
@@ -94,6 +93,21 @@ export function Preload() {
         }
       }
 
+      const flat = flatten(currentTree);
+      const metas = Object.fromEntries((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean).map((e) => [e!.id, e]));
+
+      const populateTreeWithMeta = (node: DirNode<true>) => {
+        for (let i = 0; i < node.files.length; i++)
+          (node.files[i] as any) = {
+            ...node.files[i],
+            ...(metas[node.files[i]!.id] || {}),
+            thumb: `http://localhost:${port}/thumb/${node.files[i]!.id}`,
+          };
+        node.dirs.forEach((e) => populateTreeWithMeta(e));
+      };
+
+      populateTreeWithMeta(currentTree);
+      setTree(currentTree as any);
       setTask("All done!");
       setProgress(100);
       setReady(true);

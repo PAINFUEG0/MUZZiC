@@ -1,38 +1,14 @@
 import { treeStore } from "../utils/Store";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RiHome2Line } from "react-icons/ri";
-import { flatten } from "../../shared/helpers";
 import { IoIosArrowBack } from "react-icons/io";
-import { LuFile, LuFolder } from "react-icons/lu";
-import { DirNode, File } from "../../shared/types/utils.js";
-import { Track } from "../../shared/types/sourcePlugin.js";
+import { LuFolder } from "react-icons/lu";
 
 export function List() {
-  const [data, setData] = treeStore.use();
+  const [data] = treeStore.use();
   const [path, setPath] = useState([data]);
-  const [ready, setReady] = useState(false);
 
   const current = path[path.length - 1]!;
-
-  useEffect(() => {
-    (async () => {
-      const flat = flatten(data);
-      const metas = Object.fromEntries((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean).map((e) => [e!.id, e]));
-
-      const populate = (node: DirNode<true>) => {
-        for (let i = 0; i < node.files.length; i++) (node.files[i] as any) = { ...node.files[i], ...(metas[node.files[i]!.id] || {}) };
-        node.dirs.forEach((e) => populate(e));
-      };
-
-      populate(data);
-      console.log(data);
-
-      setData({ ...data });
-      setReady(true);
-    })();
-  }, []);
-
-  if (!ready) return <div className="flex h-full w-full items-center justify-center">Loading...</div>;
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -79,21 +55,14 @@ export function List() {
           </div>
         ))}
 
-        {current.files.map((e: Track<true> | File<true>) => (
-          <div key={e.id} className="flex h-fit w-full flex-row items-center gap-1">
-            <LuFile />
-            <div className="text-xs font-medium" children={"title" in e ? e.title : e.name} />
-            -
-            <div className="text-xs font-medium" children={"resolution" in e ? e.resolution : "Unknown Resolution"} />
-            -
-            <div className="text-xs font-medium" children={"duration" in e ? e.duration : "Unknown duration"} />
-            -
-            <div
-              className="text-xs font-medium"
-              children={"artists" in e && Array.isArray(e.artists) ? e.artists.map((a) => a.name).join(", ") : "Unknown Artists"}
-            />
-            -
-            <div className="text-xs font-medium" children={"album" in e ? e.album.name : "Unknown Album"} />
+        {current.files.map((e) => (
+          <div key={e.id} className="grid grid-cols-6 h-fit w-full gap-1">
+            <img src={e.thumb} className="h-8 w-8 object-cover" />
+            <div className="text-xs font-medium" children={e.title} />
+            <div className="text-xs font-medium" children={e.resolution} />
+            <div className="text-xs font-medium" children={e.duration} />
+            <div className="text-xs font-medium" children={e.artists.map((a) => a.name).join(", ")} />
+            <div className="text-xs font-medium" children={e.album.name} />
           </div>
         ))}
       </div>

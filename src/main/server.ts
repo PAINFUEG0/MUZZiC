@@ -3,8 +3,7 @@ import express from "express";
 import { resolve } from "node:path";
 import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
-
-import type { MessagePayload } from "../shared/types/utils";
+import { MessagePayload } from "../shared/types/utils";
 
 const app = express();
 const server = createServer(app);
@@ -14,11 +13,9 @@ app.get("/", (_, res) => res.sendStatus(200));
 
 app.get("/thumb/:id", (req, res) => {
   const { id } = req.params;
-  const path = `./.thumbnails/${id}.jpg`;
-  res.sendFile(fs.existsSync(resolve(".", path)) ? path : "./public/logo.png", {
-    root: ".",
-    headers: { "Cache-Control": "public, max-age=31536000, immutable" },
-  });
+  const thumbPath = resolve(".", ".thumbnails", `${id}.jpg`);
+  const defaultThumbnailPath = resolve(".", "public", "logo.png");
+  res.sendFile(fs.existsSync(thumbPath) ? thumbPath : defaultThumbnailPath, { dotfiles: "allow" });
 });
 
 const wss = new WebSocketServer({ server, path: "/ws" });
