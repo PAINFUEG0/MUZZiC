@@ -1,7 +1,8 @@
-import { api } from "./helpers/server";
-import * as local from "./helpers/local";
+import { api } from "./server";
 import * as bin from "./helpers/binaries";
 import { dialog, ipcMain } from "electron";
+import * as local from "./helpers/local";
+import * as settings from "./helpers/settings";
 
 export function registerHandles() {
   ipcMain.handle("getPort", () => api.port);
@@ -15,8 +16,8 @@ export function registerHandles() {
   ipcMain.handle("checkFFPROBE", () => bin.checkFFPROBE());
   ipcMain.handle("downloadFFPROBE", () => bin.downloadFFPROBE());
 
-  ipcMain.handle("getMediaFolder", () => local.getMediaFolder());
-  ipcMain.handle("setMediaFolder", (_, dir) => local.setMediaFolder(dir));
+  ipcMain.handle("getMediaFolder", () => settings.getMediaFolder());
+  ipcMain.handle("setMediaFolder", (_, dir) => settings.setMediaFolder(dir));
 
   ipcMain.handle("open-folder-dialog", async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0]);
 

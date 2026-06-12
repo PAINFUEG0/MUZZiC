@@ -2,7 +2,7 @@ import express from "express";
 import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
 
-import type { MessagePayload } from "../../shared/types/utils";
+import type { MessagePayload } from "../shared/types/utils";
 
 const app = express();
 const server = createServer(app);

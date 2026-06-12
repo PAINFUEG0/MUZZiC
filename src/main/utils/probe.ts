@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
-import { FFPROBE } from "../../shared/constants.js";
-import { Track } from "../../shared/types/sourcePlugin.js";
+import { FFPROBE } from "../../shared/constants";
+import { Track } from "../../shared/types/sourcePlugin";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 

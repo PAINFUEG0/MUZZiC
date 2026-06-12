@@ -1,5 +1,5 @@
+import { api } from "./server";
 import * as path from "node:path";
-import { api } from "./helpers/server";
 import { registerHandles } from "./handles";
 import { BrowserWindow, app, screen } from "electron";
 // import { BrowserWindow, Menu, app, screen } from "electron";

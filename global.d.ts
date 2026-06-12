@@ -1,6 +1,6 @@
-import { DirNode } from "./src/shared/types/utils";
-import { Track } from "./src/shared/types/sourcePlugin";
-import { extractMetadata, deleteMeta } from "./src/main/helpers/local";
+import * as bin from "./src/main/helpers/binaries";
+import * as local from "./src/main/helpers/local";
+import * as settings from "./src/main/helpers/settings";
 
 export {};
 
@@ -9,33 +9,30 @@ declare global {
     api: {
       getPort: () => Promise<string>;
 
-      checkDLP: () => Promise<boolean>;
-      downloadDLP: () => Promise<void>;
+      checkDLP: typeof bin.checkDLP;
+      downloadDLP: typeof bin.downloadDLP;
 
-      checkFFMPEG: () => Promise<boolean>;
-      downloadFFMPEG: () => Promise<void>;
+      checkFFMPEG: typeof bin.checkFFMPEG;
+      downloadFFMPEG: typeof bin.downloadFFMPEG;
 
-      checkFFPROBE: () => Promise<boolean>;
-      downloadFFPROBE: () => Promise<void>;
+      checkFFPROBE: typeof bin.checkFFPROBE;
+      downloadFFPROBE: typeof bin.downloadFFPROBE;
 
-      getMediaFolder: () => Promise<string | null>;
-      setMediaFolder: (dir: string) => Promise<void>;
+      getMediaFolder: typeof settings.getMediaFolder;
+      setMediaFolder: typeof settings.setMediaFolder;
 
       openFolderDialog: () => Promise<string | null>;
 
-      scan: (dir: string) => Promise<DirNode<true>>;
+      scan: typeof local.scan;
 
-      getTree: (K: string) => Promise<DirNode<true> | null>;
-      setTree: (K: string, V: DirNode<true>) => Promise<void>;
+      getTree: typeof local.getTree;
+      setTree: typeof local.setTree;
 
-      extractMetadata: typeof extractMetadata;
+      extractMetadata: typeof local.extractMetadata;
 
-      setMeta: <T extends string | { key: string; value: Track<true> }[]>(
-        K: T,
-        V?: T extends string ? Track<true> : never,
-      ) => Promise<T extends string ? Track<true> : T>;
-      deleteMeta: typeof deleteMeta;
-      getMeta: <T extends string | string[]>(K: T) => Promise<T extends string ? Track<true> | null : (Track<true> | null)[]>;
+      getMeta: typeof local.getMeta;
+      setMeta: typeof local.setMeta;
+      deleteMeta: typeof local.deleteMeta;
     };
   }
 }
