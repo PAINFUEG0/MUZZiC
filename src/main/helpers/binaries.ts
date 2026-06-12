@@ -9,15 +9,15 @@ const execute = promisify(exec);
 
 fs.existsSync("./bin") || fs.mkdirSync("./bin");
 
-export function checkDLP() {
+export async function checkDLP() {
   return fs.existsSync(DLP);
 }
 
-export function checkFFMPEG() {
+export async function checkFFMPEG() {
   return fs.existsSync(FFMPEG);
 }
 
-export function checkFFPROBE() {
+export async function checkFFPROBE() {
   return fs.existsSync(FFPROBE);
 }
 

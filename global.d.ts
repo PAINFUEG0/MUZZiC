@@ -29,6 +29,7 @@ declare global {
       setTree: typeof local.setTree;
 
       extractMetadata: typeof local.extractMetadata;
+      extractThumbnail: typeof local.extractThumbnail;
 
       getMeta: typeof local.getMeta;
       setMeta: typeof local.setMeta;
