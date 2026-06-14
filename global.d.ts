@@ -5,6 +5,9 @@ import * as settings from "./src/main/helpers/settings";
 export {};
 
 declare global {
+  const MAIN_WINDOW_VITE_NAME: string;
+  const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
+
   interface Window {
     api: {
       getPort: () => Promise<string>;

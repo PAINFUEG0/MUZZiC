@@ -31,7 +31,7 @@ export default {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
     }),
     new VitePlugin({
-      renderer: [{ name: "", config: "./configs/vite/vite.renderer.config.ts" }],
+      renderer: [{ name: "main_window", config: "./configs/vite/vite.renderer.config.ts" }],
       build: [
         { entry: "./src/main/index.ts", config: "./configs/vite/vite.main.config.ts" },
         { entry: "./src/plugins/index.ts", config: "./configs/vite/vite.plugins.config.ts" },

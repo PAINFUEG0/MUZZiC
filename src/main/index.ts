@@ -20,7 +20,9 @@ process.env.UV_THREADPOOL_SIZE = "64";
 
   app.once("ready", async () => {
     const win = new BrowserWindow({ show: false, webPreferences: { backgroundThrottling: false, preload } });
-    !app.isPackaged ? win.loadURL("http://localhost:5173") : win.loadFile(path.join(__dirname, "../renderer/index.html"));
+    !app.isPackaged
+      ? win.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
+      : win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
     win.once("ready-to-show", () => (win.maximize(), win.show(), win.focus));
   });
 
