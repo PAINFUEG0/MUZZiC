@@ -1,8 +1,8 @@
-import { treeStore } from "../utils/Store";
 import { useState } from "react";
+import { LuFolder } from "react-icons/lu";
+import { treeStore } from "../utils/Store";
 import { RiHome2Line } from "react-icons/ri";
 import { IoIosArrowBack } from "react-icons/io";
-import { LuFolder } from "react-icons/lu";
 
 export function List() {
   const [data] = treeStore.use();
@@ -55,16 +55,45 @@ export function List() {
           </div>
         ))}
 
-        {current.files.map((e) => (
-          <div key={e.id} className="grid grid-cols-6 h-fit w-full gap-1">
-            <img src={e.thumb} className="h-8 w-8 object-cover" />
-            <div className="text-xs font-medium" children={e.title} />
-            <div className="text-xs font-medium" children={e.resolution} />
-            <div className="text-xs font-medium" children={e.duration} />
-            <div className="text-xs font-medium" children={e.artists.map((a) => a.name).join(", ")} />
-            <div className="text-xs font-medium" children={e.album.name} />
-          </div>
-        ))}
+        <div className="flex flex-col h-fit w-full gap-2">
+          {current.files.map((e) => (
+            <div key={e.id} className="flex flex-row h-fit w-full gap-3">
+              <div className="h-8 w-8 rounded-md overflow-hidden">
+                <img src={e.thumb} className="h-full w-full  object-cover" />
+              </div>
+
+              <div className="flex flex-col w-full">
+                <div className="flex flex-row w-full gap-2 items-center">
+                  <div className="text-xs font-bold text-no-wrap min-w-0 truncate" children={e.title} />
+                  <div
+                    className="px-0.5 py-px leading-2.5 border rounded-sm text-[10px] font-bold"
+                    style={{
+                      color:
+                        e.resolution === "DD"
+                          ? "#55ff55"
+                          : e.resolution === "CD"
+                            ? "#aa33cc"
+                            : e.resolution === "HR"
+                              ? "#aa9922"
+                              : "#2255dd",
+                    }}
+                    children={e.resolution}
+                  />
+                </div>
+
+                <div className="opacity-70 gap-3 flex flex-row w-full text-xs">
+                  <div className="text-no-wrap min-w-0 truncate" children={e.artists.map((a) => a.name).join(", ")} />
+                  <div className="text-no-wrap min-w-0 truncate" children={"-"} />
+                  <div className="text-no-wrap min-w-0 truncate" children={e.album.name} />
+                </div>
+              </div>
+
+              <div className="col-span-1 text-xs font-medium text-no-wrap min-w-0 truncate shrink-0">
+                {`${Math.floor(e.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(e.duration % 60)}`.padEnd(2, "0")}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -8,11 +8,11 @@ export async function probe(path: string) {
   const data = JSON.parse(await ffprobe(path).catch(() => "{}"));
 
   const tags = data?.format?.tags || {};
-  const stream = data?.streams?.find((s: any) => s.codec_type === "audio");
+  const stream = data?.streams?.[0];
 
   const sampleRate = Number(stream?.sample_rate || 0);
   const codec = (stream?.codec_name || "").toLowerCase();
-  const bitDepth = Number(stream?.bits_per_sample || stream?.bits_per_raw_sample || 0);
+  const bitDepth = Number(stream?.bits_per_raw_sample || stream?.bits_per_sample || 0);
 
   let resolution: Track["resolution"] = "CD";
 
