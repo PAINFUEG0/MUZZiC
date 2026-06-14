@@ -14,7 +14,7 @@ export function Popup() {
 
     (async () => {
       const port = await window.api.getPort();
-      ws = new WebSocket(`http://localhost:${port}/ws`);
+      ws = new WebSocket(`ws://localhost:${port}/ws`);
 
       ws.onmessage = (e) => {
         const message = JSON.parse(e.data) as MessagePayload;

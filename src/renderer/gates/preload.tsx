@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import { treeStore } from "../utils/Store";
-import { Popup } from "../components/Popup";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
 import { DirNode, MessagePayload } from "../../shared/types/utils";
@@ -16,7 +15,7 @@ export function Preload() {
       setTask("Preparing connections & dependencies");
 
       const port = await window.api.getPort();
-      const ws = new WebSocket(`http://localhost:${port}/ws`);
+      const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
 
       const DLP = await window.api.checkDLP();
@@ -89,7 +88,7 @@ export function Preload() {
         if (deleted.length) {
           setTask(`Removing index for ${deleted.length} deleted files`);
           await window.api.deleteMeta(deleted.map((e) => e.id));
-          setProgress(70);
+          setProgress(100);
         }
       }
 
@@ -120,8 +119,7 @@ export function Preload() {
   if (ready) return <Outlet />;
 
   return (
-    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10 ">
-      <Popup />
+    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10 border-5">
       <div
         style={{
           width: 150,
