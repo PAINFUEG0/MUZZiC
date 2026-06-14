@@ -14,7 +14,7 @@
     "make": "electron-forge make",
     "start": "electron-forge start",
     "pack": "electron-forge package",
-    "rm": "node -e \"['./dist', './.vite', './bin', './database', './.tsbuildinfo'].forEach((dir) => require('fs').existsSync(dir) && require('fs').rmSync(dir, { recursive: true, force: true }))\""
+    "rm": "node -e \"['./dist', './.vite', './bin', './database', './.tsbuildinfo', './.thumbnails'].forEach((dir) => require('fs').existsSync(dir) && require('fs').rmSync(dir, { recursive: true, force: true }))\""
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
