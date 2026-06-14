@@ -3,11 +3,11 @@ import { useRef, useEffect } from "react";
 import { PopupPayload } from "../../shared/types/utils";
 import { LuCheck, LuCross, LuInfo } from "react-icons/lu";
 
-const _ = {
-  INFO_POPUP: { bg: "#00AAFF", bar: "#00AAFF", icon: <LuInfo /> },
-  ERROR_POPUP: { bg: "#FF5500", bar: "#FF5500", icon: <LuCross /> },
-  SUCCESS_POPUP: { bg: "#88FF22", bar: "#88FF22", icon: <LuCheck /> },
-  WARNING_POPUP: { bg: "#FFDD22", bar: "#FFDD22", icon: <LuInfo className="-scale-y-100" /> },
+const styles = {
+  INFO: { bg: "#00AAFF", bar: "#00AAFF", icon: <LuInfo /> },
+  ERROR: { bg: "#FF5500", bar: "#FF5500", icon: <LuCross /> },
+  SUCCESS: { bg: "#88FF22", bar: "#88FF22", icon: <LuCheck /> },
+  WARNING: { bg: "#FFDD22", bar: "#FFDD22", icon: <LuInfo className="-scale-y-100" /> },
 };
 
 export function PopupItem({ PL }: { PL: PopupPayload }) {
@@ -18,7 +18,7 @@ export function PopupItem({ PL }: { PL: PopupPayload }) {
     if (!bar) return;
 
     let raf: number;
-    const DURATION = 3000;
+    const DURATION = PL.duration;
     const start = performance.now();
 
     const tick = (now: number) => {
@@ -37,16 +37,16 @@ export function PopupItem({ PL }: { PL: PopupPayload }) {
       exit={{ opacity: 0, x: 10 }}
       animate={{ opacity: 1, x: 0 }}
       initial={{ opacity: 0, x: 10 }}
-      style={{ backgroundColor: _[PL.type].bg }}
+      style={{ backgroundColor: styles[PL.category].bg }}
       className="relative flex flex-row p-3 border rounded-md items-center gap-2 w-full overflow-hidden"
     >
-      <div className="font-medium">{_[PL.type].icon}</div>
+      <div className="font-medium">{styles[PL.category].icon}</div>
 
       <div className="text-xs font-medium">{PL.data}</div>
 
       <div
         ref={barRef}
-        style={{ width: "100%", backgroundColor: _[PL.type].bar }}
+        style={{ width: "100%", backgroundColor: styles[PL.category].bar }}
         className="absolute bottom-0 left-0 h-0.75 transition-none"
       />
     </motion.div>
