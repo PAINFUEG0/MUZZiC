@@ -119,7 +119,7 @@ export function Preload() {
   if (ready) return <Outlet />;
 
   return (
-    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10 border-5">
+    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10">
       <div
         style={{
           width: 150,
