@@ -1,2 +1,4 @@
+/** @format */
+
 export const mediaToken =
   "An5wVvaOVdSHoM4SP6IPD5IBDAD5plncDJZWjmPzby3dbflZX9CK8smOnR1b1hroSEo3xoyyYLYVDDxkrokzW1WeGUFbkNzxlRtD44ItnGicAcqK8fFwSCi65cnJhTCVFXqVKJg7eGvHl4IwN/5HhgZUb4GdM/TjwYh/tu1Au0U3gF2I+pM/yPUVyQtvB1ccPD3GliirQvanClXe2UdZj9KCEBcricYTrw1pn1mHQxbmMPeE9Q==";

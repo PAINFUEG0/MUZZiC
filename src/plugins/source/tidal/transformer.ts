@@ -1,3 +1,5 @@
+/** @format */
+
 import type { Album, Artist, Playlist, Track, Transformer } from "../../../shared/types/sourcePlugin.js";
 
 export class Transformers implements Transformer {

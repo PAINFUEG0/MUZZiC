@@ -1,3 +1,5 @@
+/** @format */
+
 import { XMLParser } from "fast-xml-parser";
 import { Lyrics } from "../../../shared/types/lyrics.js";
 

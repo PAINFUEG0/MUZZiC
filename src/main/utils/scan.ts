@@ -1,3 +1,5 @@
+/** @format */
+
 import fs from "node:fs";
 import path from "node:path";
 import { DirNode } from "../../shared/types/utils";

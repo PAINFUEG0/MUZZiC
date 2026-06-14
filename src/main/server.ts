@@ -1,3 +1,5 @@
+/** @format */
+
 import fs from "node:fs";
 import express from "express";
 import { resolve } from "node:path";

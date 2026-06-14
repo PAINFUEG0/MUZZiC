@@ -1,3 +1,5 @@
+/** @format */
+
 import { spawn } from "node:child_process";
 import { FFMPEG } from "../../shared/constants";
 

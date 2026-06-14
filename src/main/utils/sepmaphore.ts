@@ -1,3 +1,5 @@
+/** @format */
+
 export class Semaphore {
   #active = 0;
   #queue: (() => void)[] = [];

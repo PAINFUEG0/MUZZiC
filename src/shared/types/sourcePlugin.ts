@@ -1,3 +1,5 @@
+/** @format */
+
 import { Lyrics } from "./lyrics.js";
 import { formats } from "../constants.js";
 

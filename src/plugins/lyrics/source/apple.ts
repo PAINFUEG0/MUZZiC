@@ -1,3 +1,5 @@
+/** @format */
+
 import axios from "axios";
 import { parseTTML } from "../transformers/ttml.js";
 import { safeAwait } from "../../../shared/helpers.js";

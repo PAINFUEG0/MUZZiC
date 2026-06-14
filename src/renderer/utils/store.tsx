@@ -1,3 +1,5 @@
+/** @format */
+
 import { create } from "zustand";
 import { Track } from "../../shared/types/sourcePlugin";
 

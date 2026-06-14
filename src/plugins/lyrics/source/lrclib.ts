@@ -1,3 +1,5 @@
+/** @format */
+
 import axios from "axios";
 import { safeAwait } from "../../../shared/helpers.js";
 import { LyricsPlugin } from "../../../shared/types/lyrics.js";

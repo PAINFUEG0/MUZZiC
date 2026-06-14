@@ -1,3 +1,5 @@
+/** @format */
+
 import { Outlet } from "react-router-dom";
 import { treeStore } from "../utils/Store";
 import { useState, useEffect } from "react";
@@ -119,7 +121,7 @@ export function Preload() {
   if (ready) return <Outlet />;
 
   return (
-    <div className="relative flex h-screen w-full flex-col items-center justify-center gap-3 -mt-10">
+    <div className="relative -mt-10 flex h-screen w-full flex-col items-center justify-center gap-3">
       <div
         style={{
           width: 150,
@@ -130,12 +132,12 @@ export function Preload() {
         }}
       />
 
-      <div className="flex flex-row items-center w-[25dvw] justify-center px-3 gap-2">
+      <div className="flex w-[25dvw] flex-row items-center justify-center gap-2 px-3">
         <div className="flex text-xs font-medium">{task}</div>
       </div>
 
       <div className="flex h-1 w-[25dvw] rounded-full bg-gray-400">
-        <div className="bg-black rounded-full" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
+        <div className="rounded-full bg-black" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
       </div>
     </div>
   );

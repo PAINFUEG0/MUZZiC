@@ -1,3 +1,5 @@
+/** @format */
+
 import path from "node:path";
 import { api } from "../server";
 import { thumb } from "../utils/thumb";

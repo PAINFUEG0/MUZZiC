@@ -1,3 +1,5 @@
+/** @format */
+
 import { spawn } from "node:child_process";
 import { FFPROBE } from "../../shared/constants";
 import { Track } from "../../shared/types/sourcePlugin";

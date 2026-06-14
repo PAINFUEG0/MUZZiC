@@ -1,3 +1,5 @@
+/** @format */
+
 import { DirNode } from "./types/utils";
 
 export async function safeAwait<T, E extends Error>(promiseLike: Promise<T>) {

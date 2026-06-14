@@ -1,3 +1,5 @@
+/** @format */
+
 export type LyricsPlugin = {
   init(): Promise<LyricsPlugin>;
 

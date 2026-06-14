@@ -1,3 +1,5 @@
+/** @format */
+
 export const formats = {
   HIGH: { format: "AACLC", ext: "flac" },
   LOW: { format: "HEAACV1", ext: "flac" },

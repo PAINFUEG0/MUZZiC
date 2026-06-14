@@ -1,3 +1,5 @@
+/** @format */
+
 import "./index.css";
 import { router } from "./router";
 import { createRoot } from "react-dom/client";

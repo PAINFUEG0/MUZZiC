@@ -1,3 +1,5 @@
+/** @format */
+
 process.env.UV_THREADPOOL_SIZE = "64";
 
 (async () => {

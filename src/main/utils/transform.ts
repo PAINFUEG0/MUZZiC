@@ -1,3 +1,5 @@
+/** @format */
+
 import path from "node:path";
 import { probe } from "./probe";
 import { File } from "../../shared/types/utils";

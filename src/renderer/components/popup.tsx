@@ -1,3 +1,5 @@
+/** @format */
+
 import { useEffect } from "react";
 import { PopupItem } from "./PopupItem";
 import { AnimatePresence } from "framer-motion";
@@ -30,7 +32,7 @@ export function Popup() {
   }, []);
 
   return (
-    <div className="absolute top-0 right-0 z-100 h-full w-[20dvw] flex shrink-0 flex-col gap-2 justify-end p-3 pointer-events-none">
+    <div className="pointer-events-none absolute top-0 right-0 z-100 flex h-full w-[20dvw] shrink-0 flex-col justify-end gap-2 p-3">
       <AnimatePresence>{popups && popups.map((p) => <PopupItem PL={p} key={JSON.stringify(p)} />)}</AnimatePresence>
     </div>
   );

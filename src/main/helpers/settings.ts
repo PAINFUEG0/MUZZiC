@@ -1,3 +1,5 @@
+/** @format */
+
 import { settings } from "../database";
 
 export async function setMediaFolder(dir: string) {

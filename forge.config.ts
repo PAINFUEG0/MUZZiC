@@ -1,3 +1,5 @@
+/** @format */
+
 import pkg from "./package.json";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";

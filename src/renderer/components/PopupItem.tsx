@@ -1,3 +1,5 @@
+/** @format */
+
 import { motion } from "framer-motion";
 import { useRef, useEffect } from "react";
 import { PopupPayload } from "../../shared/types/utils";
@@ -38,7 +40,7 @@ export function PopupItem({ PL }: { PL: PopupPayload }) {
       animate={{ opacity: 1, x: 0 }}
       initial={{ opacity: 0, x: 10 }}
       style={{ backgroundColor: styles[PL.category].bg }}
-      className="relative flex flex-row p-3 border rounded-md items-center gap-2 w-full overflow-hidden"
+      className="relative flex w-full flex-row items-center gap-2 overflow-hidden rounded-md border p-3"
     >
       <div className="font-medium">{styles[PL.category].icon}</div>
 

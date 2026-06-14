@@ -1,3 +1,5 @@
+/** @format */
+
 import { Root } from "./layouts/Root";
 import { Preload } from "./gates/Preload";
 import { Viewport } from "./layouts/Viewport";

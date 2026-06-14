@@ -1,3 +1,5 @@
+/** @format */
+
 import fs from "node:fs";
 import axios from "axios";
 import ffbinaries from "ffbinaries";

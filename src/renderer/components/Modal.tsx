@@ -1,3 +1,5 @@
+/** @format */
+
 import { createPortal } from "react-dom";
 import { twMerge } from "tailwind-merge";
 import { RxCross1 } from "react-icons/rx";

@@ -1,3 +1,5 @@
+/** @format */
+
 import * as bin from "./src/main/helpers/binaries";
 import * as local from "./src/main/helpers/local";
 import * as settings from "./src/main/helpers/settings";

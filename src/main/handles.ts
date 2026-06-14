@@ -1,3 +1,5 @@
+/** @format */
+
 import { api } from "./server";
 import * as local from "./helpers/local";
 import * as bin from "./helpers/binaries";

@@ -1,3 +1,5 @@
+/** @format */
+
 import { Lrclib } from "./source/lrclib.js";
 import { AppleMusic } from "./source/apple.js";
 import type { SourcePlugin } from "../../shared/types/sourcePlugin.js";

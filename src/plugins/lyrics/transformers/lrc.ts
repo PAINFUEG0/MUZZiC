@@ -1,3 +1,5 @@
+/** @format */
+
 import { Lyrics } from "../../../shared/types/lyrics.js";
 
 const syncedDotRegex = /^\[(\d{2}):(\d{2})\.(\d{1,3})\]/m;

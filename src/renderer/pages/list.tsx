@@ -1,3 +1,5 @@
+/** @format */
+
 import { useState } from "react";
 import { LuFolder } from "react-icons/lu";
 import { treeStore } from "../utils/Store";
@@ -12,7 +14,7 @@ export function List() {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex h-fit items-center gap-5 p-5 border-b">
+      <div className="flex h-fit items-center gap-5 border-b p-5">
         <div className="flex flex-row gap-2">
           <button
             disabled={path.length === 1}
@@ -31,7 +33,7 @@ export function List() {
 
         <div className="flex flex-row gap-2">
           {path.map((dir, i) => (
-            <span key={i} className="flex items-center gap-1  font-bold text-sm">
+            <span key={i} className="flex items-center gap-1 text-sm font-bold">
               <span className="cursor-pointer hover:underline" onClick={() => setPath(path.slice(0, i + 1))}>
                 {dir.name.charAt(0).toUpperCase() + dir.name.slice(1)}
               </span>
@@ -55,18 +57,18 @@ export function List() {
           </div>
         ))}
 
-        <div className="flex flex-col h-fit w-full gap-2">
+        <div className="flex h-fit w-full flex-col gap-2">
           {current.files.map((e) => (
-            <div key={e.id} className="flex flex-row h-fit w-full gap-3">
-              <div className="h-8 w-8 rounded-md overflow-hidden">
-                <img src={e.thumb} className="h-full w-full  object-cover" />
+            <div key={e.id} className="flex h-fit w-full flex-row gap-3">
+              <div className="h-8 w-8 overflow-hidden rounded-md">
+                <img src={e.thumb} className="h-full w-full object-cover" />
               </div>
 
-              <div className="flex flex-col w-full">
-                <div className="flex flex-row w-full gap-2 items-center">
-                  <div className="text-xs font-bold text-no-wrap min-w-0 truncate" children={e.title} />
+              <div className="flex w-full flex-col">
+                <div className="flex w-full flex-row items-center gap-2">
+                  <div className="text-no-wrap min-w-0 truncate text-xs font-bold" children={e.title} />
                   <div
-                    className="px-0.5 py-px leading-2.5 border rounded-sm text-[10px] font-bold"
+                    className="rounded-sm border px-0.5 py-px text-[10px] leading-2.5 font-bold"
                     style={{
                       color:
                         e.resolution === "DD"
@@ -81,14 +83,14 @@ export function List() {
                   />
                 </div>
 
-                <div className="opacity-70 gap-3 flex flex-row w-full text-xs">
+                <div className="flex w-full flex-row gap-3 text-xs opacity-70">
                   <div className="text-no-wrap min-w-0 truncate" children={e.artists.map((a) => a.name).join(", ")} />
                   <div className="text-no-wrap min-w-0 truncate" children={"-"} />
                   <div className="text-no-wrap min-w-0 truncate" children={e.album.name} />
                 </div>
               </div>
 
-              <div className="col-span-1 text-xs font-medium text-no-wrap min-w-0 truncate shrink-0">
+              <div className="text-no-wrap col-span-1 min-w-0 shrink-0 truncate text-xs font-medium">
                 {`${Math.floor(e.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(e.duration % 60)}`.padEnd(2, "0")}
               </div>
             </div>
