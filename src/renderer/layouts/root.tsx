@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import { Popup } from "../components/Popup";
 import { useEffect, useState } from "react";
 import { Sidebar } from "../components/bars/sidebar";
+import { Playbar } from "../components/bars/playbar";
 
 export function Root() {
   const [mount, setMount] = useState(true);
@@ -26,7 +27,7 @@ export function Root() {
         </div>
       </div>
 
-      <div className="flex h-20 w-full shrink-0 bg-blue-200"></div>
+      <Playbar />
     </div>
   );
 }
