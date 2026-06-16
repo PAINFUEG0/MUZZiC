@@ -21,7 +21,7 @@ process.env.UV_THREADPOOL_SIZE = "64";
   const preload = path.resolve(__dirname, "./preload.js");
 
   app.once("ready", async () => {
-    const win = new BrowserWindow({ show: false, webPreferences: { backgroundThrottling: false, preload } });
+    const win = new BrowserWindow({ show: false, webPreferences: { webSecurity: false, backgroundThrottling: false, preload } });
     !app.isPackaged
       ? win.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
       : win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));

@@ -8,12 +8,13 @@ import { IoIosArrowBack } from "react-icons/io";
 
 export function List() {
   const [data] = treeStore.use();
+  const [src, setSrc] = useState("");
   const [path, setPath] = useState([data]);
 
   const current = path[path.length - 1]!;
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       <div className="flex h-fit items-center gap-5 border-b p-5">
         <div className="flex flex-row gap-2">
           <button
@@ -29,6 +30,8 @@ export function List() {
           >
             <RiHome2Line />
           </button>
+
+          <audio controls src={src} />
         </div>
 
         <div className="flex flex-row gap-2">
@@ -44,7 +47,7 @@ export function List() {
         </div>
       </div>
 
-      <div className="flex h-full w-full flex-col gap-2 overflow-auto p-5">
+      <div className="flex h-full w-full scrollbar-none flex-col gap-2 overflow-auto p-5">
         {current.dirs.map((dir, i) => (
           <div
             key={dir.name}
@@ -58,8 +61,8 @@ export function List() {
         ))}
 
         <div className="flex h-fit w-full flex-col gap-2">
-          {current.files.map((e) => (
-            <div key={e.id} className="flex h-fit w-full flex-row gap-3">
+          {current.files.slice(0, 50).map((e) => (
+            <div key={e.id} className="flex h-fit w-full cursor-pointer flex-row gap-3" onClick={() => setSrc("file:///" + e.streamURI)}>
               <div className="h-8 w-8 overflow-hidden rounded-md">
                 <img src={e.thumb} className="h-full w-full object-cover" />
               </div>
@@ -91,7 +94,7 @@ export function List() {
               </div>
 
               <div className="text-no-wrap col-span-1 min-w-0 shrink-0 truncate text-xs font-medium">
-                {`${Math.floor(e.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(e.duration % 60)}`.padEnd(2, "0")}
+                {`${Math.floor(e.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(e.duration % 60)}`.padStart(2, "0")}
               </div>
             </div>
           ))}
