@@ -13,10 +13,7 @@ process.env.UV_THREADPOOL_SIZE = "64";
 
   registerHandles();
 
-  // Menu.setApplicationMenu(null);
-
   app.setName(appUserModelId);
-  app.disableHardwareAcceleration();
   app.setAppUserModelId(appUserModelId);
   const preload = path.resolve(__dirname, "./preload.js");
 

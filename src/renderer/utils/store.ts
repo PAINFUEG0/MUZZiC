@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { Track } from "../../shared/types/sourcePlugin";
 
-type T = { name: string; path: string; files: Track<true>[]; dirs: T[] };
+export type Tree = { name: string; path: string; files: Track<true>[]; dirs: Tree[] };
 
 export function createGlobalStore<T extends boolean | null | number | object | string | undefined>(initial: T) {
   type Store = { data: T; update: (newValue: T) => void };
@@ -20,4 +20,4 @@ export function createGlobalStore<T extends boolean | null | number | object | s
   };
 }
 
-export const treeStore = createGlobalStore<T>({} as T);
+export const treeStore = createGlobalStore<Tree>({} as Tree);

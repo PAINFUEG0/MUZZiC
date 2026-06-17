@@ -1,3 +1,7 @@
 /** @format */
 
 @import "tailwindcss";
+
+:root {
+  --theme: #ff94af;
+}
