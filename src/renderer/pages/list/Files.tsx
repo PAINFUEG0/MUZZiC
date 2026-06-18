@@ -1,6 +1,6 @@
 /** @format */
 
-import { Tree } from "../../utils/Store";
+import { Tree } from "../../utils/globalStores";
 import { TbFileMusicFilled } from "react-icons/tb";
 import { Track } from "../../../shared/types/sourcePlugin";
 

@@ -1,6 +1,7 @@
 /** @format */
 
 import { create } from "zustand";
+import { themes } from "./themes";
 import { Track } from "../../shared/types/sourcePlugin";
 
 export type Tree = { name: string; path: string; files: Track<true>[]; dirs: Tree[] };
@@ -21,3 +22,4 @@ export function createGlobalStore<T extends boolean | null | number | object | s
 }
 
 export const treeStore = createGlobalStore<Tree>({} as Tree);
+export const themeStore = createGlobalStore<(typeof themes)[keyof typeof themes]>(themes.blue);

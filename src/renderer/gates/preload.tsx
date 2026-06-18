@@ -1,9 +1,9 @@
 /** @format */
 
 import { Outlet } from "react-router-dom";
-import { treeStore } from "../utils/Store";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
+import { treeStore } from "../utils//globalStores";
 import { DirNode, MessagePayload } from "../../shared/types/utils";
 
 export function Preload() {

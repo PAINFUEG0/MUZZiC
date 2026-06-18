@@ -6,11 +6,14 @@ import { MdDownloading } from "react-icons/md";
 import { TbMicrophone2 } from "react-icons/tb";
 import { ExpandableItem, Item } from "./Items";
 import { PiMusicNoteBold } from "react-icons/pi";
-import { LuRadio, LuLibrary, LuDisc } from "react-icons/lu";
+import { themeStore } from "../../../utils/globalStores";
+import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 import { RiFolderMusicLine, RiPlayListFill } from "react-icons/ri";
 
 const mainItems = [
+  { icon: <LuFolderSearch />, label: ". . .", toSet: { type: "folders" } },
   { icon: <LuRadio />, label: "Radio", toSet: { type: "radio" } },
+  { icon: <MdDownloading />, label: "Downloader", toSet: { type: "downloads" } },
   { icon: <BiHeart />, label: "Liked Songs", toSet: { type: "liked" } },
 ];
 
@@ -18,7 +21,6 @@ const libraryItems = [
   { icon: <LuDisc className="ml-8" />, label: "Tracks", toSet: { type: "tracks" } },
   { icon: <TbMicrophone2 className="ml-8" />, label: "Artists", toSet: { type: "artists" } },
   { icon: <RiFolderMusicLine className="ml-8" />, label: "Albums", toSet: { type: "albums" } },
-  { icon: <MdDownloading className="ml-8" />, label: "Downloads", toSet: { type: "downloads" } },
 ];
 
 const playlistItems = [
@@ -33,9 +35,14 @@ const sections = [
 ];
 
 export function Body() {
-  const [scene, setScene] = useState({ type: "listen now" });
+  const [theme] = themeStore.use();
+  const [scene, setScene] = useState({ type: "folders" });
+
   return (
-    <div className="flex h-full w-65 scrollbar-none flex-col overflow-x-hidden overflow-y-auto bg-black/20 p-2 backdrop-blur-md">
+    <div className="relative flex h-full w-65 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2 backdrop-blur-md">
+      <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
+      <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
+
       {mainItems.map(({ icon, label, toSet }) => (
         <Item highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} icon={icon} label={label} onClick={() => setScene(toSet)} />
       ))}

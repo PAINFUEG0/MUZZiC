@@ -3,7 +3,7 @@
 import { Files } from "./Files";
 import { Directories } from "./Directories";
 import { RiHome2Line } from "react-icons/ri";
-import { treeStore } from "../../utils/Store";
+import { treeStore } from "../../utils/globalStores";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
 
