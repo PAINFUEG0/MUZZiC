@@ -3,10 +3,11 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
-import { treeStore } from "../utils//globalStores";
+import { themeStore, treeStore } from "../utils//globalStores";
 import { DirNode, MessagePayload } from "../../shared/types/utils";
 
 export function Preload() {
+  const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -118,27 +119,47 @@ export function Preload() {
     run();
   }, []);
 
-  if (ready) return <Outlet />;
+  useEffect(() => {
+    document.documentElement.style.setProperty("--accent-color", theme.color);
+    document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
+    document.documentElement.style.setProperty("--hover-color", theme.type === "dark" ? "#000000" : "#ffffff");
+    document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
+  }, [theme.color]);
 
   return (
-    <div className="relative -mt-10 flex h-screen w-full flex-col items-center justify-center gap-3">
-      <div
-        style={{
-          width: 150,
-          height: 120,
-          backgroundColor: "black",
-          mask: "url('./logo.png') center / contain no-repeat",
-          WebkitMask: "url('./logo.png') center / contain no-repeat",
-        }}
+    <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
+      <img
+        src={theme.backgrground}
+        style={{ filter: `blur(${theme.blur})` }}
+        className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
       />
+      <div className="absolute inset-0 -z-40 h-full w-full bg-white" style={{ opacity: theme.tint.white.overall }} />
+      <div className="absolute inset-0 -z-30 h-full w-full bg-black" style={{ opacity: theme.tint.black.overall }} />
 
-      <div className="flex w-[25dvw] flex-row items-center justify-center gap-2 px-3">
-        <div className="flex text-xs font-medium">{task}</div>
-      </div>
+      {ready ? (
+        <Outlet />
+      ) : (
+        <div className="relative flex h-full w-full shrink-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
+          <div className="absolute inset-0 -z-30 h-full w-full bg-(--hover-color)/20 backdrop-blur-lg" />
+          <div
+            style={{
+              width: 150,
+              height: 120,
+              backgroundColor: "var(--accent-color)",
+              mask: "url('./logo.png') center / contain no-repeat",
+              WebkitMask: "url('./logo.png') center / contain no-repeat",
+            }}
+          />
 
-      <div className="flex h-1 w-[25dvw] rounded-full bg-gray-400">
-        <div className="rounded-full bg-black" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
-      </div>
+          <div className="-mt-3 flex w-[25dvw] flex-row items-center justify-center gap-2 px-3">
+            <div className="flex text-xs font-medium">{task}</div>
+          </div>
+
+          <div className="flex h-1 w-[25dvw] rounded-full bg-(--accent-color)/50">
+            <div className="rounded-full bg-(--accent-color)/80" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -17,6 +17,34 @@ export function List() {
   const audioref = useRef<HTMLAudioElement>(null);
   useEffect(() => void audioref.current?.play(), [src]);
 
+  const [atTop, setAtTop] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [atBottom, setAtBottom] = useState(false);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setAtTop(el.scrollTop <= 0);
+    setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    handleScroll();
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const maskImage =
+    atTop && atBottom
+      ? "none"
+      : atTop
+        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
+        : atBottom
+          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
+          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
+
   return (
     <div className="flex h-full w-full flex-col gap-8 overflow-hidden p-10 pb-5">
       <audio src={src} ref={audioref} />
@@ -49,15 +77,18 @@ export function List() {
         </div>
       </div>
 
-      <div className="flex h-full w-full scrollbar-none flex-col gap-8 overflow-auto pb-4">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        style={{ maskImage, WebkitMaskImage: maskImage }}
+        className="relative flex h-full w-full scrollbar-none flex-col gap-8 overflow-auto pb-4"
+      >
         {current.dirs.length ? <Directories current={current} path={path} setPath={setPath} /> : null}
 
         {current.files.length ? (
           <Files
             current={current}
-            onClick={(e) => {
-              setSrc("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"));
-            }}
+            onClick={(e) => setSrc("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
           />
         ) : null}
       </div>
