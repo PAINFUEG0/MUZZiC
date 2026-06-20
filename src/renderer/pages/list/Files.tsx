@@ -9,13 +9,13 @@ export function Files({ current, onClick }: { current: Tree; onClick: (e: Track<
     <div className="flex h-fit w-full shrink-0 flex-col gap-3">
       <div className="flex h-fit w-full flex-row items-end justify-between border-white/20">
         <div className="font-medium">Playable tracks</div>
-        <div className="pr-3 text-xs text-(--theme) opacity-90"> {current.files.length} items</div>
+        <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {current.files.length} items</div>
       </div>
 
       <div className="flex h-fit w-full flex-col gap-2 rounded-md border-2 border-white/20 bg-black/5 p-5 backdrop-blur-md">
         {current.files.slice(0, 50).map((e) => (
           <div key={e.id} onClick={onClick.bind(null, e)} className="flex h-fit w-full cursor-pointer flex-row gap-3">
-            <TbFileMusicFilled className="h-8 w-8 text-(--theme)" />
+            <TbFileMusicFilled className="h-8 w-8 text-(--accent-color)" />
 
             <div className="flex w-full flex-col">
               <div className="flex w-full flex-row items-center gap-2">

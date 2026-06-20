@@ -13,7 +13,7 @@ export function Root() {
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--theme", theme.color);
+    document.documentElement.style.setProperty("--accent-color", theme.color);
   }, [theme.color]);
 
   return (

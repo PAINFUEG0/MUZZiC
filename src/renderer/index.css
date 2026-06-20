@@ -3,5 +3,8 @@
 @import "tailwindcss";
 
 :root {
-  --theme: #ff94af;
+  --text-color: #000000;
+  --hover-color: #000000;
+  --border-color: #000000;
+  --accent-color: #ff94af;
 }

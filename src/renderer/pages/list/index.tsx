@@ -31,7 +31,7 @@ export function List() {
               children={b.Icon}
               onClick={b.onclick}
               disabled={path.length === 1}
-              className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--theme) active:scale-95"
+              className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
             />
           ))}
         </div>

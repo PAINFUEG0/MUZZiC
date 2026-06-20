@@ -15,7 +15,7 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="aspect-square h-fit w-fit text-xl text-(--theme)"
+        className="aspect-square h-fit w-fit text-xl text-(--accent-color)"
         children={isOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
       />
 
@@ -23,19 +23,19 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
         <div className="flex flex-row items-center justify-center gap-2.5">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--theme)"
+            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
             children={<TbMinus />}
           />
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--theme)"
+            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
             children={<MdFullscreen />}
           />
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--theme)"
+            className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
             children={<IoMdClose />}
           />
         </div>

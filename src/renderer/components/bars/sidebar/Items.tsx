@@ -16,9 +16,9 @@ export const Item = ({ icon, label, onClick, highlighted = false }: ItemProps) =
         (highlighted ? "" : "hover:bg-[#00000044]")
       }
     >
-      {highlighted && <div className="absolute inset-0 h-full w-full bg-(--theme) opacity-10 backdrop-blur-md" />}
-      <div className={"z-1 h-full w-1 rounded-sm " + (highlighted ? "bg-(--theme)" : "group-hover:bg-(--theme)")} />
-      <div className={"z-1 text-base " + (highlighted ? "" : "group-hover:text-(--theme)")} children={icon} />
+      {highlighted && <div className="absolute inset-0 h-full w-full bg-(--accent-color) opacity-10 backdrop-blur-md" />}
+      <div className={"z-1 h-full w-1 rounded-sm " + (highlighted ? "bg-(--accent-color)" : "group-hover:bg-(--accent-color)")} />
+      <div className={"z-1 text-base " + (highlighted ? "" : "group-hover:text-(--accent-color)")} children={icon} />
       <div className="z-1 p-1 text-[13px]" children={label} />
     </div>
   );
@@ -33,8 +33,8 @@ export const ExpandableItem = ({ icon, label, items, collapsable, defaultOpen }:
       onClick={() => setShow(!show)}
       className="group flex w-full shrink-0 cursor-pointer flex-row items-center gap-3 rounded-sm p-1 hover:bg-[#00000044]"
     >
-      <div className="h-full w-1 shrink-0 rounded-sm group-hover:bg-(--theme)" />
-      <div className="text-base group-hover:text-(--theme)" children={icon} />
+      <div className="h-full w-1 shrink-0 rounded-sm group-hover:bg-(--accent-color)" />
+      <div className="text-base group-hover:text-(--accent-color)" children={icon} />
       <div className="p-1 text-[13px]" children={label} />
       <div
         className="flex w-full flex-row items-center justify-end gap-3 px-2"
