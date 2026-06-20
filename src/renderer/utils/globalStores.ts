@@ -22,4 +22,4 @@ export function createGlobalStore<T extends boolean | null | number | object | s
 }
 
 export const treeStore = createGlobalStore<Tree>({} as Tree);
-export const themeStore = createGlobalStore<(typeof themes)[keyof typeof themes]>(themes.blue);
+export const themeStore = createGlobalStore<(typeof themes)[number]>(themes[0]!);

@@ -9,7 +9,7 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
   const [theme] = themeStore.use();
 
   return (
-    <div className="relative flex h-20 w-full shrink-0 flex-row items-center justify-between px-5 py-3 backdrop-blur-md">
+    <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3 backdrop-blur-md">
       <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
       <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
 

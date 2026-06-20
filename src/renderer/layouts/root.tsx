@@ -22,7 +22,7 @@ export function Root() {
 
       <img
         src={theme.backgrground}
-        style={{ filter: `blur(${"0px"})` }}
+        style={{ filter: `blur(${theme.blur})` }}
         className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
       />
       <div className="absolute inset-0 -z-40 h-full w-full bg-white" style={{ opacity: theme.tint.white.overall }} />
