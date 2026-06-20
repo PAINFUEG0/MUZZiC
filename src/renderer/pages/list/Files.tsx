@@ -7,14 +7,18 @@ import { Track } from "../../../shared/types/sourcePlugin";
 export function Files({ current, onClick }: { current: Tree; onClick: (e: Track<true>) => void }) {
   return (
     <div className="flex h-fit w-full shrink-0 flex-col gap-3">
-      <div className="flex h-fit w-full flex-row items-end justify-between border-white/20">
+      <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="font-medium">Playable tracks</div>
         <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {current.files.length} items</div>
       </div>
 
-      <div className="flex h-fit w-full flex-col gap-2 rounded-md border-2 border-white/20 bg-black/5 p-5 backdrop-blur-md">
+      <div className="flex h-fit w-full flex-col gap-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
         {current.files.slice(0, 50).map((e) => (
-          <div key={e.id} onClick={onClick.bind(null, e)} className="flex h-fit w-full cursor-pointer flex-row gap-3">
+          <div
+            key={e.id}
+            onClick={onClick.bind(null, e)}
+            className="flex h-fit w-full shrink-0 cursor-pointer flex-row items-center gap-3 rounded-md px-2 py-1 hover:bg-(--hover-color)/20"
+          >
             <TbFileMusicFilled className="h-8 w-8 text-(--accent-color)" />
 
             <div className="flex w-full flex-col">
