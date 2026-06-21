@@ -18,7 +18,11 @@ export function Playbar() {
               className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl text-white/70 opacity-0 hover:opacity-100"
               children={<LuExpand />}
             />
-            <img src="./logo.png" className="h-full w-full object-contain" />
+            <img
+              src="./logo.png"
+              className="h-full w-full object-contain"
+              style={{ filter: theme.type === "dark" ? "invert(100%)" : "" }}
+            />
           </button>
 
           <div className="flex h-full w-full flex-col items-center justify-center">
