@@ -15,12 +15,12 @@ export function Playbar() {
         <div className="flex h-20 w-full flex-row gap-3 p-2">
           <button className="relative flex aspect-square h-full shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md transition-all duration-100 active:scale-95">
             <div
-              className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl text-white/70 opacity-0 hover:opacity-100"
               children={<LuExpand />}
+              className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl text-white/70 opacity-0 transition-opacity duration-300 hover:opacity-100"
             />
             <img
               src="./logo.png"
-              className="h-full w-full object-contain"
+              className="-z-1 h-full w-full object-contain"
               style={{ filter: theme.type === "dark" ? "invert(100%)" : "" }}
             />
           </button>
