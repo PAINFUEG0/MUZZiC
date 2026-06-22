@@ -3,46 +3,37 @@
 import { Files } from "./Files";
 import { Directories } from "./Directories";
 import { RiHome2Line } from "react-icons/ri";
-import { treeStore } from "../../utils/globalStores";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { searchBox, treeStore } from "../../utils/globalStores";
+
+const variants = {
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
+};
 
 export function List() {
   const [data] = treeStore.use();
-  const [src, setSrc] = useState("");
-  const [value, setValue] = useState("");
   const [path, setPath] = useState([data]);
+  const [atTop, setAtTop] = useState(true);
+  const [query, setQuery] = searchBox.use();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [atBottom, setAtBottom] = useState(false);
 
   const current = path[path.length - 1]!;
   const [dirs, setDirs] = useState(current.dirs);
   const [files, setFiles] = useState(current.files);
+
+  useEffect(() => setQuery(""), []);
   useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
-  useEffect(() => {
-    setDirs(!value ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(value.toLowerCase())));
-    setFiles(!value ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(value.toLowerCase())));
-  }, [value]);
-
-  const audioref = useRef<HTMLAudioElement>(null);
-  useEffect(() => void audioref.current?.play(), [src]);
-
-  const [atTop, setAtTop] = useState(true);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [atBottom, setAtBottom] = useState(false);
-
-  const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setAtTop(el.scrollTop <= 0);
-    setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-  };
+  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [current]);
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    handleScroll();
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
+    setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
+    setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
+  }, [query]);
 
   const maskImage =
     atTop && atBottom
@@ -53,15 +44,17 @@ export function List() {
           ? "linear-gradient(to bottom, transparent 0%, black 5%)"
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
+  const [direction, setDirection] = useState(1);
+  const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
+  const goBack = (newPath: typeof path) => (setDirection(-1), setPath(newPath));
+
   return (
     <div className="flex h-full w-full flex-col gap-8 overflow-hidden p-10 pb-5">
-      <audio src={src} ref={audioref} />
-
       <div className="flex h-fit items-center gap-5">
         <div className="flex flex-row gap-2">
           {[
-            { Icon: <IoIosArrowBack />, onclick: () => setPath((path) => [...path.slice(0, path.length - 1)]) },
-            { Icon: <RiHome2Line />, onclick: () => setPath((path) => [...path.slice(0, 1)]) },
+            { Icon: <IoIosArrowBack />, onclick: () => goBack(path.slice(0, path.length - 1)) },
+            { Icon: <RiHome2Line />, onclick: () => goBack(path.slice(0, 1)) },
           ].map((b) => (
             <button
               children={b.Icon}
@@ -75,7 +68,7 @@ export function List() {
         <div className="flex w-full flex-row gap-2">
           {path.map((dir, i) => (
             <span key={i} className="flex items-center gap-1 text-sm font-medium">
-              <span className="cursor-pointer hover:underline" onClick={() => setPath(path.slice(0, i + 1))}>
+              <span className="cursor-pointer hover:underline" onClick={() => goBack(path.slice(0, i + 1))}>
                 {dir.name.charAt(0).toUpperCase() + dir.name.slice(1)}
               </span>
 
@@ -83,30 +76,36 @@ export function List() {
             </span>
           ))}
         </div>
-
-        <input
-          type="search"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder=""
-          className="flex w-sm shrink-0 flex-row border outline-none"
-        />
       </div>
 
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        style={{ maskImage, WebkitMaskImage: maskImage }}
-        className="relative flex h-full w-full scrollbar-none flex-col gap-8 overflow-auto pb-4"
-      >
-        {dirs.length ? <Directories dirs={dirs} path={path} setPath={setPath} /> : null}
-
-        {files.length ? (
-          <Files
-            files={files}
-            onClick={(e) => setSrc("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
-          />
-        ) : null}
+      <div className="relative flex-1 overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.div
+            ref={scrollRef}
+            key={current.name}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            style={{ maskImage, WebkitMaskImage: maskImage }}
+            onScroll={() => {
+              const el = scrollRef.current;
+              el && setAtTop(el.scrollTop <= 0);
+              el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
+            }}
+            className="absolute inset-0 flex scrollbar-none flex-col gap-8 overflow-auto pb-4"
+          >
+            {dirs.length ? <Directories dirs={dirs} path={path} setPath={goForward} /> : null}
+            {files.length ? (
+              <Files
+                files={files}
+                onClick={(e) => console.log("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
+              />
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
