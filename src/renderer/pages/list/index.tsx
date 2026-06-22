@@ -10,9 +10,17 @@ import { useEffect, useRef, useState } from "react";
 export function List() {
   const [data] = treeStore.use();
   const [src, setSrc] = useState("");
+  const [value, setValue] = useState("");
   const [path, setPath] = useState([data]);
 
   const current = path[path.length - 1]!;
+  const [dirs, setDirs] = useState(current.dirs);
+  const [files, setFiles] = useState(current.files);
+  useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
+  useEffect(() => {
+    setDirs(!value ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(value.toLowerCase())));
+    setFiles(!value ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(value.toLowerCase())));
+  }, [value]);
 
   const audioref = useRef<HTMLAudioElement>(null);
   useEffect(() => void audioref.current?.play(), [src]);
@@ -64,7 +72,7 @@ export function List() {
           ))}
         </div>
 
-        <div className="flex flex-row gap-2">
+        <div className="flex w-full flex-row gap-2">
           {path.map((dir, i) => (
             <span key={i} className="flex items-center gap-1 text-sm font-medium">
               <span className="cursor-pointer hover:underline" onClick={() => setPath(path.slice(0, i + 1))}>
@@ -75,6 +83,14 @@ export function List() {
             </span>
           ))}
         </div>
+
+        <input
+          type="search"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder=""
+          className="flex w-sm shrink-0 flex-row border outline-none"
+        />
       </div>
 
       <div
@@ -83,11 +99,11 @@ export function List() {
         style={{ maskImage, WebkitMaskImage: maskImage }}
         className="relative flex h-full w-full scrollbar-none flex-col gap-8 overflow-auto pb-4"
       >
-        {current.dirs.length ? <Directories current={current} path={path} setPath={setPath} /> : null}
+        {dirs.length ? <Directories dirs={dirs} path={path} setPath={setPath} /> : null}
 
-        {current.files.length ? (
+        {files.length ? (
           <Files
-            current={current}
+            files={files}
             onClick={(e) => setSrc("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
           />
         ) : null}
