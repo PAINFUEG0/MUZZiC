@@ -1,13 +1,15 @@
 /** @format */
 
+import path from "node:path";
 import { spawn } from "node:child_process";
+import { File } from "../../shared/types/utils";
 import { FFPROBE } from "../../shared/constants";
 import { Track } from "../../shared/types/sourcePlugin";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 
-export async function probe(path: string) {
-  const data = JSON.parse(await ffprobe(path).catch(() => "{}"));
+export async function probe(file: File) {
+  const data = JSON.parse(await ffprobe(file.path).catch(() => "{}"));
 
   const tags = data?.format?.tags || {};
   const stream = data?.streams?.[0];
@@ -18,21 +20,28 @@ export async function probe(path: string) {
 
   let resolution: Track["resolution"] = "CD";
 
+  console.log(codec, bitDepth, sampleRate, path.extname(file.path));
+
   if (codec === "ac3" || codec === "eac3") resolution = "DD";
   else if (codec === "mp3" || codec === "aac" || codec === "opus" || codec === "vorbis") resolution = "SR";
   else if (bitDepth > 16 || sampleRate > 44100) resolution = "HR";
 
   return {
     resolution,
+    id: file.id,
+    streamURI: file.path,
+    thumb: `${file.id}.jpg`,
+    needsTranscoding: false,
     duration: Number(data?.format?.duration),
+    title: path.basename(file.path, path.extname(file.path)),
     album: (tags.album || tags.ALBUM || "Unknown") as string,
     artists: (tags.artist || tags.ARTIST || "Unknown")
       .split(regex)
       .map((v: any) => v.trim?.())
       .filter(Boolean) as string[],
-    lyrics: (tags["LYRICS"] || tags["lyrics"] || tags["UNSYNCEDLYRICS"] || tags["lyrics-eng"] || null) as string | null,
+    lyrics: tags["LYRICS"] || tags["lyrics"] || tags["UNSYNCEDLYRICS"] || tags["lyrics-eng"] || "No lyrics found",
     explicit: ["1", "true", "yes", "explicit"].includes(String(tags.explicit || tags.ITUNESADVISORY || tags.EXPLICIT).toLowerCase()),
-  };
+  } satisfies Track;
 }
 
 function ffprobe(path: string): Promise<string> {

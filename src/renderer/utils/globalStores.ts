@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { themes } from "./themes";
 import { Track } from "../../shared/types/sourcePlugin";
 
-export type Tree = { name: string; path: string; files: Track<true>[]; dirs: Tree[] };
+export type Tree = { name: string; path: string; files: Track[]; dirs: Tree[] };
 
 export function createGlobalStore<T extends boolean | null | number | object | string | undefined>(initial: T) {
   type Store = { data: T; update: (newValue: T) => void };

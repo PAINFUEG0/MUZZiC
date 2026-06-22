@@ -15,7 +15,7 @@ export function chunk<T>(arr: T[], size: number) {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, (i + 1) * size));
 }
 
-export function flatten<T extends boolean>(node: DirNode<T>): DirNode<T>["files"] {
+export function flatten(node: DirNode): DirNode["files"] {
   if (!node) return [];
   return [...node.files, ...node.dirs.flatMap((e) => flatten(e))];
 }

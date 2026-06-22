@@ -67,23 +67,11 @@ export function Preload() {
             const data = JSON.parse(m.data) as MessagePayload;
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
             setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
-            setProgress(Math.floor(30 * (data.current / data.total)) + 35);
+            setProgress(Math.floor(30 * (data.current / data.total)) + 65);
           };
 
           const res = await window.api.extractMetadata(added);
           await window.api.setMeta(res);
-          setProgress(65);
-
-          setTask(`Preparing to extract .thumbnails of ${added.length} newly added files`);
-
-          ws.onmessage = (m: MessageEvent) => {
-            const data = JSON.parse(m.data) as MessagePayload;
-            if (data.type !== "PROGRESS" || data.data !== "THUMB") return;
-            setTask("Extracting thumbnail [ " + data.current + "/" + data.total + " ]");
-            setProgress(Math.floor(30 * (data.current / data.total)) + 65);
-          };
-
-          await window.api.extractThumbnail(added);
           ws.onmessage = null;
           setProgress(95);
         }
@@ -98,7 +86,7 @@ export function Preload() {
       const flat = flatten(currentTree);
       const metas = Object.fromEntries((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean).map((e) => [e!.id, e]));
 
-      const populateTreeWithMeta = (node: DirNode<true>) => {
+      const populateTreeWithMeta = (node: DirNode) => {
         for (let i = 0; i < node.files.length; i++)
           (node.files[i] as any) = {
             ...node.files[i],

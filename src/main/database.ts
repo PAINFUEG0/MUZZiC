@@ -8,6 +8,6 @@ import { Track } from "../shared/types/sourcePlugin";
 //  app.getPath("userData")
 const databasePath = path.join("./", "database");
 
-export const tree = new CoreDatabase<DirNode<true>>(`${databasePath}/tree`);
-export const meta = new CoreDatabase<Track<true>>(`${databasePath}/meta`);
+export const tree = new CoreDatabase<DirNode>(`${databasePath}/tree`);
 export const settings = new CoreDatabase(`${databasePath}/settings`);
+export const meta = new CoreDatabase<Track>(`${databasePath}/meta`);

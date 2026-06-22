@@ -11,5 +11,5 @@
     "tsBuildInfoFile": "../../.tsbuildinfo/main.ts-buildinfo"
   },
   "include": ["../../src/main", "../../global.d.ts"],
-  "references": [{ "path": "./tsconfig.shared.json" }, { "path": "./tsconfig.plugins.json" }]
+  "references": [{ "path": "./tsconfig.shared.json" }]
 }

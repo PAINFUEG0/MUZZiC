@@ -22,7 +22,7 @@ process.env.UV_THREADPOOL_SIZE = "64";
     !app.isPackaged
       ? win.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
       : win.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-    win.once("ready-to-show", () => (win.maximize(), win.show(), win.focus));
+    win.once("ready-to-show", () => (win.maximize(), win.show(), win.focus()));
   });
 
   app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());

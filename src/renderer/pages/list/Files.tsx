@@ -4,7 +4,7 @@ import { Tree } from "../../utils/globalStores";
 import { TbFileMusicFilled } from "react-icons/tb";
 import { Track } from "../../../shared/types/sourcePlugin";
 
-export function Files({ current, onClick }: { current: Tree; onClick: (e: Track<true>) => void }) {
+export function Files({ current, onClick }: { current: Tree; onClick: (e: Track) => void }) {
   return (
     <div className="flex h-fit w-full shrink-0 flex-col gap-3">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
@@ -35,9 +35,9 @@ export function Files({ current, onClick }: { current: Tree; onClick: (e: Track<
               </div>
 
               <div className="flex w-full flex-row gap-3 text-xs opacity-70">
-                <div className="text-no-wrap min-w-0 truncate" children={e.artists.map((a) => a.name).join(", ")} />
+                <div className="text-no-wrap min-w-0 truncate" children={e.artists?.join?.(", ")} />
                 <div className="text-no-wrap min-w-0 truncate" children={"-"} />
-                <div className="text-no-wrap min-w-0 truncate" children={e.album.name} />
+                <div className="text-no-wrap min-w-0 truncate" children={e.album} />
               </div>
             </div>
 
