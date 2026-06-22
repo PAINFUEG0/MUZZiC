@@ -67,7 +67,7 @@ export function Preload() {
             const data = JSON.parse(m.data) as MessagePayload;
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
             setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
-            setProgress(Math.floor(30 * (data.current / data.total)) + 65);
+            setProgress(Math.floor(60 * (data.current / data.total)) + 35);
           };
 
           const res = await window.api.extractMetadata(added);

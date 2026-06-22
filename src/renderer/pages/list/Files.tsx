@@ -13,7 +13,7 @@ export function Files({ current, onClick }: { current: Tree; onClick: (e: Track)
       </div>
 
       <div className="flex h-fit w-full flex-col gap-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
-        {current.files.slice(0, 50).map((e) => (
+        {current.files.map((e) => (
           <div
             key={e.id}
             onClick={onClick.bind(null, e)}
