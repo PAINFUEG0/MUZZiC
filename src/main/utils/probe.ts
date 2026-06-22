@@ -11,23 +11,19 @@ const regex = /,|;| feat\.?| ft\.?| & /i;
 export async function probe(file: File) {
   const data = JSON.parse(await ffprobe(file.path).catch(() => "{}"));
 
-  const tags = data?.format?.tags || {};
   const stream = data?.streams?.[0];
-
+  const tags = data?.format?.tags || {};
   const sampleRate = Number(stream?.sample_rate || 0);
+  const streamBitrate = Number(stream?.bit_rate || 0);
   const codec = (stream?.codec_name || "").toLowerCase();
   const bitDepth = Number(stream?.bits_per_raw_sample || stream?.bits_per_sample || 0);
 
-  let resolution: Track["resolution"] = "CD";
-
-  console.log(codec, bitDepth, sampleRate, path.extname(file.path));
-
+  let resolution: Track["resolution"]["name"] = "CD";
   if (codec === "ac3" || codec === "eac3") resolution = "DD";
   else if (codec === "mp3" || codec === "aac" || codec === "opus" || codec === "vorbis") resolution = "SR";
   else if (bitDepth > 16 || sampleRate > 44100) resolution = "HR";
 
   return {
-    resolution,
     id: file.id,
     streamURI: file.path,
     thumb: `${file.id}.jpg`,
@@ -39,6 +35,7 @@ export async function probe(file: File) {
       .split(regex)
       .map((v: any) => v.trim?.())
       .filter(Boolean) as string[],
+    resolution: { name: resolution, bitDepth: bitDepth, sampleRate: sampleRate, bitrate: streamBitrate },
     lyrics: tags["LYRICS"] || tags["lyrics"] || tags["UNSYNCEDLYRICS"] || tags["lyrics-eng"] || "No lyrics found",
     explicit: ["1", "true", "yes", "explicit"].includes(String(tags.explicit || tags.ITUNESADVISORY || tags.EXPLICIT).toLowerCase()),
   } satisfies Track;
@@ -52,7 +49,7 @@ function ffprobe(path: string): Promise<string> {
       "-print_format",
       "json",
       "-show_entries",
-      "format=duration:format_tags:stream=codec_name,sample_rate,bits_per_sample,bits_per_raw_sample",
+      "format=duration:format_tags:stream=bit_rate,codec_name,sample_rate,bits_per_sample,bits_per_raw_sample,channels,channel_layout",
       path,
     ];
 

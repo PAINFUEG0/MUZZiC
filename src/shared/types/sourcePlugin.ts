@@ -11,5 +11,5 @@ export type Track = {
   explicit: boolean;
   streamURI: string;
   needsTranscoding: boolean;
-  resolution: "SR" | "CD" | "HR" | "DD";
+  resolution: { name: "SR" | "CD" | "HR" | "DD"; bitDepth: number; sampleRate: number; bitrate: number };
 };
