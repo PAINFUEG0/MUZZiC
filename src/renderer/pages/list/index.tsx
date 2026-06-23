@@ -10,8 +10,8 @@ import { searchBox, treeStore } from "../../utils/globalStores";
 
 const variants = {
   center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
-  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
+  exit: (dir: number) => ({ x: dir > 0 ? "-20%" : "20%", opacity: 0 }),
+  enter: (dir: number) => ({ x: dir > 0 ? "20%" : "-20%", opacity: 0 }),
 };
 
 export function List() {
@@ -79,17 +79,17 @@ export function List() {
       </div>
 
       <div className="relative flex-1 overflow-hidden">
-        <AnimatePresence initial={false}>
+        <AnimatePresence initial={false} custom={direction}>
           <motion.div
+            exit="exit"
+            initial="enter"
             ref={scrollRef}
+            animate="center"
             key={current.name}
             custom={direction}
             variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{ maskImage, WebkitMaskImage: maskImage }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             onScroll={() => {
               const el = scrollRef.current;
               el && setAtTop(el.scrollTop <= 0);
