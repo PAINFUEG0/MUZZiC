@@ -2,10 +2,10 @@
 
 import { api } from "./server";
 import { API } from "../shared/types";
-import { setMediaFolder, getMediaFolder } from "./helpers/settings";
+import * as local from "./helpers/local";
+import * as bin from "./helpers/binaries";
+import * as settings from "./helpers/settings";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from "electron";
-import { scan, getTree, setTree, setMeta, getMeta, deleteMeta, extractMetadata } from "./helpers/local";
-import { checkDLP, downloadDLP, checkFFMPEG, checkFFPROBE, downloadFFMPEG, downloadFFPROBE } from "./helpers/binaries";
 
 export function registerHandles(win: BrowserWindow) {
   Object.entries({
@@ -15,30 +15,30 @@ export function registerHandles(win: BrowserWindow) {
 
     getPort: () => api.port,
 
-    checkDLP: () => checkDLP(),
-    downloadDLP: () => downloadDLP(),
+    checkDLP: () => bin.checkDLP(),
+    downloadDLP: () => bin.downloadDLP(),
 
-    checkFFMPEG: () => checkFFMPEG(),
-    checkFFPROBE: () => checkFFPROBE(),
+    checkFFMPEG: () => bin.checkFFMPEG(),
+    checkFFPROBE: () => bin.checkFFPROBE(),
 
-    downloadFFMPEG: () => downloadFFMPEG(),
-    downloadFFPROBE: () => downloadFFPROBE(),
+    downloadFFMPEG: () => bin.downloadFFMPEG(),
+    downloadFFPROBE: () => bin.downloadFFPROBE(),
 
-    getMediaFolder: () => getMediaFolder(),
-    setMediaFolder: (_: IpcMainInvokeEvent, ...args) => setMediaFolder(...args),
+    getMediaFolder: () => settings.getMediaFolder(),
+    setMediaFolder: (_: IpcMainInvokeEvent, ...args) => settings.setMediaFolder(...args),
 
     openFolderDialog: async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null,
 
-    scan: (_: IpcMainInvokeEvent, ...args) => scan(...args),
+    scan: (_: IpcMainInvokeEvent, ...args) => local.scan(...args),
 
-    getTree: (_: IpcMainInvokeEvent, ...args) => getTree(...args),
-    setTree: (_: IpcMainInvokeEvent, ...args) => setTree(...args),
+    getTree: (_: IpcMainInvokeEvent, ...args) => local.getTree(...args),
+    setTree: (_: IpcMainInvokeEvent, ...args) => local.setTree(...args),
 
-    setMeta: (_: IpcMainInvokeEvent, ...args) => setMeta(...args),
-    getMeta: (_: IpcMainInvokeEvent, ...args) => getMeta(...args),
-    deleteMeta: (_: IpcMainInvokeEvent, ...args) => deleteMeta(...args),
+    setMeta: (_: IpcMainInvokeEvent, ...args) => local.setMeta(...args),
+    getMeta: (_: IpcMainInvokeEvent, ...args) => local.getMeta(...args),
+    deleteMeta: (_: IpcMainInvokeEvent, ...args) => local.deleteMeta(...args),
 
-    extractMetadata: (_: IpcMainInvokeEvent, ...args) => extractMetadata(...args),
+    extractMetadata: (_: IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
   } satisfies {
     [K in keyof API]: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => ipcMain.handle(K, V));
