@@ -1,8 +1,8 @@
 /** @format */
 
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Popup } from "../components/Popup";
-import { useState } from "react";
 import { Navbar } from "../components/bars/navbar";
 import { Sidebar } from "../components/bars/sidebar";
 import { Playbar } from "../components/bars/playbar";

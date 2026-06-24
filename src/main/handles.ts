@@ -29,7 +29,6 @@ export function registerHandles() {
   ipcMain.handle("setTree", (_, K, V) => local.setTree(K, V));
 
   ipcMain.handle("extractMetadata", (_, flat) => local.extractMetadata(flat));
-  ipcMain.handle("extractThumbnail", (_, flat) => local.extractThumbnail(flat));
 
   ipcMain.handle("getMeta", (_, K) => local.getMeta(K));
   ipcMain.handle("setMeta", (_, K, V) => local.setMeta(K, V));

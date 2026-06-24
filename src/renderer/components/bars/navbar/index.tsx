@@ -1,13 +1,14 @@
 /** @format */
 
-import { useEffect, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
-import { MdFullscreen } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
+import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import { searchBox, themeStore } from "../../../utils/globalStores";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 
 export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg: boolean) => void }) {
   const [theme] = themeStore.use();
+  const [fs, setFs] = useState(true);
   const [value, setValue] = searchBox.use();
   const ref = useRef<HTMLInputElement>(null);
 
@@ -29,7 +30,9 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
         children={isOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
       />
 
-      <div className="flex w-full items-center justify-end gap-3">
+      <div className="flex h-full w-full items-center justify-end gap-3">
+        <div className="relative m-5 flex h-full w-full" style={{ WebkitAppRegion: "drag" } as any} />
+
         <div className="relative flex">
           <input
             ref={ref}
@@ -63,23 +66,17 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
 
         <div className="flex flex-row items-center justify-end">
           <div className="flex flex-row items-center justify-center gap-2.5">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
-              children={<TbMinus />}
-            />
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
-              children={<MdFullscreen />}
-            />
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color)"
-              children={<IoMdClose />}
-            />
+            {[
+              { Icon: <TbMinus />, onclick: () => window.api.minimize() },
+              { Icon: fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
+              { Icon: <IoMdClose />, onclick: () => window.api.close() },
+            ].map((b) => (
+              <button
+                children={b.Icon}
+                onClick={b.onclick}
+                className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color) transition-all duration-100 active:scale-99"
+              />
+            ))}
           </div>
         </div>
       </div>

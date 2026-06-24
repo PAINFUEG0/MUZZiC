@@ -121,8 +121,11 @@ export function Preload() {
         style={{ filter: `blur(${theme.blur})` }}
         className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
       />
+
       <div className="absolute inset-0 -z-40 h-full w-full bg-white" style={{ opacity: theme.tint.white.overall }} />
       <div className="absolute inset-0 -z-30 h-full w-full bg-black" style={{ opacity: theme.tint.black.overall }} />
+
+      <div className="absolute inset-0 h-7 w-full cursor-pointer" style={{ WebkitAppRegion: "drag" } as any} />
 
       {ready ? (
         <Outlet />

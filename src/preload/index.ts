@@ -3,6 +3,10 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
+  close: () => ipcRenderer.invoke("close"),
+  minimize: () => ipcRenderer.invoke("minimize"),
+  fullscreen: () => ipcRenderer.invoke("fullscreen"),
+
   getPort: () => ipcRenderer.invoke("getPort"),
 
   checkDLP: () => ipcRenderer.invoke("checkDLP"),
@@ -25,7 +29,6 @@ contextBridge.exposeInMainWorld("api", {
   setTree: (K, V) => ipcRenderer.invoke("setTree", K, V),
 
   extractMetadata: (flat) => ipcRenderer.invoke("extractMetadata", flat),
-  extractThumbnail: (flat) => ipcRenderer.invoke("extractThumbnail", flat),
 
   getMeta: (K) => ipcRenderer.invoke("getMeta", K),
   deleteMeta: (K) => ipcRenderer.invoke("deleteMeta", K),

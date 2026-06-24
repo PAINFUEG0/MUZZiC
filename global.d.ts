@@ -12,6 +12,10 @@ declare global {
 
   interface Window {
     api: {
+      close: () => Promise<void>;
+      minimize: () => Promise<void>;
+      fullscreen: () => Promise<void>;
+
       getPort: () => Promise<string>;
 
       checkDLP: typeof bin.checkDLP;
@@ -34,7 +38,6 @@ declare global {
       setTree: typeof local.setTree;
 
       extractMetadata: typeof local.extractMetadata;
-      extractThumbnail: typeof local.extractThumbnail;
 
       getMeta: typeof local.getMeta;
       setMeta: typeof local.setMeta;
