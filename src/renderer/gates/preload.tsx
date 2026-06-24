@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
 import { themeStore, treeStore } from "../utils//globalStores";
 import { DirNode, MessagePayload } from "../../shared/types";
+import { API } from "../../../global";
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -15,6 +16,12 @@ export function Preload() {
 
   useEffect(() => {
     const run = async () => {
+      window.api = new Proxy({} as API, {
+        get(_, K) {
+          return (...args: any[]) => window.invoke(String(K), ...args);
+        },
+      });
+
       setTask("Preparing connections & dependencies");
 
       const port = await window.api.getPort();

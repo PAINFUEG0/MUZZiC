@@ -1,5 +1,6 @@
 /** @format */
 
+import { IpcRenderer } from "electron";
 import { Track } from "./src/shared/types";
 import { DirNode, File } from "./src/shared/types";
 
@@ -10,6 +11,7 @@ declare global {
   const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 
   interface Window {
+    invoke: IpcRenderer["invoke"];
     api: API;
   }
 }
