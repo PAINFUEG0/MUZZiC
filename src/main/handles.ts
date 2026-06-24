@@ -2,31 +2,44 @@
 
 import { api } from "./server";
 import { API } from "../shared/types";
-import * as local from "./helpers/local";
-import * as bin from "./helpers/binaries";
-import * as settings from "./helpers/settings";
-import { dialog, ipcMain, IpcMainInvokeEvent } from "electron";
+import { setMediaFolder, getMediaFolder } from "./helpers/settings";
+import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from "electron";
+import { scan, getTree, setTree, setMeta, getMeta, deleteMeta, extractMetadata } from "./helpers/local";
+import { checkDLP, downloadDLP, checkFFMPEG, checkFFPROBE, downloadFFMPEG, downloadFFPROBE } from "./helpers/binaries";
 
-export function registerHandles() {
-  handle("getPort", () => api.port);
-  handle("checkDLP", () => bin.checkDLP());
-  handle("downloadDLP", () => bin.downloadDLP());
-  handle("checkFFMPEG", () => bin.checkFFMPEG());
-  handle("checkFFPROBE", () => bin.checkFFPROBE());
-  handle("scan", (_, ...args) => local.scan(...args));
-  handle("downloadFFMPEG", () => bin.downloadFFMPEG());
-  handle("downloadFFPROBE", () => bin.downloadFFPROBE());
-  handle("getMediaFolder", () => settings.getMediaFolder());
-  handle("getTree", (_, ...args) => local.getTree(...args));
-  handle("setTree", (_, ...args) => local.setTree(...args));
-  handle("setMeta", (_, ...args) => local.setMeta(...args));
-  handle("getMeta", (_, ...args) => local.getMeta(...args));
-  handle("deleteMeta", (_, ...args) => local.deleteMeta(...args));
-  handle("extractMetadata", (_, ...args) => local.extractMetadata(...args));
-  handle("setMediaFolder", (_, ...args) => settings.setMediaFolder(...args));
-  handle("openFolderDialog", async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null);
-}
+export function registerHandles(win: BrowserWindow) {
+  Object.entries({
+    close: () => Promise.resolve(app.quit()),
+    minimize: () => Promise.resolve(win.minimize()),
+    fullscreen: () => Promise.resolve(win.setFullScreen(!win.isFullScreen())),
 
-function handle<K extends keyof API>(channel: K, listener: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>) {
-  ipcMain.handle(channel as string, listener);
+    getPort: () => api.port,
+
+    checkDLP: () => checkDLP(),
+    downloadDLP: () => downloadDLP(),
+
+    checkFFMPEG: () => checkFFMPEG(),
+    checkFFPROBE: () => checkFFPROBE(),
+
+    downloadFFMPEG: () => downloadFFMPEG(),
+    downloadFFPROBE: () => downloadFFPROBE(),
+
+    getMediaFolder: () => getMediaFolder(),
+    setMediaFolder: (_: IpcMainInvokeEvent, ...args) => setMediaFolder(...args),
+
+    openFolderDialog: async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null,
+
+    scan: (_: IpcMainInvokeEvent, ...args) => scan(...args),
+
+    getTree: (_: IpcMainInvokeEvent, ...args) => getTree(...args),
+    setTree: (_: IpcMainInvokeEvent, ...args) => setTree(...args),
+
+    setMeta: (_: IpcMainInvokeEvent, ...args) => setMeta(...args),
+    getMeta: (_: IpcMainInvokeEvent, ...args) => getMeta(...args),
+    deleteMeta: (_: IpcMainInvokeEvent, ...args) => deleteMeta(...args),
+
+    extractMetadata: (_: IpcMainInvokeEvent, ...args) => extractMetadata(...args),
+  } satisfies {
+    [K in keyof API]: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
+  }).forEach(([K, V]) => ipcMain.handle(K, V));
 }

@@ -1,7 +1,5 @@
 /** @format */
 
-import { ipcMain } from "electron";
-
 process.env.UV_THREADPOOL_SIZE = "64";
 
 (async () => {
@@ -13,8 +11,6 @@ process.env.UV_THREADPOOL_SIZE = "64";
 
   await api.startServer();
 
-  registerHandles();
-
   app.setName(appUserModelId);
   app.setAppUserModelId(appUserModelId);
   const preload = path.resolve(__dirname, "./preload.js");
@@ -23,9 +19,7 @@ process.env.UV_THREADPOOL_SIZE = "64";
   app.once("ready", async () => {
     const win = new BrowserWindow({ frame: false, show: false, webPreferences, minHeight: 600, minWidth: Math.round(600 * (1280 / 720)) });
 
-    ipcMain.handle("close", () => app.quit());
-    ipcMain.handle("minimize", () => win.minimize());
-    ipcMain.handle("fullscreen", () => win.setFullScreen(!win.isFullScreen()));
+    registerHandles(win);
 
     !app.isPackaged
       ? win.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL)
