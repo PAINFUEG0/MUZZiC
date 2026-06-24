@@ -1,8 +1,7 @@
 /** @format */
 
-import * as bin from "./src/main/helpers/binaries";
-import * as local from "./src/main/helpers/local";
-import * as settings from "./src/main/helpers/settings";
+import { Track } from "./src/shared/types/sourcePlugin";
+import { DirNode, File } from "./src/shared/types/utils";
 
 export {};
 
@@ -18,30 +17,32 @@ declare global {
 
       getPort: () => Promise<string>;
 
-      checkDLP: typeof bin.checkDLP;
-      downloadDLP: typeof bin.downloadDLP;
+      checkDLP: () => Promise<boolean>;
+      downloadDLP: () => Promise<void>;
 
-      checkFFMPEG: typeof bin.checkFFMPEG;
-      downloadFFMPEG: typeof bin.downloadFFMPEG;
+      checkFFMPEG: () => Promise<boolean>;
+      downloadFFMPEG: () => Promise<void>;
 
-      checkFFPROBE: typeof bin.checkFFPROBE;
-      downloadFFPROBE: typeof bin.downloadFFPROBE;
+      checkFFPROBE: () => Promise<boolean>;
+      downloadFFPROBE: () => Promise<void>;
 
-      getMediaFolder: typeof settings.getMediaFolder;
-      setMediaFolder: typeof settings.setMediaFolder;
+      getMediaFolder: () => Promise<string | null>;
+      setMediaFolder: (dir: string) => Promise<void>;
 
       openFolderDialog: () => Promise<string | null>;
 
-      scan: typeof local.scan;
+      scan: (dir: string) => Promise<DirNode>;
 
-      getTree: typeof local.getTree;
-      setTree: typeof local.setTree;
+      getTree: (K: string) => Promise<DirNode | null>;
+      setTree: (K: string, V: DirNode) => Promise<DirNode>;
 
-      extractMetadata: typeof local.extractMetadata;
+      extractMetadata: (flat: File[]) => Promise<{ key: string; value: Track }[]>;
 
-      getMeta: typeof local.getMeta;
-      setMeta: typeof local.setMeta;
-      deleteMeta: typeof local.deleteMeta;
+      deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;
+      getMeta: <T extends string | string[], R extends Track | null>(K: T) => Promise<T extends string ? R : R[]>;
+      setMeta: <T extends [string, Track] | [{ key: string; value: Track }[]], R extends ReturnType<(typeof meta)["set"]>>(
+        ...args: T
+      ) => Promise<T extends [string, Track] ? R : R[]>;
     };
   }
 }
