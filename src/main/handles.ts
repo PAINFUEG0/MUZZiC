@@ -1,7 +1,7 @@
 /** @format */
 
 import { api } from "./server";
-import { API } from "../../global";
+import { API } from "../shared/types";
 import * as local from "./helpers/local";
 import * as bin from "./helpers/binaries";
 import * as settings from "./helpers/settings";

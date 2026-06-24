@@ -4,8 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
 import { themeStore, treeStore } from "../utils//globalStores";
-import { DirNode, MessagePayload } from "../../shared/types";
-import { API } from "../../../global";
+import { API, DirNode, MessagePayload } from "../../shared/types";
 
 export function Preload() {
   const [theme] = themeStore.use();

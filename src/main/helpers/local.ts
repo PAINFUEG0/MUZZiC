@@ -2,11 +2,10 @@
 
 import path from "node:path";
 import { api } from "../server";
-import { API } from "../../../global";
 import { probe } from "../utils/probe";
 import { thumb } from "../utils/thumb";
 import { tree, meta } from "../database";
-import { File } from "../../shared/types";
+import { API, File } from "../../shared/types";
 import { Semaphore } from "../utils/sepmaphore";
 import { scanMediaFolder } from "../utils/scan";
 
