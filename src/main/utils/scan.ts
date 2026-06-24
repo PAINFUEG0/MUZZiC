@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { DirNode } from "../../shared/types/utils";
+import { DirNode } from "../../shared/types";
 import { AUDIO_EXTENSIONS } from "../../shared/constants";
 
 export async function scanMediaFolder(dir: string) {

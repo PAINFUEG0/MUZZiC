@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRef, useEffect } from "react";
-import { PopupPayload } from "../../shared/types/utils";
+import { PopupPayload } from "../../shared/types";
 import { LuCheck, LuCross, LuInfo } from "react-icons/lu";
 
 const styles = {

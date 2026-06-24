@@ -20,3 +20,17 @@ export type MessagePayload = Prettify<
 
 export type File = { path: string; name: string; id: string };
 export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode[] };
+
+export type Track = {
+  id: string;
+  title: string;
+  thumb: string;
+  album: string;
+  lyrics: string;
+  duration: number;
+  artists: string[];
+  explicit: boolean;
+  streamURI: string;
+  needsTranscoding: boolean;
+  resolution: { name: "SR" | "CD" | "HR" | "DD"; bitDepth: number; sampleRate: number; bitrate: number };
+};

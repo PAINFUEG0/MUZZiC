@@ -3,7 +3,7 @@
 import { LuHeart } from "react-icons/lu";
 import { Tree } from "../../utils/globalStores";
 import { TbFileMusicFilled } from "react-icons/tb";
-import { Track } from "../../../shared/types/sourcePlugin";
+import { Track } from "../../../shared/types";
 import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
 export function Files({ files, onClick }: { files: Tree["files"]; onClick: (e: Track) => void }) {

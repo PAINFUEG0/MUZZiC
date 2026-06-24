@@ -2,9 +2,9 @@
 
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { File } from "../../shared/types/utils";
+import { File } from "../../shared/types";
 import { FFPROBE } from "../../shared/constants";
-import { Track } from "../../shared/types/sourcePlugin";
+import { Track } from "../../shared/types";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 

@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
 import { themeStore, treeStore } from "../utils//globalStores";
-import { DirNode, MessagePayload } from "../../shared/types/utils";
+import { DirNode, MessagePayload } from "../../shared/types";
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -142,11 +142,11 @@ export function Preload() {
             }}
           />
 
-          <div className="-mt-3 flex w-[25dvw] flex-row items-center justify-center gap-2 px-3">
+          <div className="-mt-3 flex w-[25dvw] shrink-0 flex-row items-center justify-center gap-2 px-3">
             <div className="flex text-xs font-medium">{task}</div>
           </div>
 
-          <div className="flex h-1 w-[25dvw] rounded-full bg-(--accent-color)/50">
+          <div className="flex h-1 w-[25dvw] shrink-0 rounded-full bg-(--accent-color)/50">
             <div className="rounded-full bg-(--accent-color)/80" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
           </div>
         </div>

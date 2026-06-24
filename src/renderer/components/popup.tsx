@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { PopupItem } from "./PopupItem";
 import { AnimatePresence } from "framer-motion";
 import { createGlobalStore } from "../utils/globalStores";
-import type { MessagePayload, PopupPayload } from "../../shared/types/utils";
+import type { MessagePayload, PopupPayload } from "../../shared/types";
 
 const popupStore = createGlobalStore<PopupPayload[]>([]);
 

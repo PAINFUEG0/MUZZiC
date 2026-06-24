@@ -2,8 +2,8 @@
 
 import path from "node:path";
 import { CoreDatabase } from "@xenodb/server";
-import { DirNode } from "../shared/types/utils";
-import { Track } from "../shared/types/sourcePlugin";
+import { DirNode } from "../shared/types";
+import { Track } from "../shared/types";
 
 //  app.getPath("userData")
 const databasePath = path.join("./", "database");
