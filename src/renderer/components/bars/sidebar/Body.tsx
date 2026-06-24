@@ -7,8 +7,8 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { ExpandableItem, Item } from "./Items";
 import { PiMusicNoteBold } from "react-icons/pi";
 import { themeStore } from "../../../utils/globalStores";
-import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 import { RiFolderMusicLine, RiPlayListFill } from "react-icons/ri";
+import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 
 const mainItems = [
   { icon: <LuFolderSearch />, label: ". . .", toSet: { type: "folders" } },

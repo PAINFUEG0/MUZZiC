@@ -1,6 +1,6 @@
 /** @format */
 
-import { Root } from "./layouts/Root";
+import { Root } from "./layouts/root";
 import { Preload } from "./gates/Preload";
 import { Viewport } from "./layouts/Viewport";
 import { createHashRouter } from "react-router-dom";

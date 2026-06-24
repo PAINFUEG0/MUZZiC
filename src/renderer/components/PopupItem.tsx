@@ -10,7 +10,7 @@ const styles = {
   ERROR: { bg: "#FF5500", bar: "#FF5500", icon: <LuCross /> },
   SUCCESS: { bg: "#88FF22", bar: "#88FF22", icon: <LuCheck /> },
   WARNING: { bg: "#FFDD22", bar: "#FFDD22", icon: <LuInfo className="-scale-y-100" /> },
-};
+} as const;
 
 export function PopupItem({ PL }: { PL: PopupPayload }) {
   const barRef = useRef<HTMLDivElement>(null);

@@ -3,8 +3,8 @@
 export type Theme = {
   blur: `${string}px`;
   color: `#${string}`;
-  type: "dark" | "light";
   backgrground: string;
+  type: "dark" | "light";
   tint: { black: { overall: number; bars: number }; white: { overall: number; bars: number } };
 };
 
