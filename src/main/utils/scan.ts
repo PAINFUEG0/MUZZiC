@@ -16,7 +16,7 @@ export async function scanMediaFolder(dir: string) {
       .filter((e) => e.isFile() && AUDIO_EXTENSIONS.has(path.extname(e.name).toLowerCase()))
       .map(async (e) => {
         const _ = path.resolve(dir, e.name);
-        return { name: e.name, path: _, id: (await fs.promises.stat(_)).ino.toString() };
+        return { name: e.name, path: _, id: (await fs.promises.stat(_, { bigint: true })).ino.toString() };
       }),
   );
 
