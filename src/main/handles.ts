@@ -5,6 +5,7 @@ import { API } from "../shared/types";
 import * as local from "./helpers/local";
 import * as bin from "./helpers/binaries";
 import * as settings from "./helpers/settings";
+import { transcode } from "./helpers/transcode";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from "electron";
 
 export function registerHandles(win: BrowserWindow) {
@@ -39,6 +40,8 @@ export function registerHandles(win: BrowserWindow) {
     deleteMeta: (_: IpcMainInvokeEvent, ...args) => local.deleteMeta(...args),
 
     extractMetadata: (_: IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
+
+    transcode: (_: IpcMainInvokeEvent, ...args) => transcode(...args),
   } satisfies {
     [K in keyof API]: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => ipcMain.handle(K, V));

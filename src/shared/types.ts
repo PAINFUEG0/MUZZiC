@@ -68,4 +68,6 @@ export type API = {
   setMeta: <T extends [string, Track] | [{ key: string; value: Track }[]], R extends Track>(
     ...args: T
   ) => Promise<T extends [string, Track] ? R : R[]>;
+
+  transcode: (input: string) => Promise<string>;
 };
