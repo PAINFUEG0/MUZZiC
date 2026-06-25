@@ -31,7 +31,7 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
       />
 
       <div className="flex h-full w-full items-center justify-end gap-3">
-        <div className="relative m-5 flex h-full w-full" style={{ WebkitAppRegion: "drag" } as any} />
+        <div className="mx-5 flex h-full w-full" style={{ WebkitAppRegion: "drag" } as any} />
 
         <div className="relative flex">
           <input
@@ -68,7 +68,7 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
           <div className="flex flex-row items-center justify-center gap-2.5">
             {[
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
-              { Icon: fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
+              { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
               { Icon: <IoMdClose />, onclick: () => window.api.close() },
             ].map((b) => (
               <button
