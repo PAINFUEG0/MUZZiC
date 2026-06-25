@@ -21,12 +21,12 @@ export function Files({ files, onClick }: { files: Tree["files"]; onClick: (e: T
             onClick={onClick.bind(null, e)}
             className="grid w-full shrink-0 cursor-pointer grid-cols-15 rounded-md px-2 py-1 transition-transform duration-100 hover:bg-(--hover-color)/20 active:scale-[99%]"
           >
-            <div className="flex h-full w-full flex-row items-center justify-between gap-3 pr-5">
+            <div className="flex h-full w-full flex-row items-center justify-between px-0.5">
               <div className="flex w-2.5 shrink-0 justify-end text-xs opacity-50">{i + 1}</div>
               <TbFileMusicFilled className="aspect-square h-8 w-8 shrink-0 text-(--accent-color)" />
             </div>
 
-            <div className="col-span-8 flex w-full flex-col pr-3">
+            <div className="col-span-8 flex w-full flex-col px-3">
               <div className="text-no-wrap min-w-0 truncate text-xs" children={e.title} />
               <div className="flex w-full flex-row gap-3 text-[10px] opacity-50">
                 <div className="text-no-wrap min-w-0 truncate" children={e.artists?.join(", ")} />
@@ -52,10 +52,10 @@ export function Files({ files, onClick }: { files: Tree["files"]; onClick: (e: T
               {`${Math.floor(e.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(e.duration % 60)}`.padStart(2, "0")}
             </div>
 
-            <div className="col-span-2 flex flex-row items-center justify-center gap-7 px-3 opacity-90">
-              <BiAddToQueue />
-              <BiTrash />
-              <BiDotsVertical />
+            <div className="col-span-2 flex flex-row items-center justify-between px-3 opacity-90">
+              <BiAddToQueue className="shrink-0" />
+              <BiTrash className="shrink-0" />
+              <BiDotsVertical className="shrink-0" />
             </div>
           </div>
         ))}
