@@ -14,7 +14,7 @@ process.env.UV_THREADPOOL_SIZE = "64";
   app.setName(appUserModelId);
   app.setAppUserModelId(appUserModelId);
   const preload = path.resolve(__dirname, "./preload.js");
-  const webPreferences = { webSecurity: false, backgroundThrottling: false, preload } as Electron.WebPreferences;
+  const webPreferences = { webSecurity: false, backgroundThrottling: false, devTools: !app.isPackaged, preload } as Electron.WebPreferences;
 
   app.once("ready", async () => {
     const win = new BrowserWindow({ frame: false, show: false, webPreferences, minHeight: 600, minWidth: Math.round(600 * (1280 / 720)) });
