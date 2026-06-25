@@ -1,7 +1,7 @@
 /** @format */
 
-import { Files } from "./Files";
-import { Directories } from "./Directories";
+import { File } from "./Files";
+import { Directory } from "./Directories";
 import { RiHome2Line } from "react-icons/ri";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
@@ -55,8 +55,9 @@ export function List() {
           {[
             { Icon: <IoIosArrowBack />, onclick: () => goBack(path.slice(0, path.length - 1)) },
             { Icon: <RiHome2Line />, onclick: () => goBack(path.slice(0, 1)) },
-          ].map((b) => (
+          ].map((b, i) => (
             <button
+              key={i}
               children={b.Icon}
               onClick={b.onclick}
               disabled={path.length === 1}
@@ -97,13 +98,32 @@ export function List() {
             }}
             className="absolute inset-0 flex scrollbar-none flex-col gap-8 overflow-auto pb-4"
           >
-            {dirs.length ? <Directories dirs={dirs} path={path} setPath={goForward} /> : null}
-            {files.length ? (
-              <Files
-                files={files}
-                onClick={(e) => console.log("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
-              />
-            ) : null}
+            <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+              <div className="font-medium">Directories</div>
+              <div className="pr-3 text-xs text-(--accent-color) opacity-90">{dirs.length} items</div>
+            </div>
+
+            <div className="grid grid-cols-5 gap-x-3 gap-y-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
+              {dirs.map((dir, i) => (
+                <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
+              ))}
+            </div>
+
+            <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+              <div className="font-medium">Playable tracks</div>
+              <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {files.length} items</div>
+            </div>
+
+            <div className="flex h-fit w-full flex-col gap-1.5 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
+              {files.map((file, i) => (
+                <File
+                  index={i}
+                  file={file}
+                  key={file.id}
+                  onClick={(e) => console.log("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
+                />
+              ))}
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>

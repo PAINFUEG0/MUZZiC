@@ -42,6 +42,7 @@
     "vite": "^8.0.14"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.14.3",
     "@xenodb/server": "^1.1.1",
     "axios": "^1.16.1",
     "cors": "^2.8.6",
