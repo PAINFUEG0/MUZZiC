@@ -44,7 +44,13 @@ export function Body() {
       <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
 
       {mainItems.map(({ icon, label, toSet }) => (
-        <Item highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} icon={icon} label={label} onClick={() => setScene(toSet)} />
+        <Item
+          key={label}
+          icon={icon}
+          label={label}
+          onClick={() => setScene(toSet)}
+          highlighted={JSON.stringify(scene) === JSON.stringify(toSet)}
+        />
       ))}
 
       {sections.map(({ icon, label, items, defaultOpen }) => (
@@ -55,7 +61,13 @@ export function Body() {
           defaultOpen={defaultOpen}
           collapsable={!items.some(({ toSet }) => JSON.stringify(scene) === JSON.stringify(toSet))}
           items={items.map(({ icon, label, toSet }) => (
-            <Item highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} icon={icon} label={label} onClick={() => setScene(toSet)} />
+            <Item
+              key={label}
+              icon={icon}
+              label={label}
+              onClick={() => setScene(toSet)}
+              highlighted={JSON.stringify(scene) === JSON.stringify(toSet)}
+            />
           ))}
         />
       ))}

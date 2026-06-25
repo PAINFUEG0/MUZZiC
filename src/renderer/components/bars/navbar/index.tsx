@@ -70,8 +70,9 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
               { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
               { Icon: <IoMdClose />, onclick: () => window.api.close() },
-            ].map((b) => (
+            ].map((b, i) => (
               <button
+                key={i}
                 children={b.Icon}
                 onClick={b.onclick}
                 className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color) transition-all duration-100 active:scale-99"
