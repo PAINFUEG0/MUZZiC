@@ -98,32 +98,39 @@ export function List() {
             }}
             className="absolute inset-0 flex scrollbar-none flex-col gap-8 overflow-auto pb-4"
           >
-            <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
-              <div className="font-medium">Directories</div>
-              <div className="pr-3 text-xs text-(--accent-color) opacity-90">{dirs.length} items</div>
-            </div>
+            {dirs.length
+              ? [
+                  <div key={"dirs-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+                    <div className="font-medium">Directories</div>
+                    <div className="pr-3 text-xs text-(--accent-color) opacity-90">{dirs.length} items</div>
+                  </div>,
+                  <div
+                    key={"dirs"}
+                    className="grid grid-cols-5 gap-x-3 gap-y-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md"
+                  >
+                    {dirs.map((dir, i) => (
+                      <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
+                    ))}
+                  </div>,
+                ]
+              : null}
 
-            <div className="grid grid-cols-5 gap-x-3 gap-y-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
-              {dirs.map((dir, i) => (
-                <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
-              ))}
-            </div>
-
-            <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
-              <div className="font-medium">Playable tracks</div>
-              <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {files.length} items</div>
-            </div>
-
-            <div className="flex h-fit w-full flex-col gap-1.5 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md">
-              {files.map((file, i) => (
-                <File
-                  index={i}
-                  file={file}
-                  key={file.id}
-                  onClick={(e) => console.log("file:///" + encodeURIComponent((e as any).path.replace(/\\/g, "/")).replace(/%2F/g, "/"))}
-                />
-              ))}
-            </div>
+            {files.length
+              ? [
+                  <div key={"files-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+                    <div className="font-medium">Playable tracks</div>
+                    <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {files.length} items</div>
+                  </div>,
+                  <div
+                    key={"files"}
+                    className="flex h-fit w-full flex-col gap-1.5 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md"
+                  >
+                    {files.map((file, i) => (
+                      <File index={i} file={file} key={file.id} onClick={(e) => console.log((e as any).path)} />
+                    ))}
+                  </div>,
+                ]
+              : null}
           </motion.div>
         </AnimatePresence>
       </div>
