@@ -1,6 +1,6 @@
 /** @format */
 
-import { Tree } from "../../utils/globalStores";
+import { Tree } from "../../../shared/types";
 import { RiFolderMusicFill } from "react-icons/ri";
 
 export function Directory({ dir, onClick }: { dir: Tree["dirs"][number]; onClick: () => void }) {

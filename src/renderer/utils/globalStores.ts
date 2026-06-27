@@ -2,9 +2,7 @@
 
 import { create } from "zustand";
 import { themes } from "./themes";
-import { Track } from "../../shared/types";
-
-export type Tree = { name: string; path: string; files: Track[]; dirs: Tree[] };
+import { Tree } from "../../shared/types";
 
 export function createGlobalStore<T extends boolean | null | number | object | string | undefined>(initial: T) {
   type Store = { data: T; update: (newValue: T) => void };

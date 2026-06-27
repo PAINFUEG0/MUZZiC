@@ -149,7 +149,7 @@ export function List() {
                   key={row.file.id}
                   initial={row.index === 0}
                   end={row.index === row.len - 1}
-                  onClick={(e) => console.log((e as any).path)}
+                  onClick={(e) => console.log(e.path)}
                 />
               );
 

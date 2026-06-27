@@ -25,7 +25,6 @@ export async function probe(file: File) {
 
   return {
     id: file.id,
-    streamURI: file.path,
     thumb: `${file.id}.jpg`,
     needsTranscoding: false,
     duration: Number(data?.format?.duration),

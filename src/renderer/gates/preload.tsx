@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten } from "../../shared/helpers";
 import { themeStore, treeStore } from "../utils//globalStores";
-import { API, DirNode, MessagePayload } from "../../shared/types";
+import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -90,20 +90,25 @@ export function Preload() {
       }
 
       const flat = flatten(currentTree);
-      const metas = Object.fromEntries((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean).map((e) => [e!.id, e]));
+
+      const metas = Object.fromEntries(
+        ((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean) as Track[]).map((e) => [e!.id, e]),
+      );
 
       const populateTreeWithMeta = (node: DirNode) => {
         for (let i = 0; i < node.files.length; i++)
           (node.files[i] as any) = {
             ...node.files[i],
-            ...(metas[node.files[i]!.id] || {}),
+            ...metas[node.files[i]!.id]!,
             thumb: `http://localhost:${port}/thumb/${node.files[i]!.id}`,
-          };
+          } satisfies Track;
+
         node.dirs.forEach((e) => populateTreeWithMeta(e));
+
+        return node as unknown as Tree;
       };
 
-      populateTreeWithMeta(currentTree);
-      setTree(currentTree as any);
+      setTree(populateTreeWithMeta(currentTree));
       setTask("All done!");
       setProgress(100);
       setReady(true);

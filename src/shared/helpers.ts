@@ -1,14 +1,15 @@
 /** @format */
 
-import { DirNode } from "./types";
+import { DirNode, Tree } from "./types";
 
 export function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export function flatten(node: DirNode): DirNode["files"] {
-  if (!node) return [];
-  return [...node.files, ...node.dirs.flatMap((e) => flatten(e))];
+export function flatten(node: Tree): Tree["files"];
+export function flatten(node: DirNode): DirNode["files"];
+export function flatten(node: DirNode | Tree) {
+  return [...node.files, ...node.dirs.flatMap((_) => flatten(_))];
 }
 
 export async function safeAwait<T, E extends Error>(promiseLike: Promise<T>) {

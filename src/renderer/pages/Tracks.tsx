@@ -1,7 +1,6 @@
 /** @format */
 
 import { File } from "./list/Files";
-import { Track } from "../../shared/types";
 import { flatten } from "../../shared/helpers";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -23,7 +22,7 @@ export function Tracks() {
           ? "linear-gradient(to bottom, transparent 0%, black 5%)"
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
-  const flat = flatten(data as any) as unknown as Track[];
+  const flat = flatten(data);
   const [tracks, setTracks] = useState(flat);
 
   const virtualizer = useVirtualizer({
@@ -71,7 +70,7 @@ export function Tracks() {
                   index={vItem.index}
                   initial={vItem.index === 0}
                   end={vItem.index === tracks.length - 1}
-                  onClick={(e) => console.log(e.streamURI)}
+                  onClick={(e) => console.log(e.path)}
                 />
               </div>
             );

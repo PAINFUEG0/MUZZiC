@@ -1,7 +1,7 @@
 /** @format */
 
 import { LuHeart } from "react-icons/lu";
-import { Track } from "../../../shared/types";
+import { Tree } from "../../../shared/types";
 import { TbFileMusicFilled } from "react-icons/tb";
 import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
@@ -12,11 +12,11 @@ export function File({
   initial,
   onClick,
 }: {
-  file: Track;
+  file: Tree["files"][number];
   end: boolean;
   index: number;
   initial: boolean;
-  onClick: (e: Track) => void;
+  onClick: (e: Tree["files"][number]) => void;
 }) {
   return (
     <div
