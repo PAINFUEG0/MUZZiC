@@ -38,7 +38,7 @@ export function Tracks() {
   useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden p-10">
+    <div className="flex h-full w-full flex-col overflow-hidden px-10">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
         <div className="font-medium">Playable tracks</div>
         <div className="pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
@@ -71,7 +71,7 @@ export function Tracks() {
                   index={vItem.index}
                   initial={vItem.index === 0}
                   end={vItem.index === tracks.length - 1}
-                  onClick={(e) => console.log((e as any).path)}
+                  onClick={(e) => console.log(e.streamURI)}
                 />
               </div>
             );
