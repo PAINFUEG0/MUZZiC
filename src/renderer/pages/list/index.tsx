@@ -1,13 +1,14 @@
 /** @format */
 
 import { File } from "./Files";
+import { motion } from "framer-motion";
 import { Directory } from "./Directories";
 import { RiHome2Line } from "react-icons/ri";
+import { chunk } from "../../../shared/helpers";
 import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { searchBox, treeStore } from "../../utils/globalStores";
-import { chunk } from "../../../shared/helpers";
 
 const variants = {
   center: { x: 0, opacity: 1 },
@@ -27,15 +28,6 @@ export function List() {
   const [dirs, setDirs] = useState(current.dirs);
   const [files, setFiles] = useState(current.files);
 
-  useEffect(() => setQuery(""), []);
-  useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
-  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [current]);
-
-  useEffect(() => {
-    setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
-    setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
-  }, [query]);
-
   const maskImage =
     atTop && atBottom
       ? "none"
@@ -48,6 +40,29 @@ export function List() {
   const [direction, setDirection] = useState(1);
   const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
   const goBack = (newPath: typeof path) => (setDirection(-1), setPath(newPath));
+
+  const rows = [
+    ...(dirs.length ? ([{ type: "label", label: "Directories", count: dirs.length }] as const) : []),
+    ...(dirs.length ? chunk(dirs, 5).map((c, i, arr) => ({ type: "dir", dirs: c, index: i, len: arr.length }) as const) : []),
+    ...(files.length ? [{ type: "label", label: "Playable tracks", count: files.length } as const] : []),
+    ...(files.length ? files.map((f, i, arr) => ({ type: "file", file: f, index: i, len: arr.length }) as const) : []),
+  ];
+
+  const virtualizer = useVirtualizer({
+    overscan: 5,
+    count: rows.length,
+    estimateSize: () => 61,
+    getScrollElement: () => scrollRef.current,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  });
+
+  useEffect(() => setQuery(""), []);
+  useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
+  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [current]);
+  useEffect(() => {
+    setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
+    setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
+  }, [query]);
 
   return (
     <div className="flex h-full w-full flex-col gap-8 overflow-hidden p-10 pb-5">
@@ -80,76 +95,76 @@ export function List() {
         </div>
       </div>
 
-      <div className="relative flex-1 overflow-hidden">
-        <AnimatePresence initial={false} custom={direction}>
-          <motion.div
-            exit="exit"
-            initial="enter"
-            ref={scrollRef}
-            animate="center"
-            key={current.name}
-            custom={direction}
-            variants={variants}
-            style={{ maskImage, WebkitMaskImage: maskImage }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            onScroll={() => {
-              const el = scrollRef.current;
-              el && setAtTop(el.scrollTop <= 0);
-              el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-            }}
-            className="absolute inset-0 flex scrollbar-none flex-col overflow-auto pb-4"
-          >
-            {dirs.length
-              ? [
-                  <div key={"dirs-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
-                    <div className="font-medium">Directories</div>
-                    <div className="pr-3 text-xs text-(--accent-color) opacity-90">{dirs.length} items</div>
-                  </div>,
-                  chunk(dirs, 5).map((dirs, i, arr) => (
-                    <div
-                      key={"dirs"}
-                      className={
-                        `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
-                        `${
-                          arr.length === 1
-                            ? "rounded-md border-2 pt-5 pb-5"
-                            : i === 0
-                              ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.75"
-                              : i === arr.length - 1
-                                ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.75 pb-5"
-                                : "border-x-2 pt-0.75 pb-0.75"
-                        } `
-                      }
-                    >
-                      {dirs.map((dir, i) => (
-                        <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
-                      ))}
-                    </div>
-                  )),
-                ]
-              : null}
+      <motion.div
+        exit="exit"
+        initial="enter"
+        ref={scrollRef}
+        animate="center"
+        key={current.name}
+        custom={direction}
+        variants={variants}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
+        onScroll={() => {
+          const el = scrollRef.current;
+          el && setAtTop(el.scrollTop <= 0);
+          el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
+        }}
+        className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto pb-4"
+      >
+        <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+          {virtualizer.getVirtualItems().map((vItem) => {
+            const row = rows[vItem.index]!;
 
-            {files.length
-              ? [
-                  <div key={"files-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
-                    <div className="font-medium">Playable tracks</div>
-                    <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {files.length} items</div>
-                  </div>,
-                  files.map((file, i) => (
-                    <File
-                      index={i}
-                      file={file}
-                      key={file.id}
-                      initial={i === 0}
-                      end={i === files.length - 1}
-                      onClick={(e) => console.log((e as any).path)}
-                    />
-                  )),
-                ]
-              : null}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+            const component =
+              row.type === "label" ? (
+                <div key={row.label} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
+                  <div className="font-medium">{row.label}</div>
+                  <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
+                </div>
+              ) : row.type === "dir" ? (
+                <div
+                  key={"dirs"}
+                  className={
+                    `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
+                    `${
+                      row.len === 1
+                        ? "rounded-md border-2 pt-5 pb-5"
+                        : row.index === 0
+                          ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.75"
+                          : row.index === row.len - 1
+                            ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.75 pb-5"
+                            : "border-x-2 pt-0.75 pb-0.75"
+                    } `
+                  }
+                >
+                  {row.dirs.map((dir, i) => (
+                    <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
+                  ))}
+                </div>
+              ) : (
+                <File
+                  file={row.file}
+                  index={row.index}
+                  key={row.file.id}
+                  initial={row.index === 0}
+                  end={row.index === row.len - 1}
+                  onClick={(e) => console.log((e as any).path)}
+                />
+              );
+
+            return (
+              <div
+                key={vItem.index}
+                children={component}
+                data-index={vItem.index}
+                ref={virtualizer.measureElement}
+                style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
+              />
+            );
+          })}
+        </div>
+      </motion.div>
     </div>
   );
 }
