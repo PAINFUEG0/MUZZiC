@@ -23,4 +23,5 @@ export function createGlobalStore<T extends boolean | null | number | object | s
 
 export const searchBox = createGlobalStore<string>("");
 export const treeStore = createGlobalStore<Tree>({} as Tree);
+export const view = createGlobalStore<{ scene: string }>({ scene: "explorer" });
 export const themeStore = createGlobalStore<(typeof themes)[number]>(themes[0]!);
