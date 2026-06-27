@@ -7,6 +7,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { searchBox, treeStore } from "../../utils/globalStores";
+import { chunk } from "../../../shared/helpers";
 
 const variants = {
   center: { x: 0, opacity: 1 },
@@ -96,39 +97,54 @@ export function List() {
               el && setAtTop(el.scrollTop <= 0);
               el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
             }}
-            className="absolute inset-0 flex scrollbar-none flex-col gap-8 overflow-auto pb-4"
+            className="absolute inset-0 flex scrollbar-none flex-col overflow-auto pb-4"
           >
             {dirs.length
               ? [
-                  <div key={"dirs-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+                  <div key={"dirs-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
                     <div className="font-medium">Directories</div>
                     <div className="pr-3 text-xs text-(--accent-color) opacity-90">{dirs.length} items</div>
                   </div>,
-                  <div
-                    key={"dirs"}
-                    className="grid grid-cols-5 gap-x-3 gap-y-1 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md"
-                  >
-                    {dirs.map((dir, i) => (
-                      <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
-                    ))}
-                  </div>,
+                  chunk(dirs, 5).map((dirs, i, arr) => (
+                    <div
+                      key={"dirs"}
+                      className={
+                        `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
+                        `${
+                          arr.length === 1
+                            ? "rounded-md border-2 pt-5 pb-5"
+                            : i === 0
+                              ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.75"
+                              : i === arr.length - 1
+                                ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.75 pb-5"
+                                : "border-x-2 pt-0.75 pb-0.75"
+                        } `
+                      }
+                    >
+                      {dirs.map((dir, i) => (
+                        <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
+                      ))}
+                    </div>
+                  )),
                 ]
               : null}
 
             {files.length
               ? [
-                  <div key={"files-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+                  <div key={"files-label"} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
                     <div className="font-medium">Playable tracks</div>
                     <div className="pr-3 text-xs text-(--accent-color) opacity-90"> {files.length} items</div>
                   </div>,
-                  <div
-                    key={"files"}
-                    className="flex h-fit w-full flex-col gap-1.5 rounded-md border-2 border-(--border-color)/20 bg-(--hover-color)/5 p-5 backdrop-blur-md"
-                  >
-                    {files.map((file, i) => (
-                      <File index={i} file={file} key={file.id} onClick={(e) => console.log((e as any).path)} />
-                    ))}
-                  </div>,
+                  files.map((file, i) => (
+                    <File
+                      index={i}
+                      file={file}
+                      key={file.id}
+                      initial={i === 0}
+                      end={i === files.length - 1}
+                      onClick={(e) => console.log((e as any).path)}
+                    />
+                  )),
                 ]
               : null}
           </motion.div>
