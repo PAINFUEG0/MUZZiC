@@ -1,7 +1,7 @@
 /** @format */
 
 import { List } from "../pages/list";
-import { Tracks } from "../pages/tracks";
+import { Tracks } from "../pages/Tracks";
 import { view } from "../utils/globalStores";
 
 export function Viewport() {
