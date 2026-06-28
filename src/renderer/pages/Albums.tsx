@@ -127,7 +127,7 @@ export function Albums() {
                         : vItem.index === 0
                           ? "rounded-md rounded-b-none border-2 border-b-0 pt-5"
                           : vItem.index === rows.data.length - 1
-                            ? "rounded-md rounded-t-none border-2 border-t-0 pb-5"
+                            ? "rounded-md rounded-t-none border-2 border-t-0 pt-5 pb-5"
                             : "border-x-2 pt-5"
                     } `
                   }
