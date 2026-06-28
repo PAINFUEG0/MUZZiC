@@ -24,20 +24,18 @@ export function Viewport() {
     case "artists":
       page = <Artists />;
       break;
-    default:
-      page = <List />;
   }
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <motion.div
         children={page}
         key={state.scene}
-        exit={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.2 }}
-        initial={{ opacity: 0, x: 10 }}
+        exit={{ opacity: 0, x: "-20%" }}
+        initial={{ opacity: 0, x: "20%" }}
         className="flex h-full w-full overflow-hidden"
+        transition={{ duration: 0.2, ease: "easeIn" }}
       />
     </AnimatePresence>
   );
