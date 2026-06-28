@@ -3,12 +3,11 @@
 import { File } from "./Files";
 import { motion } from "framer-motion";
 import { Directory } from "./Directories";
-import { RiHome2Line } from "react-icons/ri";
 import { chunk } from "../../../shared/helpers";
-import { IoIosArrowBack } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { searchBox, treeStore } from "../../utils/globalStores";
+import { IoIosArrowBack, IoIosMusicalNotes } from "react-icons/io";
 
 const variants = {
   center: { x: 0, opacity: 1 },
@@ -66,20 +65,14 @@ export function List() {
 
   return (
     <div className="flex h-full w-full flex-col gap-8 overflow-hidden p-10 pb-5">
-      <div className="flex h-fit items-center gap-5">
+      <div className="flex h-fit items-center gap-3">
         <div className="flex flex-row gap-2">
-          {[
-            { Icon: <IoIosArrowBack />, onclick: () => goBack(path.slice(0, path.length - 1)) },
-            { Icon: <RiHome2Line />, onclick: () => goBack(path.slice(0, 1)) },
-          ].map((b, i) => (
-            <button
-              key={i}
-              children={b.Icon}
-              onClick={b.onclick}
-              disabled={path.length === 1}
-              className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
-            />
-          ))}
+          <button
+            onClick={() => goBack(path.slice(0, path.length - 1))}
+            children={path.length === 1 ? <IoIosMusicalNotes /> : <IoIosArrowBack />}
+            disabled={path.length === 1}
+            className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
+          />
         </div>
 
         <div className="flex w-full flex-row gap-2">
@@ -110,7 +103,7 @@ export function List() {
           el && setAtTop(el.scrollTop <= 0);
           el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
         }}
-        className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto pb-4"
+        className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto"
       >
         <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
           {virtualizer.getVirtualItems().map((vItem) => {

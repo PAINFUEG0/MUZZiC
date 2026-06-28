@@ -2,6 +2,7 @@
 
 import { File } from "./list/Files";
 import { flatten } from "../../shared/helpers";
+import { RiFolderMusicFill } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { searchBox, treeStore } from "../utils/globalStores";
@@ -37,10 +38,17 @@ export function Tracks() {
   useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden px-10">
-      <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
-        <div className="font-medium">Playable tracks</div>
-        <div className="pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
+    <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
+      <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
+        <div className="flex h-fit w-full flex-row gap-3">
+          <button
+            children={<RiFolderMusicFill />}
+            className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
+          />
+          <div className="font-medium">Playable tracks</div>
+        </div>
+
+        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
       </div>
 
       <div
@@ -51,7 +59,7 @@ export function Tracks() {
           el && setAtTop(el.scrollTop <= 0);
           el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
         }}
-        className="mb-5 flex h-full w-full scrollbar-none flex-col overflow-y-auto"
+        className="flex h-full w-full scrollbar-none flex-col overflow-y-auto"
       >
         <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
           {virtualizer.getVirtualItems().map((vItem) => {
