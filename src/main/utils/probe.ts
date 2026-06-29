@@ -1,10 +1,10 @@
 /** @format */
 
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { FFPROBE } from "../constants";
 import { File } from "../../shared/types";
-import { FFPROBE } from "../../shared/constants";
 import { Track } from "../../shared/types";
+import { spawn } from "node:child_process";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
 

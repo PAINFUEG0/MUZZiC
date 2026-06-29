@@ -5,6 +5,7 @@ import { api } from "../server";
 import { probe } from "../utils/probe";
 import { thumb } from "../utils/thumb";
 import { tree, meta } from "../database";
+import { directories } from "../constants";
 import { API, File } from "../../shared/types";
 import { Semaphore } from "../utils/sepmaphore";
 import { scanMediaFolder } from "../utils/scan";
@@ -22,10 +23,12 @@ export const extractMetadata: API["extractMetadata"] = async (flat: File[]) => {
   const results = await Promise.all(
     flat.map((file) =>
       sem.run(() =>
-        Promise.all([probe(file), thumb(file.path, `./.thumbnails/${file.id}.jpg`).catch(() => null)]).then(([meta]) => {
-          api.broadcast({ type: "PROGRESS", data: "PROBE", current: count++, total: flat.length });
-          return { key: file.id, value: meta };
-        }),
+        Promise.all([probe(file), thumb(file.path, path.resolve(directories.thumbnails, `${file.id}.jpg`)).catch(() => null)]).then(
+          ([meta]) => {
+            api.broadcast({ type: "PROGRESS", data: "PROBE", current: count++, total: flat.length });
+            return { key: file.id, value: meta };
+          },
+        ),
       ),
     ),
   );

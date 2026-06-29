@@ -1,7 +1,7 @@
 /** @format */
 
+import { FFMPEG } from "../constants";
 import { spawn } from "node:child_process";
-import { FFMPEG } from "../../shared/constants";
 
 export async function thumb(source: string, dest: string) {
   return new Promise((resolve, reject) => {

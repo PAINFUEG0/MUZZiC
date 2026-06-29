@@ -1,12 +1,9 @@
 /** @format */
 
-import path from "node:path";
+import { directories } from "./constants";
 import { CoreDatabase } from "@xenodb/server";
 import { DirNode, Track } from "../shared/types";
 
-//  app.getPath("userData")
-const databasePath = path.join("./", "database");
-
-export const tree = new CoreDatabase<DirNode>(`${databasePath}/tree`);
-export const settings = new CoreDatabase(`${databasePath}/settings`);
-export const meta = new CoreDatabase<Track>(`${databasePath}/meta`);
+export const tree = new CoreDatabase<DirNode>(`${directories.database}/tree`);
+export const settings = new CoreDatabase(`${directories.database}/settings`);
+export const meta = new CoreDatabase<Track>(`${directories.database}/meta`);

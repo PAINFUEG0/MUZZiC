@@ -4,12 +4,12 @@ import path from "node:path";
 import { rm } from "node:fs/promises";
 import { spawn } from "child_process";
 import { randomUUID } from "node:crypto";
-import { FFMPEG } from "../../shared/constants";
+import { directories, FFMPEG } from "../constants";
 
 let last = "";
 
 export async function transcode(input: string) {
-  const out = path.join(`./${randomUUID()}.wav`);
+  const out = path.resolve(directories.thumbnails, `${randomUUID()}.wav`);
 
   const res = new Promise<string>((resolve, reject) => {
     const args = ["-i", input, "-map", "0:a:0", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", "pcm_s16le", out];

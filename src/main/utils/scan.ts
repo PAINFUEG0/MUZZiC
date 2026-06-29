@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DirNode } from "../../shared/types";
-import { AUDIO_EXTENSIONS } from "../../shared/constants";
+import { AUDIO_EXTENSIONS } from "../constants";
 
 export async function scanMediaFolder(dir: string) {
   const name = path.basename(dir);
