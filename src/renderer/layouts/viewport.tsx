@@ -27,13 +27,13 @@ export function Viewport() {
   }
 
   return (
-    <AnimatePresence mode="popLayout">
+    <AnimatePresence mode="wait">
       <motion.div
         children={page}
         key={state.scene}
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: "-20%" }}
-        initial={{ opacity: 0, x: "20%" }}
+        exit={{ opacity: 0, x: "-2%" }}
+        initial={{ opacity: 0, x: "2%" }}
         className="flex h-full w-full overflow-hidden"
         transition={{ duration: 0.2, ease: "easeIn" }}
       />
