@@ -1,6 +1,7 @@
 bin
 out
 dist
+temp
 .env
 .vite
 tracks
