@@ -50,7 +50,7 @@ export function Artists() {
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
   useEffect(() => setQuery(""), [selected]);
-  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [rows]);
+  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
   useEffect(
     () => setRows(selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }),
     [selected],
