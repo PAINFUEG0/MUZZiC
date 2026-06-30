@@ -5,7 +5,7 @@ import { Tree } from "../../../shared/types";
 import { TbFileMusicFilled } from "react-icons/tb";
 import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
-export function File({
+export function Track({
   end,
   file,
   index,

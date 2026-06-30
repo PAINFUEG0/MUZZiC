@@ -17,7 +17,11 @@ router.get("/thumb/:id", (req, res) => {
   const { id } = req.params;
   const thumbPath = path.resolve(directories.thumbnails, `${id}.jpg`);
   const defaultThumbnailPath = path.resolve(".", "public", "logo.png");
-  res.sendFile(fs.existsSync(thumbPath) ? thumbPath : defaultThumbnailPath, { dotfiles: "allow" });
+
+  return fs.promises
+    .access(thumbPath)
+    .then(() => res.set("Cache-Control", "public, max-age=31536000, immutable").sendFile(thumbPath, { dotfiles: "allow" }))
+    .catch(() => res.set("Cache-Control", "public, max-age=31536000, immutable").sendFile(defaultThumbnailPath, { dotfiles: "allow" }));
 });
 
 const wss = new WebSocketServer({ server, path: "/ws" });

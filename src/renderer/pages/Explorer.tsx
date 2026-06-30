@@ -1,13 +1,15 @@
 /** @format */
 
-import { File } from "./Files";
 import { motion } from "framer-motion";
-import { Directory } from "./Directories";
-import { chunk } from "../../../shared/helpers";
+import { chunk } from "../../shared/helpers";
+import { Track } from "../components/utils/Track";
 import { useEffect, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { searchBox, treeStore } from "../../utils/globalStores";
-import { IoIosArrowBack, IoIosMusicalNotes } from "react-icons/io";
+import { Directory } from "../components/utils/Directory";
+import { treeStore, searchBox } from "../utils/globalStores";
+import { DirectoryGrid } from "../components/utils/DirectoryGrid";
+import { IoIosArrowBack } from "react-icons/io";
+import { LuFolderSearch } from "react-icons/lu";
 
 const variants = {
   center: { x: 0, opacity: 1 },
@@ -18,14 +20,15 @@ const variants = {
 export function List() {
   const [data] = treeStore.use();
   const [path, setPath] = useState([data]);
-  const [atTop, setAtTop] = useState(true);
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [atBottom, setAtBottom] = useState(false);
 
   const current = path[path.length - 1]!;
   const [dirs, setDirs] = useState(current.dirs);
   const [files, setFiles] = useState(current.files);
+
+  const [atTop, setAtTop] = useState(true);
+  const [atBottom, setAtBottom] = useState(false);
 
   const maskImage =
     atTop && atBottom
@@ -68,9 +71,9 @@ export function List() {
       <div className="flex h-fit items-center gap-3">
         <div className="flex flex-row gap-2">
           <button
-            onClick={() => goBack(path.slice(0, path.length - 1))}
-            children={path.length === 1 ? <IoIosMusicalNotes /> : <IoIosArrowBack />}
             disabled={path.length === 1}
+            onClick={() => goBack(path.slice(0, path.length - 1))}
+            children={path.length === 1 ? <LuFolderSearch /> : <IoIosArrowBack />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
         </div>
@@ -87,25 +90,26 @@ export function List() {
           ))}
         </div>
       </div>
-
-      <motion.div
-        exit="exit"
-        initial="enter"
+      <div
         ref={scrollRef}
-        animate="center"
-        key={current.name}
-        custom={direction}
-        variants={variants}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
-        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
         onScroll={() => {
           const el = scrollRef.current;
           el && setAtTop(el.scrollTop <= 0);
           el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
         }}
+        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
         className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto"
       >
-        <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        <motion.div
+          exit="exit"
+          initial="enter"
+          animate="center"
+          key={current.name}
+          custom={direction}
+          variants={variants}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+        >
           {virtualizer.getVirtualItems().map((vItem) => {
             const row = rows[vItem.index]!;
 
@@ -116,27 +120,21 @@ export function List() {
                   <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
                 </div>
               ) : row.type === "dir" ? (
-                <div
-                  key={"dirs"}
-                  className={
-                    `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
-                    `${
-                      row.len === 1
-                        ? "rounded-md border-2 pt-5 pb-5"
-                        : row.index === 0
-                          ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.75"
-                          : row.index === row.len - 1
-                            ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.75 pb-5"
-                            : "border-x-2 pt-0.75 pb-0.75"
-                    } `
-                  }
-                >
+                <DirectoryGrid index={row.index} len={row.len}>
                   {row.dirs.map((dir, i) => (
-                    <Directory key={dir.name} dir={dir} onClick={() => goForward([...path, dirs[i]!])} />
+                    <Directory
+                      dir={dir}
+                      key={dir.name}
+                      onClick={() => {
+                        console.log(row.dirs);
+                        console.log(dir.name);
+                        goForward([...path, row.dirs[i]!]);
+                      }}
+                    />
                   ))}
-                </div>
+                </DirectoryGrid>
               ) : (
-                <File
+                <Track
                   file={row.file}
                   index={row.index}
                   key={row.file.id}
@@ -156,8 +154,8 @@ export function List() {
               />
             );
           })}
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }

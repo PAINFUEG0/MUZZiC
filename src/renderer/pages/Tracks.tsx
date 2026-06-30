@@ -1,11 +1,11 @@
 /** @format */
 
-import { File } from "./list/Files";
+import { Track } from "../components/utils/Track";
 import { flatten } from "../../shared/helpers";
-import { RiFolderMusicFill } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { searchBox, treeStore } from "../utils/globalStores";
+import { LuDisc } from "react-icons/lu";
 
 export function Tracks() {
   const [data] = treeStore.use();
@@ -42,7 +42,7 @@ export function Tracks() {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button
-            children={<RiFolderMusicFill />}
+            children={<LuDisc />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
           <div className="font-medium">Playable tracks</div>
@@ -72,7 +72,7 @@ export function Tracks() {
                 ref={virtualizer.measureElement}
                 style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
               >
-                <File
+                <Track
                   file={track}
                   key={track.id}
                   index={vItem.index}
