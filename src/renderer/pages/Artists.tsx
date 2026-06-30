@@ -1,6 +1,6 @@
 /** @format */
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
@@ -97,49 +97,51 @@ export function Artists() {
         }}
         style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
       >
-        <motion.div
-          key={selected}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          style={{ height: virtualizer.getTotalSize(), position: "relative" }}
-          initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
-        >
-          {virtualizer.getVirtualItems().map((vItem) => {
-            return (
-              <div
-                key={vItem.index}
-                data-index={vItem.index}
-                ref={virtualizer.measureElement}
-                style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                children={
-                  rows.type === "tracks" ? (
-                    <Track
-                      index={vItem.index}
-                      initial={vItem.index === 0}
-                      file={rows.data[vItem.index]!}
-                      key={rows.data[vItem.index]!.id}
-                      end={vItem.index === rows.data.length - 1}
-                      onClick={() => console.log(rows.data[vItem.index]!.path)}
-                    />
-                  ) : (
-                    <ThumbGrid
-                      index={vItem.index}
-                      len={rows.data.length}
-                      children={rows.data[vItem.index]!.map((artist) => (
-                        <Card
-                          label1={artist}
-                          thumb={artists[artist]![0]!.thumb}
-                          onClick={() => setSelected(artist)}
-                          label2={`${artists[artist]?.length} track/s`}
-                        />
-                      ))}
-                    />
-                  )
-                }
-              />
-            );
-          })}
-        </motion.div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selected}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+            initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
+          >
+            {virtualizer.getVirtualItems().map((vItem) => {
+              return (
+                <div
+                  key={vItem.index}
+                  data-index={vItem.index}
+                  ref={virtualizer.measureElement}
+                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
+                  children={
+                    rows.type === "tracks" ? (
+                      <Track
+                        index={vItem.index}
+                        initial={vItem.index === 0}
+                        file={rows.data[vItem.index]!}
+                        key={rows.data[vItem.index]!.id}
+                        end={vItem.index === rows.data.length - 1}
+                        onClick={() => console.log(rows.data[vItem.index]!.path)}
+                      />
+                    ) : (
+                      <ThumbGrid
+                        index={vItem.index}
+                        len={rows.data.length}
+                        children={rows.data[vItem.index]!.map((artist) => (
+                          <Card
+                            label1={artist}
+                            thumb={artists[artist]![0]!.thumb}
+                            onClick={() => setSelected(artist)}
+                            label2={`${artists[artist]?.length} track/s`}
+                          />
+                        ))}
+                      />
+                    )
+                  }
+                />
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
