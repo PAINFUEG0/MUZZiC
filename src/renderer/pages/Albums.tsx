@@ -1,12 +1,12 @@
 /** @format */
 
-import { AnimatePresence, motion } from "framer-motion";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
 import { RiFolderMusicLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { searchBox, treeStore } from "../utils/globalStores";
@@ -121,7 +121,7 @@ export function Albums() {
                         file={rows.data[vItem.index]!}
                         key={rows.data[vItem.index]!.id}
                         end={vItem.index === rows.data.length - 1}
-                        onClick={() => console.log(rows.data[vItem.index]!.path)}
+                        onClick={() => console.log({ current: vItem.index, queue: rows.data })}
                       />
                     ) : (
                       <ThumbGrid

@@ -1,11 +1,11 @@
 /** @format */
 
-import { Track } from "../components/utils/Track";
+import { LuDisc } from "react-icons/lu";
 import { flatten } from "../../shared/helpers";
+import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { searchBox, treeStore } from "../utils/globalStores";
-import { LuDisc } from "react-icons/lu";
 
 export function Tracks() {
   const [data] = treeStore.use();
@@ -78,7 +78,7 @@ export function Tracks() {
                   index={vItem.index}
                   initial={vItem.index === 0}
                   end={vItem.index === tracks.length - 1}
-                  onClick={(e) => console.log(e.path)}
+                  onClick={() => console.log({ current: vItem.index, queue: tracks })}
                 />
               </div>
             );

@@ -10,8 +10,8 @@ export function Card({ thumb, label1, label2, onClick }: { thumb: string; label1
 
       <div className="flex h-full w-full flex-col items-end justify-end">
         <div className="flex h-12 w-full flex-col items-center gap-0.5 bg-(--hover-color)/50 p-2 backdrop-blur-sm">
-          <div className="w-full min-w-0 flex-row truncate text-center text-[11px] font-bold">{label1}</div>
-          <div className="w-full min-w-0 flex-row truncate text-center text-[10px] opacity-50">{label2}</div>
+          <div className="w-full min-w-0 flex-row truncate text-center text-[11px] font-bold" children={label1} />
+          <div className="w-full min-w-0 flex-row truncate text-center text-[10px] opacity-50" children={label2} />
         </div>
       </div>
     </div>

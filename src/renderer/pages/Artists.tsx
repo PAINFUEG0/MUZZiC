@@ -1,15 +1,15 @@
 /** @format */
 
-import { AnimatePresence, motion } from "framer-motion";
+import { TbMicrophone2 } from "react-icons/tb";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { searchBox, treeStore } from "../utils/globalStores";
-import { TbMicrophone2 } from "react-icons/tb";
 
 export function Artists() {
   type Row = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> } | { type: "artists"; data: string[][] };
@@ -120,7 +120,7 @@ export function Artists() {
                         file={rows.data[vItem.index]!}
                         key={rows.data[vItem.index]!.id}
                         end={vItem.index === rows.data.length - 1}
-                        onClick={() => console.log(rows.data[vItem.index]!.path)}
+                        onClick={() => console.log({ current: vItem.index, queue: rows.data })}
                       />
                     ) : (
                       <ThumbGrid

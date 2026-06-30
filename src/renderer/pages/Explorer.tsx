@@ -1,21 +1,15 @@
 /** @format */
 
-import { motion } from "framer-motion";
 import { chunk } from "../../shared/helpers";
+import { IoIosArrowBack } from "react-icons/io";
+import { LuFolderSearch } from "react-icons/lu";
 import { Track } from "../components/utils/Track";
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Directory } from "../components/utils/Directory";
 import { treeStore, searchBox } from "../utils/globalStores";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
-import { IoIosArrowBack } from "react-icons/io";
-import { LuFolderSearch } from "react-icons/lu";
-
-const variants = {
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? "-20%" : "20%", opacity: 0 }),
-  enter: (dir: number) => ({ x: dir > 0 ? "20%" : "-20%", opacity: 0 }),
-};
 
 export function List() {
   const [data] = treeStore.use();
@@ -90,6 +84,7 @@ export function List() {
           ))}
         </div>
       </div>
+
       <div
         ref={scrollRef}
         onScroll={() => {
@@ -100,61 +95,51 @@ export function List() {
         style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
         className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto"
       >
-        <motion.div
-          exit="exit"
-          initial="enter"
-          animate="center"
-          key={current.name}
-          custom={direction}
-          variants={variants}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-          style={{ height: virtualizer.getTotalSize(), position: "relative" }}
-        >
-          {virtualizer.getVirtualItems().map((vItem) => {
-            const row = rows[vItem.index]!;
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.name}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            initial={{ x: direction > 0 ? "20%" : "-20%", opacity: 0 }}
+            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+          >
+            {virtualizer.getVirtualItems().map((vItem) => {
+              const row = rows[vItem.index]!;
 
-            const component =
-              row.type === "label" ? (
-                <div key={row.label} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
-                  <div className="font-medium">{row.label}</div>
-                  <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
-                </div>
-              ) : row.type === "dir" ? (
-                <DirectoryGrid index={row.index} len={row.len}>
-                  {row.dirs.map((dir, i) => (
-                    <Directory
-                      dir={dir}
-                      key={dir.name}
-                      onClick={() => {
-                        console.log(row.dirs);
-                        console.log(dir.name);
-                        goForward([...path, row.dirs[i]!]);
-                      }}
-                    />
-                  ))}
-                </DirectoryGrid>
-              ) : (
-                <Track
-                  file={row.file}
-                  index={row.index}
-                  key={row.file.id}
-                  initial={row.index === 0}
-                  end={row.index === row.len - 1}
-                  onClick={(e) => console.log(e.path)}
+              return (
+                <div
+                  key={vItem.index}
+                  data-index={vItem.index}
+                  ref={virtualizer.measureElement}
+                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
+                  children={
+                    row.type === "label" ? (
+                      <div key={row.label} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
+                        <div className="font-medium">{row.label}</div>
+                        <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
+                      </div>
+                    ) : row.type === "dir" ? (
+                      <DirectoryGrid index={row.index} len={row.len}>
+                        {row.dirs.map((dir, i) => (
+                          <Directory dir={dir} key={dir.name} onClick={() => goForward([...path, row.dirs[i]!])} />
+                        ))}
+                      </DirectoryGrid>
+                    ) : (
+                      <Track
+                        file={row.file}
+                        index={row.index}
+                        key={row.file.id}
+                        initial={row.index === 0}
+                        end={row.index === row.len - 1}
+                        onClick={() => console.log({ current: vItem.index, queue: current.files })}
+                      />
+                    )
+                  }
                 />
               );
-
-            return (
-              <div
-                key={vItem.index}
-                children={component}
-                data-index={vItem.index}
-                ref={virtualizer.measureElement}
-                style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
-              />
-            );
-          })}
-        </motion.div>
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

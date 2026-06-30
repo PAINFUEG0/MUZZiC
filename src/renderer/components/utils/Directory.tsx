@@ -9,7 +9,7 @@ export function Directory({ dir, onClick }: { dir: Tree["dirs"][number]; onClick
       onClick={onClick}
       className="flex h-fit w-full cursor-pointer flex-row items-center gap-1 rounded-md px-2 py-1 hover:bg-(--hover-color)/20"
     >
-      <RiFolderMusicFill className="h-8.5 w-8.5 text-(--accent-color)" />
+      <RiFolderMusicFill className="h-8.5 w-8.5 shrink-0 text-(--accent-color)" />
 
       <div className="flex h-fit w-full flex-col">
         <div className="text-no-wrap min-w-0 truncate text-[11px] font-medium" children={dir.name} />
