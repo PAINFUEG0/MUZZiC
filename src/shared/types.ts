@@ -40,6 +40,8 @@ export type API = {
   minimize: () => Promise<void>;
   fullscreen: () => Promise<void>;
 
+  usage: () => Promise<{ cpu: number; mem: number }>;
+
   getPort: () => Promise<string>;
 
   checkDLP: () => Promise<boolean>;

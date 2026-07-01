@@ -42,6 +42,8 @@ export function registerHandles(win: BrowserWindow) {
     extractMetadata: (_: IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
 
     transcode: (_: IpcMainInvokeEvent, ...args) => transcode(...args),
+
+    usage: async (_: IpcMainInvokeEvent) => ({ cpu: process.getCPUUsage().percentCPUUsage, mem: process.memoryUsage().rss }),
   } satisfies {
     [K in keyof API]: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => ipcMain.handle(K, V));

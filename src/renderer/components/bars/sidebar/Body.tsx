@@ -5,7 +5,7 @@ import { MdDownloading } from "react-icons/md";
 import { TbMicrophone2 } from "react-icons/tb";
 import { ExpandableItem, Item } from "./Items";
 import { PiMusicNoteBold } from "react-icons/pi";
-import { themeStore, view } from "../../../utils/globalStores";
+import { view } from "../../../utils/globalStores";
 import { RiFolderMusicLine, RiPlayListFill } from "react-icons/ri";
 import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 
@@ -26,6 +26,13 @@ const playlistItems = [
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Hip-hop / Rap", toSet: { scene: "playlist", id: "Playlist 1" } },
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Soul music ( Lithe-like )", toSet: { scene: "playlist", id: "Playlist 2" } },
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
+  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
 ];
 
 const sections = [
@@ -34,14 +41,10 @@ const sections = [
 ];
 
 export function Body() {
-  const [theme] = themeStore.use();
   const [scene, setScene] = view.use();
 
   return (
-    <div className="relative flex h-full w-65 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2 backdrop-blur-md">
-      <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
-      <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
-
+    <div className="relative flex h-full w-65 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
       {mainItems.map(({ icon, label, toSet }) => (
         <Item
           key={label}
