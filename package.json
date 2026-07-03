@@ -1,0 +1,62 @@
+{
+  "private": true,
+  "name": "muzzic",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "icon": "./public/logo.ico",
+  "main": "./.vite/build/muzzic.js",
+  "appUserModelId": "com.painfuego.music",
+  "description": "A music player I guess",
+  "author": {
+    "name": "1sT-Services",
+    "email": "contact@painfuego.xyz"
+  },
+  "scripts": {
+    "make": "electron-forge make",
+    "start": "electron-forge start",
+    "pack": "electron-forge package",
+    "rm": "node -e \"['./dist', './.vite', './bin', './database', './.tsbuildinfo', './.thumbnails'].forEach((dir) => require('fs').existsSync(dir) && require('fs').rmSync(dir, { recursive: true, force: true }))\""
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-wix": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron-forge/plugin-vite": "^7.11.2",
+    "@electron-forge/shared-types": "^7.11.2",
+    "@electron/fuses": "^1.8.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/ffbinaries": "^1.1.5",
+    "@types/node": "^25.9.1",
+    "@types/node-forge": "^1.3.14",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "electron": "^42.2.0",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14"
+  },
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.14.3",
+    "@xenodb/server": "^1.1.1",
+    "axios": "^1.16.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "ffbinaries": "^1.1.6",
+    "framer-motion": "^12.40.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-icons": "^5.6.0",
+    "react-router-dom": "^7.15.1",
+    "recharts": "^3.9.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.0",
+    "ws": "^8.21.0",
+    "zustand": "^5.0.14"
+  }
+}
