@@ -13,6 +13,11 @@ export function Preload() {
   const [progress, setProgress] = useState(0);
   const [task, setTask] = useState<string>("Initializing");
 
+  document.documentElement.style.setProperty("--accent-color", theme.color);
+  document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
+  document.documentElement.style.setProperty("--hover-color", theme.type === "dark" ? "#000000" : "#ffffff");
+  document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
+
   useEffect(() => {
     const run = async () => {
       window.api = new Proxy({} as API, {

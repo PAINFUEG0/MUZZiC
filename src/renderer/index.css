@@ -7,10 +7,10 @@
 }
 
 :root {
-  --text-color: #ffffff;
-  --hover-color: #000000;
-  --border-color: #ffffff;
-  --accent-color: #ff94af;
+  --text-color: #00000000;
+  --hover-color: #00000000;
+  --border-color: #00000000;
+  --accent-color: #00000000;
 }
 
 ::view-transition-old(root),

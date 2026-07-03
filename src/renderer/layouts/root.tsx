@@ -33,7 +33,7 @@ export function Root() {
         children={<Settings />}
         setOpen={setSettingsOpen}
         onClose={() => console.log("colsed")}
-        className="min-h-[50%] min-w-[50%] border-2 border-(--border-color)/20 bg-(--hover-color)/5 text-(--text-color) backdrop-blur-sm"
+        className="h-fit min-h-[50%] w-fit min-w-[50%] border-2 border-(--border-color)/20 bg-(--hover-color)/5 text-(--text-color) backdrop-blur-sm"
       />
     </div>
   );

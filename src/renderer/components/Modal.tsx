@@ -3,8 +3,8 @@
 import { createPortal } from "react-dom";
 import { twMerge } from "tailwind-merge";
 import { RxCross1 } from "react-icons/rx";
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
 
 interface ModalProps {
   open: boolean;
@@ -41,8 +41,6 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
     };
   }, [open, setOpen, close]);
 
-  // if (!open) return null;
-
   return createPortal(
     <AnimatePresence mode="wait">
       {open && (
@@ -62,7 +60,7 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
               className,
             )}
           >
-            <div className="flex h-full w-full overflow-auto">{children}</div>
+            <div className="flex h-full w-full scrollbar-none overflow-auto">{children}</div>
             <div className="text-primary absolute top-5 right-5 z-100 cursor-pointer" children={<RxCross1 onClick={close} />} />
           </div>
         </motion.div>
