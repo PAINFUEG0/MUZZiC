@@ -6,7 +6,7 @@ import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import { searchBox, themeStore } from "../../../utils/globalStores";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 
-export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg: boolean) => void }) {
+export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
   const [theme] = themeStore.use();
   const [fs, setFs] = useState(true);
   const [value, setValue] = searchBox.use();
@@ -25,9 +25,9 @@ export function Navbar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (arg
       <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
 
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
         className="aspect-square h-fit w-fit text-xl text-(--accent-color)"
-        children={isOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
+        children={sidebarOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
       />
 
       <div className="flex h-full w-full items-center justify-end gap-3">

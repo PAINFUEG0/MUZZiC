@@ -3,27 +3,38 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Popup } from "../components/Popup";
+import { Modal } from "../components/Modal";
+import { Settings } from "../pages/Settings";
 import { Navbar } from "../components/bars/navbar";
 import { Sidebar } from "../components/bars/sidebar";
 import { Playbar } from "../components/bars/playbar";
 
 export function Root() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <div className="relative flex h-full w-full shrink-0 flex-col overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
       <Popup />
 
       <div className="relative flex h-full w-full flex-row overflow-hidden">
-        <Sidebar isOpen={isOpen} />
+        <Sidebar sidebarOpen={sidebarOpen} setSettingsOpen={setSettingsOpen} />
 
         <div className="flex h-full w-full flex-col">
-          <Navbar isOpen={isOpen} setIsOpen={setIsOpen} />
+          <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           <Outlet />
         </div>
       </div>
 
       <Playbar />
+
+      <Modal
+        open={settingsOpen}
+        children={<Settings />}
+        setOpen={setSettingsOpen}
+        onClose={() => console.log("colsed")}
+        className="min-h-[50%] min-w-[50%] border-2 border-(--border-color)/20 bg-(--hover-color)/5 text-(--text-color) backdrop-blur-sm"
+      />
     </div>
   );
 }

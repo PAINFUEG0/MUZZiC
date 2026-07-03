@@ -6,7 +6,7 @@ import { IoAnalyticsOutline } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuArrowBigUpDash, LuSettings2 } from "react-icons/lu";
 
-export function Tail() {
+export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) {
   const [direction, setDirection] = useState(1);
   const [view, setView] = useState<"x" | "stats" | null>(null);
 
@@ -68,6 +68,7 @@ export function Tail() {
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
             />
             <button
+              onClick={() => setisSettingsOpen(true)}
               children={<LuSettings2 />}
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
             />

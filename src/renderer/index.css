@@ -2,9 +2,19 @@
 
 @import "tailwindcss";
 
+*:focus {
+  outline: none;
+}
+
 :root {
   --text-color: #ffffff;
   --hover-color: #000000;
   --border-color: #ffffff;
   --accent-color: #ff94af;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
