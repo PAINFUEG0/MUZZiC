@@ -61,7 +61,7 @@ export function List() {
   }, [query]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-8 overflow-hidden p-10 pb-5">
+    <div className="flex h-full w-full flex-col gap-2 overflow-hidden p-10 pb-5">
       <div className="flex h-fit items-center gap-3">
         <div className="flex flex-row gap-2">
           <button
