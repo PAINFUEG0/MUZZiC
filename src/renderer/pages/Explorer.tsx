@@ -61,7 +61,7 @@ export function List() {
   }, [query]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 overflow-hidden p-10 pb-5">
+    <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
       <div className="flex h-fit items-center gap-3">
         <div className="flex flex-row gap-2">
           <button
@@ -114,7 +114,10 @@ export function List() {
                   style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
                   children={
                     row.type === "label" ? (
-                      <div key={row.label} className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 py-6">
+                      <div
+                        key={row.label}
+                        className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${vItem.index === 0 ? "pb-6" : "py-6"}`}
+                      >
                         <div className="font-medium">{row.label}</div>
                         <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
                       </div>
