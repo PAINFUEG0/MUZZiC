@@ -44,7 +44,19 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
-    usage: async (_: eˉ.IpcMainInvokeEvent) => ({ cpu: process.getCPUUsage().percentCPUUsage, mem: process.memoryUsage().rss }),
+    usage: async (_: eˉ.IpcMainInvokeEvent) => {
+      return eˉ.app
+        .getAppMetrics()
+        .filter((m) => m.type !== "GPU")
+        .reduce(
+          (acc, curr) => {
+            acc.cpu += curr.cpu.percentCPUUsage;
+            acc.mem += (curr.memory.privateBytes ?? curr.memory.workingSetSize) * 1024;
+            return acc;
+          },
+          { cpu: 0, mem: 0 },
+        );
+    },
   } satisfies {
     [K in keyof API]: (event: eˉ.IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => eˉ.ipcMain.handle(K, V));

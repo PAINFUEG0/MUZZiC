@@ -30,7 +30,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
           <motion.div
             ref={scrollRef}
             style={{ maskImage, WebkitMaskImage: maskImage }}
-            animate={{ height: view ? "calc(var(--spacing) * 25)" : "0px" }}
+            animate={{ height: view ? "calc(var(--spacing) * 27)" : "0px" }}
             className="flex w-full shrink-0 scrollbar-none flex-col overflow-y-auto"
             onScroll={() => {
               const el = scrollRef.current;
@@ -45,7 +45,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
               className="flex h-full w-full flex-col"
               initial={{ x: direction === 0 ? "0" : direction === 1 ? "70%" : "-70%" }}
             >
-              {Stats()}
+              <Stats />
             </motion.div>
           </motion.div>
         </AnimatePresence>
