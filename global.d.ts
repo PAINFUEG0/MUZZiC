@@ -1,6 +1,6 @@
 /** @format */
 
-import { IpcRenderer } from "electron";
+import eˉ from "electron";
 import { API } from "./src/shared/types";
 
 export {};
@@ -11,6 +11,6 @@ declare global {
 
   interface Window {
     api: API;
-    invoke: IpcRenderer["invoke"];
+    invoke: eˉ.IpcRenderer["invoke"];
   }
 }

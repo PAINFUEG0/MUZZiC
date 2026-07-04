@@ -1,50 +1,51 @@
 /** @format */
 
+import eˉ from "electron";
 import { api } from "./server";
 import { API } from "../shared/types";
 import * as local from "./helpers/local";
+import * as constants from "./constants";
 import * as bin from "./helpers/binaries";
 import * as settings from "./helpers/settings";
 import { transcode } from "./helpers/transcode";
-import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from "electron";
 
-export function registerHandles(win: BrowserWindow) {
+export function registerHandles(win: eˉ.BrowserWindow) {
   Object.entries({
-    close: () => Promise.resolve(app.quit()),
+    close: () => Promise.resolve(eˉ.app.quit()),
     minimize: () => Promise.resolve(win.minimize()),
     fullscreen: () => Promise.resolve(win.setFullScreen(!win.isFullScreen())),
 
     getPort: () => api.port,
 
-    checkDLP: () => bin.checkDLP(),
-    downloadDLP: () => bin.downloadDLP(),
+    checkDLP: () => bin.checkForBinary("yt-dlp", "--version", "dlp"),
+    downloadDLP: () => bin.downloadBinary(constants.DLP_BIN_URL, constants.bin.dlp),
 
-    checkFFMPEG: () => bin.checkFFMPEG(),
-    checkFFPROBE: () => bin.checkFFPROBE(),
+    checkFFMPEG: () => bin.checkForBinary("ffmpeg", "-version", "ffmpeg"),
+    downloadFFMPEG: () => bin.downloadBinary(constants.FFMPEG_BIN_URL, constants.bin.ffmpeg),
 
-    downloadFFMPEG: () => bin.downloadFFMPEG(),
-    downloadFFPROBE: () => bin.downloadFFPROBE(),
+    checkFFPROBE: () => bin.checkForBinary("ffprobe", "-version", "ffprobe"),
+    downloadFFPROBE: () => bin.downloadBinary(constants.FFPROBE_BIN_URL, constants.bin.ffprobe),
 
     getMediaFolder: () => settings.getMediaFolder(),
-    setMediaFolder: (_: IpcMainInvokeEvent, ...args) => settings.setMediaFolder(...args),
+    setMediaFolder: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.setMediaFolder(...args),
 
-    openFolderDialog: async () => (await dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null,
+    openFolderDialog: async () => (await eˉ.dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null,
 
-    scan: (_: IpcMainInvokeEvent, ...args) => local.scan(...args),
+    scan: (_: eˉ.IpcMainInvokeEvent, ...args) => local.scan(...args),
 
-    getTree: (_: IpcMainInvokeEvent, ...args) => local.getTree(...args),
-    setTree: (_: IpcMainInvokeEvent, ...args) => local.setTree(...args),
+    getTree: (_: eˉ.IpcMainInvokeEvent, ...args) => local.getTree(...args),
+    setTree: (_: eˉ.IpcMainInvokeEvent, ...args) => local.setTree(...args),
 
-    setMeta: (_: IpcMainInvokeEvent, ...args) => local.setMeta(...args),
-    getMeta: (_: IpcMainInvokeEvent, ...args) => local.getMeta(...args),
-    deleteMeta: (_: IpcMainInvokeEvent, ...args) => local.deleteMeta(...args),
+    setMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.setMeta(...args),
+    getMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.getMeta(...args),
+    deleteMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteMeta(...args),
 
-    extractMetadata: (_: IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
+    extractMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
 
-    transcode: (_: IpcMainInvokeEvent, ...args) => transcode(...args),
+    transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
-    usage: async (_: IpcMainInvokeEvent) => ({ cpu: process.getCPUUsage().percentCPUUsage, mem: process.memoryUsage().rss }),
+    usage: async (_: eˉ.IpcMainInvokeEvent) => ({ cpu: process.getCPUUsage().percentCPUUsage, mem: process.memoryUsage().rss }),
   } satisfies {
-    [K in keyof API]: (event: IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
-  }).forEach(([K, V]) => ipcMain.handle(K, V));
+    [K in keyof API]: (event: eˉ.IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
+  }).forEach(([K, V]) => eˉ.ipcMain.handle(K, V));
 }

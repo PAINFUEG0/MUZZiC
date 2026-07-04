@@ -1,7 +1,7 @@
 /** @format */
 
 import path from "node:path";
-import { FFPROBE } from "../constants";
+import { bin } from "../constants";
 import { File } from "../../shared/types";
 import { Track } from "../../shared/types";
 import { spawn } from "node:child_process";
@@ -54,7 +54,7 @@ function ffprobe(path: string): Promise<string> {
 
     let stdout = "";
     let stderr = "";
-    const child = spawn(FFPROBE, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(bin.ffprobe, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     child.on("error", reject);
     child.stdout.on("data", (chunk) => (stdout += chunk.toString()));

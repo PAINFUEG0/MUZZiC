@@ -1,5 +1,5 @@
 /** @format */
 
-import { contextBridge, ipcRenderer } from "electron";
+import eˉ from "electron";
 
-contextBridge.exposeInMainWorld("invoke", ipcRenderer.invoke.bind(ipcRenderer));
+eˉ.contextBridge.exposeInMainWorld("invoke", eˉ.ipcRenderer.invoke.bind(eˉ.ipcRenderer));

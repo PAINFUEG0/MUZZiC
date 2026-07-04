@@ -2,25 +2,31 @@
 
 import fs from "node:fs";
 import axios from "axios";
+import stream from "node:stream";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
-import { existsBin } from "../utils/existsBin";
-import { DLP, FFMPEG, FFPROBE, WIN32, YT_DLP_BIN_URL as URL, directories } from "../constants";
-import { downloadBin } from "../utils/downloadBin.js";
+import { bin, WIN32 } from "../constants";
+import { safeAwait } from "../../shared/helpers";
 
 const execute = promisify(exec);
 
-export const checkDLP = async () => existsBin(DLP);
+export async function checkForBinary(name: string, cmd: string, K: keyof typeof bin) {
+  const [res] = await safeAwait(execute(`${name} ${cmd}`));
+  if (res) return !!(bin[K] = name);
 
-export const checkFFMPEG = async () => existsBin(FFMPEG);
+  res;
 
-export const checkFFPROBE = async () => existsBin(FFPROBE);
+  return await fs.promises
+    .access(bin[K], fs.promises.constants.X_OK)
+    .then(() => true)
+    .catch(() => false);
+}
+
+export async function downloadBinary(url: string, destination: string) {
+  return axios
+    .get(url, { responseType: "stream" })
+    .then(({ data }) => stream.promises.pipeline(data, fs.createWriteStream(destination)))
+    .then(() => patch(destination));
+}
 
 export const patch = async (bin: string) => void (!WIN32 && (await execute(`chmod +x ${bin}`)));
-
-export const downloadFFMPEG = () => downloadBin("ffmpeg", directories.bin).then(() => patch(FFMPEG));
-
-export const downloadFFPROBE = () => downloadBin("ffprobe", directories.bin).then(() => patch(FFPROBE));
-
-export const downloadDLP = () =>
-  axios(URL, { responseType: "arraybuffer" }).then(({ data }) => fs.promises.writeFile(DLP, Buffer.from(data)).then(() => patch(DLP)));
