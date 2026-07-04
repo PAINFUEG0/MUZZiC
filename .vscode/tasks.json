@@ -2,10 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build ( TSC : Project refs )",
       "type": "shell",
-      "command": "npx tsc -b",
-      "problemMatcher": ["$tsc"],
+      "command": "npm run make",
+      "label": "Build ( electron-forge make )",
       "group": { "kind": "build", "isDefault": true }
     },
     {
