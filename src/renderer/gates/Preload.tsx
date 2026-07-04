@@ -1,10 +1,38 @@
 /** @format */
 
 import { Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, RefObject } from "react";
 import { flatten } from "../../shared/helpers";
-import { themeStore, treeStore } from "../utils//globalStores";
+import { themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
+
+interface ETARef {
+  time: number;
+  speed: number;
+  current: number;
+}
+
+function formatETA(sec: number | null) {
+  if (sec == null) return "--:--";
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m ? `${m}m ${s}s` : `${s}s`;
+}
+
+function getETA(ref: RefObject<ETARef>, current: number, total: number) {
+  if (Number.isNaN(total)) return null;
+  const now = Date.now();
+  const dt = (now - ref.current.time) / 1000;
+  const dc = current - ref.current.current;
+  if (dt > 0 && dc > 0) {
+    const d = dc / dt;
+    ref.current.speed = ref.current.speed ? ref.current.speed * 0.8 + d * 0.2 : d;
+  }
+  ref.current.current = current;
+  ref.current.time = now;
+  if (!ref.current.speed) return null;
+  return Math.ceil((total - current) / ref.current.speed);
+}
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -12,6 +40,13 @@ export function Preload() {
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [task, setTask] = useState<string>("Initializing");
+  const [eta, setEta] = useState<string | null>(null);
+
+  const etaRef = useRef<ETARef>({
+    speed: 0,
+    current: 0,
+    time: Date.now(),
+  });
 
   document.documentElement.style.setProperty("--accent-color", theme.color);
   document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
@@ -32,6 +67,11 @@ export function Preload() {
       const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
 
+      ws.onmessage = (m) => {
+        const data = JSON.parse(m.data) as MessagePayload;
+        if (data.type === "PROGRESS") setEta(formatETA(getETA(etaRef, data.current, data.total)));
+      };
+
       const DLP = await window.api.checkDLP();
       const FFMPEG = await window.api.checkFFMPEG();
       const FFPROBE = await window.api.checkFFPROBE();
@@ -39,15 +79,20 @@ export function Preload() {
 
       !FFMPEG && setTask("Downloading missing dependency (FFMPEG)");
       !FFMPEG && (await window.api.downloadFFMPEG());
+      !FFMPEG && setEta(null);
       setProgress(10);
 
       !FFPROBE && setTask("Downloading missing dependency (FFPROBE)");
       !FFPROBE && (await window.api.downloadFFPROBE());
+      !FFPROBE && setEta(null);
       setProgress(15);
 
       !DLP && setTask("Downloading missing dependency (YT-DLP)");
       !DLP && (await window.api.downloadDLP());
+      !DLP && setEta(null);
       setProgress(20);
+
+      ws.onmessage = null;
 
       setTask("Checking for media folder");
       let mediaFolder = await window.api.getMediaFolder();
@@ -77,6 +122,7 @@ export function Preload() {
           ws.onmessage = (m: MessageEvent) => {
             const data = JSON.parse(m.data) as MessagePayload;
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
+            setEta(formatETA(getETA(etaRef, data.current, data.total)));
             setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
             setProgress(Math.floor(60 * (data.current / data.total)) + 35);
           };
@@ -158,6 +204,7 @@ export function Preload() {
           <div className="flex h-1 w-[25dvw] shrink-0 rounded-full bg-(--accent-color)/50">
             <div className="rounded-full bg-(--accent-color)/80" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
           </div>
+          <div className="flex w-[25dvw] justify-end text-[10px] opacity-40">{eta ? `ETA ${eta}` : "\u00A0"}</div>
         </div>
       )}
     </div>

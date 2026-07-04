@@ -9,6 +9,12 @@ import * as bin from "./helpers/binaries";
 import * as settings from "./helpers/settings";
 import { transcode } from "./helpers/transcode";
 
+import type { AxiosProgressEvent } from "axios";
+
+const onProgress = (e: AxiosProgressEvent) => {
+  api.broadcast({ type: "PROGRESS", data: "BIN", current: e.loaded, total: e.total ?? Number.NaN });
+};
+
 export function registerHandles(win: eˉ.BrowserWindow) {
   Object.entries({
     close: () => Promise.resolve(eˉ.app.quit()),
@@ -18,13 +24,13 @@ export function registerHandles(win: eˉ.BrowserWindow) {
     getPort: () => api.port,
 
     checkDLP: () => bin.checkForBinary("yt-dlp", "--version", "dlp"),
-    downloadDLP: () => bin.downloadBinary(constants.DLP_BIN_URL, constants.bin.dlp),
+    downloadDLP: () => bin.downloadBinary(constants.DLP_BIN_URL, constants.bin.dlp, onProgress),
 
     checkFFMPEG: () => bin.checkForBinary("ffmpeg", "-version", "ffmpeg"),
-    downloadFFMPEG: () => bin.downloadBinary(constants.FFMPEG_BIN_URL, constants.bin.ffmpeg),
+    downloadFFMPEG: () => bin.downloadBinary(constants.FFMPEG_BIN_URL, constants.bin.ffmpeg, onProgress),
 
     checkFFPROBE: () => bin.checkForBinary("ffprobe", "-version", "ffprobe"),
-    downloadFFPROBE: () => bin.downloadBinary(constants.FFPROBE_BIN_URL, constants.bin.ffprobe),
+    downloadFFPROBE: () => bin.downloadBinary(constants.FFPROBE_BIN_URL, constants.bin.ffprobe, onProgress),
 
     getMediaFolder: () => settings.getMediaFolder(),
     setMediaFolder: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.setMediaFolder(...args),
