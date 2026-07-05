@@ -73,6 +73,13 @@ export const themes: Theme[] = [
     backgrground: "x.png",
   },
   {
+    blur: "8px",
+    type: "dark",
+    color: "#9988FF",
+    tint: { black: { overall: 0.5, bars: 0.3 }, white: { overall: 0, bars: 0 } },
+    backgrground: "z.png",
+  },
+  {
     blur: "12px",
     type: "dark",
     color: "#AA88CC",

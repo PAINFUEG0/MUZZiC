@@ -30,7 +30,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
           <motion.div
             ref={scrollRef}
             style={{ maskImage, WebkitMaskImage: maskImage }}
-            animate={{ height: view ? "calc(var(--spacing) * 27)" : "0px" }}
+            animate={{ height: view ? "calc(var(--spacing) * 29)" : "0px" }}
             className="flex w-full shrink-0 scrollbar-none flex-col overflow-y-auto"
             onScroll={() => {
               const el = scrollRef.current;
@@ -50,7 +50,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex h-fit w-full gap-2 p-1">
+        <div className="flex h-fit w-full gap-2 p-1 pt-0">
           <div className="flex w-full flex-col px-1 text-[10px]">
             <div className="text-[10px] font-medium opacity-100">Resource usage stats</div>
             <div className="text-[9px] font-normal opacity-60">Use buttons to switch view</div>
