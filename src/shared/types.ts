@@ -60,11 +60,13 @@ export type API = {
 
   scan: (dir: string) => Promise<DirNode>;
 
+  deleteTree: (K: string) => Promise<boolean>;
   getTree: (K: string) => Promise<DirNode | null>;
   setTree: (K: string, V: DirNode) => Promise<DirNode>;
 
-  extractMetadata: (flat: File[]) => Promise<{ key: string; value: Track }[]>;
+  extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: Track }[]>;
 
+  getAllMeta: () => Promise<{ [K: string]: Track }>;
   deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;
   getMeta: <T extends string | string[], R extends Track | null>(K: T) => Promise<T extends string ? R : R[]>;
   setMeta: <T extends [string, Track] | [{ key: string; value: Track }[]], R extends Track>(

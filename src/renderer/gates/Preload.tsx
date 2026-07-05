@@ -2,10 +2,9 @@
 
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { flatten, sleep } from "../../shared/helpers";
+import { flatten, sleep } from "../../shared/helpers.js";
 import { themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
-
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
@@ -27,18 +26,11 @@ export function Preload() {
         },
       });
 
-      setTask("Preparing connections & dependencies");
+      setTask("Initializing conns, deps and peers");
 
       const port = await window.api.getPort();
       const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
-
-      const downloadProgress = (p: number, b: string) => (m: MessageEvent) => {
-        const data = JSON.parse(m.data) as MessagePayload;
-        if (data.type !== "PROGRESS") return;
-        setProgress(p + (data.current / data.total) * 5);
-        setFooter(`Downloading ${b} - ${(data.current / 1024 / 1024).toFixed(2)} MB / ${(data.total / 1024 / 1024).toFixed(2)} MB`);
-      };
 
       setTask("Checking for dependencies");
 
@@ -55,6 +47,13 @@ export function Preload() {
       setProgress(15);
 
       (!DLP || !FFMPEG || !FFPROBE) && setTask("Downloading missing dependencies");
+
+      const downloadProgress = (p: number, b: string) => (m: MessageEvent) => {
+        const data = JSON.parse(m.data) as MessagePayload;
+        if (data.type !== "PROGRESS") return;
+        setProgress(p + (data.current / data.total) * 5);
+        setFooter(`Downloading ${b} - ${(data.current / 1024 / 1024).toFixed(2)} MB / ${(data.total / 1024 / 1024).toFixed(2)} MB`);
+      };
 
       ws.onmessage = downloadProgress(15, "YT-DLP");
       !DLP && (await window.api.downloadDLP());
@@ -79,70 +78,56 @@ export function Preload() {
       setProgress(40);
 
       setTask("Preparing library");
-
       setFooter("Scanning");
-      const currentTree = await window.api.scan(mediaFolder);
-      const previousTree = await window.api.getTree("mediaFolder");
-      await window.api.setTree("mediaFolder", currentTree);
-      await sleep(150);
+      const tree = await window.api.scan(mediaFolder);
+      await window.api.setTree("mediaFolder", tree);
+      await sleep(200);
       setProgress(50);
 
-      setFooter("Checking for changes");
-      if (JSON.stringify(previousTree) !== JSON.stringify(currentTree)) {
-        const _current = flatten(currentTree);
-        const _previous = previousTree ? flatten(previousTree) : [];
-        const currentMap = new Map(_current.map((x) => [x.id, x]));
-        const previousMap = new Map(_previous.map((x) => [x.id, x]));
-        const added = _current.filter(({ id }) => !previousMap.has(id));
-        const deleted = _previous.filter(({ id }) => !currentMap.has(id));
+      setFooter("Generating diff for extraction");
+      const flat = flatten(tree);
+      let metas = await window.api.getAllMeta();
+      const needsExtraction = flat.filter((file) => !metas[file.id]);
+      const ids = Object.fromEntries(flat.map((file) => [file.id, 1]));
+      const needsDeletion = Object.keys(metas).filter((key) => !ids[key]);
 
-        if (added.length) {
-          ws.onmessage = (m: MessageEvent) => {
-            const data = JSON.parse(m.data) as MessagePayload;
-            if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
-            setTask("Extracting metadata and thumbnails");
-            setFooter(`Processed ${data.current} / ${data.total} files`);
-            setProgress(Math.floor(30 * (data.current / data.total)) + 50);
-          };
-
-          const res = await window.api.extractMetadata(added);
-
-          setTask(`Saving index for ${added.length} newly added files`);
-          await window.api.setMeta(res);
-          ws.onmessage = null;
-          setProgress(deleted.length ? 85 : 90);
-        }
-
-        if (deleted.length) {
-          setTask(`Removing index for ${deleted.length} deleted files`);
-          await window.api.deleteMeta(deleted.map((e) => e.id));
-          setProgress(90);
-        }
+      if (needsExtraction.length) {
+        ws.onmessage = (m: MessageEvent) => {
+          const data = JSON.parse(m.data) as MessagePayload;
+          if (data.type !== "PROGRESS") return;
+          setTask("Extracting metadata and thumbnails");
+          setFooter(`Processed ${data.current} / ${data.total} files`);
+          setProgress(Math.floor(40 * (data.current / data.total)) + 50);
+        };
+        await window.api.extractAndSaveMetadata(needsExtraction);
+        ws.onmessage = null;
       }
 
-      const flat = flatten(currentTree);
+      if (needsDeletion.length) await window.api.deleteMeta(needsDeletion);
 
-      const metas = Object.fromEntries(
-        ((await window.api.getMeta(flat.map((e) => e.id))).filter(Boolean) as Track[]).map((e) => [e!.id, e]),
-      );
+      setProgress(90);
+      setTask(`Syncing changes and generating tree`);
+      setFooter(`Indexed ${needsExtraction.length} files and removed index for ${needsDeletion.length} files`);
+      await sleep(200);
 
-      const populateTreeWithMeta = (node: DirNode) => {
+      const populateTreeWithMeta = (node: DirNode, metadata: { [K: string]: Track }) => {
         for (let i = 0; i < node.files.length; i++)
           (node.files[i] as any) = {
             ...node.files[i],
-            ...metas[node.files[i]!.id]!,
+            ...metadata[node.files[i]!.id]!,
             thumb: `http://localhost:${port}/thumb/${node.files[i]!.id}`,
           } satisfies Track;
 
-        node.dirs.forEach((e) => populateTreeWithMeta(e));
+        node.dirs.forEach((e) => populateTreeWithMeta(e, metadata));
 
         return node as unknown as Tree;
       };
 
-      setTree(populateTreeWithMeta(currentTree));
+      setTree(populateTreeWithMeta(tree, await window.api.getAllMeta()));
+      setFooter("Hope you enjoy your music");
       setTask("All done!");
       setProgress(100);
-      await sleep(300);
+      await sleep(200);
       setReady(true);
       ws.close();
     };

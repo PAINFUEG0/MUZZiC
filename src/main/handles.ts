@@ -41,12 +41,14 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     getTree: (_: eˉ.IpcMainInvokeEvent, ...args) => local.getTree(...args),
     setTree: (_: eˉ.IpcMainInvokeEvent, ...args) => local.setTree(...args),
+    deleteTree: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteTree(...args),
 
+    getAllMeta: (_: eˉ.IpcMainInvokeEvent) => local.getAllMeta(),
     setMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.setMeta(...args),
     getMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.getMeta(...args),
     deleteMeta: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteMeta(...args),
 
-    extractMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractMetadata(...args),
+    extractAndSaveMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractAndSaveMetadata(...args),
 
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
