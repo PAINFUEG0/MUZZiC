@@ -1,38 +1,10 @@
 /** @format */
 
 import { Outlet } from "react-router-dom";
-import { useState, useEffect, useRef, RefObject } from "react";
-import { flatten } from "../../shared/helpers";
+import { useState, useEffect } from "react";
+import { flatten, sleep } from "../../shared/helpers";
 import { themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
-
-interface ETARef {
-  time: number;
-  speed: number;
-  current: number;
-}
-
-function formatETA(sec: number | null) {
-  if (sec == null) return "--:--";
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return m ? `${m}m ${s}s` : `${s}s`;
-}
-
-function getETA(ref: RefObject<ETARef>, current: number, total: number) {
-  if (Number.isNaN(total)) return null;
-  const now = Date.now();
-  const dt = (now - ref.current.time) / 1000;
-  const dc = current - ref.current.current;
-  if (dt > 0 && dc > 0) {
-    const d = dc / dt;
-    ref.current.speed = ref.current.speed ? ref.current.speed * 0.8 + d * 0.2 : d;
-  }
-  ref.current.current = current;
-  ref.current.time = now;
-  if (!ref.current.speed) return null;
-  return Math.ceil((total - current) / ref.current.speed);
-}
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -40,13 +12,7 @@ export function Preload() {
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [task, setTask] = useState<string>("Initializing");
-  const [eta, setEta] = useState<string | null>(null);
-
-  const etaRef = useRef<ETARef>({
-    speed: 0,
-    current: 0,
-    time: Date.now(),
-  });
+  const [footer, setFooter] = useState<string | null>(null);
 
   document.documentElement.style.setProperty("--accent-color", theme.color);
   document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
@@ -67,47 +33,61 @@ export function Preload() {
       const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
 
-      ws.onmessage = (m) => {
+      const downloadProgress = (p: number, b: string) => (m: MessageEvent) => {
         const data = JSON.parse(m.data) as MessagePayload;
-        if (data.type === "PROGRESS") setEta(formatETA(getETA(etaRef, data.current, data.total)));
+        if (data.type !== "PROGRESS") return;
+        setProgress(p + (data.current / data.total) * 5);
+        setFooter(`Downloading ${b} - ${(data.current / 1024 / 1024).toFixed(2)} MB / ${(data.total / 1024 / 1024).toFixed(2)} MB`);
       };
 
+      setTask("Checking for dependencies");
+
+      setFooter("1/3 - YT-DLP");
       const DLP = await window.api.checkDLP();
-      const FFMPEG = await window.api.checkFFMPEG();
-      const FFPROBE = await window.api.checkFFPROBE();
       setProgress(5);
 
-      !FFMPEG && setTask("Downloading missing dependency (FFMPEG)");
-      !FFMPEG && (await window.api.downloadFFMPEG());
-      !FFMPEG && setEta(null);
+      setFooter("2/3 - FFMPEG");
+      const FFMPEG = await window.api.checkFFMPEG();
       setProgress(10);
 
-      !FFPROBE && setTask("Downloading missing dependency (FFPROBE)");
-      !FFPROBE && (await window.api.downloadFFPROBE());
-      !FFPROBE && setEta(null);
+      setFooter("3/3 - FFPROBE");
+      const FFPROBE = await window.api.checkFFPROBE();
       setProgress(15);
 
-      !DLP && setTask("Downloading missing dependency (YT-DLP)");
+      (!DLP || !FFMPEG || !FFPROBE) && setTask("Downloading missing dependencies");
+
+      ws.onmessage = downloadProgress(15, "YT-DLP");
       !DLP && (await window.api.downloadDLP());
-      !DLP && setEta(null);
       setProgress(20);
 
+      ws.onmessage = downloadProgress(20, "FFMPEG");
+      !FFMPEG && (await window.api.downloadFFMPEG());
+      setProgress(25);
+
+      ws.onmessage = downloadProgress(25, "FFPROBE");
+      !FFPROBE && (await window.api.downloadFFPROBE());
+      setProgress(30);
+
       ws.onmessage = null;
+      setFooter("");
 
       setTask("Checking for media folder");
       let mediaFolder = await window.api.getMediaFolder();
       !mediaFolder && setTask("Media folder not set! Please select a folder");
       while (!mediaFolder) mediaFolder = await window.api.openFolderDialog();
       await window.api.setMediaFolder(mediaFolder);
-      setProgress(25);
+      setProgress(40);
 
-      setTask("Preparing library (Scanning)");
+      setTask("Preparing library");
+
+      setFooter("Scanning");
       const currentTree = await window.api.scan(mediaFolder);
       const previousTree = await window.api.getTree("mediaFolder");
       await window.api.setTree("mediaFolder", currentTree);
-      setProgress(35);
+      await sleep(150);
+      setProgress(50);
 
-      setTask("Preparing library (Checking for changes)");
+      setFooter("Checking for changes");
       if (JSON.stringify(previousTree) !== JSON.stringify(currentTree)) {
         const _current = flatten(currentTree);
         const _previous = previousTree ? flatten(previousTree) : [];
@@ -117,26 +97,26 @@ export function Preload() {
         const deleted = _previous.filter(({ id }) => !currentMap.has(id));
 
         if (added.length) {
-          setTask(`Preparing to extract metadata of ${added.length} newly added files`);
-
           ws.onmessage = (m: MessageEvent) => {
             const data = JSON.parse(m.data) as MessagePayload;
             if (data.type !== "PROGRESS" || data.data !== "PROBE") return;
-            setEta(formatETA(getETA(etaRef, data.current, data.total)));
-            setTask("Extracting metadata [ " + data.current + "/" + data.total + " ]");
-            setProgress(Math.floor(60 * (data.current / data.total)) + 35);
+            setTask("Extracting metadata and thumbnails");
+            setFooter(`Processed ${data.current} / ${data.total} files`);
+            setProgress(Math.floor(30 * (data.current / data.total)) + 50);
           };
 
           const res = await window.api.extractMetadata(added);
+
+          setTask(`Saving index for ${added.length} newly added files`);
           await window.api.setMeta(res);
           ws.onmessage = null;
-          setProgress(95);
+          setProgress(deleted.length ? 85 : 90);
         }
 
         if (deleted.length) {
           setTask(`Removing index for ${deleted.length} deleted files`);
           await window.api.deleteMeta(deleted.map((e) => e.id));
-          setProgress(100);
+          setProgress(90);
         }
       }
 
@@ -162,6 +142,7 @@ export function Preload() {
       setTree(populateTreeWithMeta(currentTree));
       setTask("All done!");
       setProgress(100);
+      await sleep(300);
       setReady(true);
       ws.close();
     };
@@ -187,6 +168,7 @@ export function Preload() {
       ) : (
         <div className="relative flex h-full w-full shrink-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
           <div className="absolute inset-0 -z-30 h-full w-full bg-(--hover-color)/20 backdrop-blur-lg" />
+
           <div
             style={{
               width: 150,
@@ -197,14 +179,13 @@ export function Preload() {
             }}
           />
 
-          <div className="-mt-3 flex w-[25dvw] shrink-0 flex-row items-center justify-center gap-2 px-3">
-            <div className="flex text-xs font-medium">{task}</div>
-          </div>
+          <div className="-mt-3 text-center text-xs font-medium text-nowrap" children={task} />
 
           <div className="flex h-1 w-[25dvw] shrink-0 rounded-full bg-(--accent-color)/50">
             <div className="rounded-full bg-(--accent-color)/80" style={{ width: `${progress}%`, transition: "width 0.3s ease" }} />
           </div>
-          <div className="flex w-[25dvw] justify-end text-[10px] opacity-40">{eta ? `ETA ${eta}` : "\u00A0"}</div>
+
+          <div className="-mt-1.5 flex w-[22dvw] justify-end text-[10px] opacity-40" children={footer || "\u00A0"} />
         </div>
       )}
     </div>
