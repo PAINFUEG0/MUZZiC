@@ -3,13 +3,15 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten, sleep } from "../../shared/helpers.js";
-import { themeStore, treeStore } from "../utils/globalStores";
+import { pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
+
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [, setPcmFormat] = pcmFormatStore.use();
   const [task, setTask] = useState<string>("Initializing");
   const [footer, setFooter] = useState<string | null>(null);
 
@@ -31,6 +33,8 @@ export function Preload() {
       const port = await window.api.getPort();
       const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
+
+      setPcmFormat(await window.api.getPcmFormat());
 
       setTask("Checking for dependencies");
 

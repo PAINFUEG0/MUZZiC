@@ -73,5 +73,8 @@ export type API = {
     ...args: T
   ) => Promise<T extends [string, Track] ? R : R[]>;
 
+  getPcmFormat: () => Promise<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">;
+  setPcmFormat: (format: "pcm_s16le" | "pcm_s24le" | "pcm_s32le") => Promise<void>;
+
   transcode: (input: string) => Promise<string>;
 };

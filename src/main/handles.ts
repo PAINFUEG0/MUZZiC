@@ -50,6 +50,9 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     extractAndSaveMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractAndSaveMetadata(...args),
 
+    getPcmFormat: (_: eˉ.IpcMainInvokeEvent) => settings.getPcmFormat(),
+    setPcmFormat: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.setPcmFormat(...args),
+
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
     usage: async (_: eˉ.IpcMainInvokeEvent) => {
