@@ -30,7 +30,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
           <motion.div
             ref={scrollRef}
             style={{ maskImage, WebkitMaskImage: maskImage }}
-            animate={{ height: view ? "calc(var(--spacing) * 29)" : "0px" }}
+            animate={{ height: view ? "calc(var(--spacing) * 30)" : "0px" }}
             className="flex w-full shrink-0 scrollbar-none flex-col overflow-y-auto"
             onScroll={() => {
               const el = scrollRef.current;
