@@ -21,7 +21,7 @@ export function registerHandles(win: eˉ.BrowserWindow) {
     minimize: () => Promise.resolve(win.minimize()),
     fullscreen: () => Promise.resolve(win.setFullScreen(!win.isFullScreen())),
 
-    getPort: () => api.port,
+    getPort: () => Promise.resolve(api.port),
 
     checkDLP: () => bin.checkForBinary("yt-dlp", "dlp", "--version"),
     downloadDLP: () => bin.downloadBinary(constants.DLP_BIN_URL, constants.bin.dlp, onProgress),
@@ -55,19 +55,20 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
-    usage: async (_: eˉ.IpcMainInvokeEvent) => {
-      return eˉ.app
-        .getAppMetrics()
-        .filter((m) => m.type !== "GPU")
-        .reduce(
-          (acc, curr) => {
-            acc.cpu += curr.cpu.percentCPUUsage;
-            acc.mem += (curr.memory.privateBytes ?? curr.memory.workingSetSize) * 1024;
-            return acc;
-          },
-          { cpu: 0, mem: 0 },
-        );
-    },
+    usage: (_: eˉ.IpcMainInvokeEvent) =>
+      Promise.resolve(
+        eˉ.app
+          .getAppMetrics()
+          .filter((m) => m.type !== "GPU")
+          .reduce(
+            (acc, curr) => {
+              acc.cpu += curr.cpu.percentCPUUsage;
+              acc.mem += (curr.memory.privateBytes ?? curr.memory.workingSetSize) * 1024;
+              return acc;
+            },
+            { cpu: 0, mem: 0 },
+          ),
+      ),
   } satisfies {
     [K in keyof API]: (event: eˉ.IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => eˉ.ipcMain.handle(K, V));
