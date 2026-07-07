@@ -2,11 +2,12 @@
 
 import { IoMdClose } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
-import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
-import { searchBox, themeStore } from "../../../utils/globalStores";
+import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
+import { needsRestart, searchBox, themeStore } from "../../../utils/globalStores";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 
 export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
+  const [rs] = needsRestart.use();
   const [theme] = themeStore.use();
   const [fs, setFs] = useState(true);
   const [value, setValue] = searchBox.use();
@@ -66,6 +67,16 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
 
         <div className="flex flex-row items-center justify-end">
           <div className="flex flex-row items-center justify-center gap-2.5">
+            {rs && (
+              <button
+                onClick={() => window.location.reload()}
+                className="relative flex aspect-square h-7 w-7 animate-pulse cursor-pointer items-center justify-center rounded-full border-2 p-0.5 text-xl text-(--accent-color) transition-all duration-100 active:scale-99"
+              >
+                <MdRestartAlt className="mb-0.5" />
+                <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-(--accent-color)" />
+              </button>
+            )}
+
             {[
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
               { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },

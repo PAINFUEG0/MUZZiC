@@ -1,13 +1,16 @@
 /** @format */
 
-import { useEffect } from "react";
 import { themes } from "../utils/themes";
-import { pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
+import { useEffect, useState } from "react";
+import { flatten } from "../../shared/helpers";
+import { needsRestart, pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
 
 export function Settings() {
   const [tree] = treeStore.use();
+  const [rs, setRs] = needsRestart.use();
   const [currentTheme, setTheme] = themeStore.use();
   const [pcmFormat, setPcmFormat] = pcmFormatStore.use();
+  const [mediaFolder, setMediaFolder] = useState(localStorage.getItem("mediaFolder") || tree.path);
 
   useEffect(() => void window.api.setPcmFormat(pcmFormat), [pcmFormat]);
 
@@ -69,13 +72,30 @@ export function Settings() {
         <div className="flex h-fit w-full flex-col gap-2 p-3">
           <div className="flex flex-row items-center gap-1">
             <div className="font-medium">Media folder :</div>
-            <div className="pt-0.5 text-sm opacity-70">{tree.path}</div>
+            <div className="pt-0.5 text-sm opacity-70">{mediaFolder}</div>
           </div>
 
           <div className="flex flex-row items-center gap-2">
             {[
-              { label: "Change media folder", onClick: () => {} },
-              { label: "Re-index library", onClick: () => {} },
+              {
+                label: "Change media folder",
+                onClick: async () => {
+                  const newMediaFolder = await window.api.openFolderDialog();
+                  if (!newMediaFolder || newMediaFolder === mediaFolder) return;
+                  localStorage.setItem("mediaFolder", newMediaFolder);
+                  await window.api.setMediaFolder(newMediaFolder);
+                  setMediaFolder(newMediaFolder);
+                  !rs && setRs(true);
+                },
+              },
+              {
+                label: "Re-index library",
+                onClick: async () => {
+                  await window.api.deleteMeta(flatten(tree).map(({ id }) => id));
+                  await window.api.deleteTree("mediaFolder");
+                  !rs && setRs(true);
+                },
+              },
               { label: "Reinstall binaries", onClick: () => {} },
               { label: "Update binaries", onClick: () => {} },
               { label: "Check for updates", onClick: () => {} },

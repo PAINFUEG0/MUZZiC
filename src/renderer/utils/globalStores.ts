@@ -21,6 +21,7 @@ export function createGlobalStore<T extends boolean | null | number | object | s
 
 export const searchBox = createGlobalStore<string>("");
 export const treeStore = createGlobalStore<Tree>({} as Tree);
+export const needsRestart = createGlobalStore<boolean>(false);
 export const view = createGlobalStore<{ scene: string }>({ scene: "explorer" });
 export const pcmFormatStore = createGlobalStore<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">("pcm_s16le");
 export const themeStore = createGlobalStore<(typeof themes)[number]>(themes[Number(localStorage.getItem("theme")) || 0]!);
