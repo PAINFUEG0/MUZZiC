@@ -86,4 +86,11 @@ export const themes: Theme[] = [
     tint: { black: { overall: 0.5, bars: 0.3 }, white: { overall: 0, bars: 0 } },
     backgrground: "https://cdn.hentaigifz.com/82570/anime-boobs.gif",
   },
+  {
+    blur: "10px",
+    type: "dark",
+    color: "#FF2222",
+    tint: { black: { overall: 0.5, bars: 0.4 }, white: { overall: 0.05, bars: 0 } },
+    backgrground: "./l.png",
+  },
 ];
