@@ -10,6 +10,7 @@ import { view } from "../utils/globalStores";
 export function Viewport() {
   let page;
   const [state] = view.use();
+  // const [theme] = themeStore.use();
 
   switch (state.scene) {
     case "explorer":
@@ -28,13 +29,14 @@ export function Viewport() {
 
   return (
     <motion.div
-      children={page}
       key={state.scene}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
       exit={{ opacity: 0, x: "-20%" }}
       initial={{ opacity: 0, x: "20%" }}
-      className="flex h-full w-full overflow-hidden"
-    />
+      className="relative flex h-full w-full overflow-hidden"
+    >
+      {page}
+    </motion.div>
   );
 }
