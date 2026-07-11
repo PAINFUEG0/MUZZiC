@@ -26,9 +26,9 @@ export function Settings() {
           {themes.map((theme, i) => (
             <button
               key={i}
-              children={<img className="h-fit w-full rounded-sm" src={`./${i + 1}.png`} />}
+              children={[<img className="h-fit w-full rounded-sm" src={theme.preview} />, <div>{theme.name.toUpperCase()}</div>]}
               className={
-                "flex h-fit w-full shrink-0 cursor-pointer rounded-md border-2 p-1 transition-all duration-150 hover:scale-105 active:scale-95 " +
+                "flex h-fit w-full shrink-0 cursor-pointer flex-col rounded-md border-2 p-1 text-[10px] font-bold transition-all duration-150 hover:scale-105 active:scale-95 " +
                 (JSON.stringify(theme) === JSON.stringify(currentTheme)
                   ? "border-(--accent-color)/45 bg-(--accent-color)/8"
                   : "border-(--border-color)/20")

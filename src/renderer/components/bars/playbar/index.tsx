@@ -2,14 +2,20 @@
 
 import { LuExpand } from "react-icons/lu";
 import { themeStore } from "../../../utils/globalStores";
+import { hexToRgba } from "../../../../shared/helpers";
 
 export function Playbar() {
   const [theme] = themeStore.use();
 
   return (
-    <div className="relative flex h-20 w-full shrink-0 overflow-hidden border-t-2 border-(--border-color)/10 backdrop-blur-md">
-      <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
-      <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
+    <div className="relative flex h-20 w-full shrink-0 overflow-hidden border-t-2 border-(--border-color)/10">
+      <div
+        className="absolute inset-0 -z-10 h-full w-full"
+        style={{
+          backdropFilter: `blur(${theme.playbar.blur})`,
+          backgroundColor: hexToRgba(theme.playbar.tint.color, theme.playbar.tint.opacity),
+        }}
+      />
 
       <div className="grid h-full w-full grid-cols-3">
         <div className="flex h-20 w-full flex-row gap-3 p-2">

@@ -5,12 +5,13 @@ import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
-import { view } from "../utils/globalStores";
+import { hexToRgba } from "../../shared/helpers";
+import { themeStore, view } from "../utils/globalStores";
 
 export function Viewport() {
   let page;
   const [state] = view.use();
-  // const [theme] = themeStore.use();
+  const [theme] = themeStore.use();
 
   switch (state.scene) {
     case "explorer":
@@ -36,6 +37,13 @@ export function Viewport() {
       initial={{ opacity: 0, x: "20%" }}
       className="relative flex h-full w-full overflow-hidden"
     >
+      <div
+        className="absolute inset-0 -z-10 h-full w-full"
+        style={{
+          backdropFilter: `blur(${theme.viewport.blur})`,
+          backgroundColor: hexToRgba(theme.viewport.tint.color, theme.viewport.tint.opacity),
+        }}
+      />
       {page}
     </motion.div>
   );

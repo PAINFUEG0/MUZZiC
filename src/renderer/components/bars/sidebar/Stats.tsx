@@ -49,7 +49,7 @@ export function Stats() {
 
 function MiniChart({ data }: { data: number[] }) {
   const [theme] = themeStore.use();
-  const borderColor = theme.color;
+  const borderColor = theme.accent;
   const chartRef = useRef<Chart<"line">>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const color = theme.type === "dark" ? "rgb(255, 255, 255, 0.1)" : "rgb(0, 0, 0, 0.15)";

@@ -2,7 +2,7 @@
 
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { flatten, sleep } from "../../shared/helpers.js";
+import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
 import { pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
 
@@ -15,7 +15,7 @@ export function Preload() {
   const [task, setTask] = useState<string>("Initializing");
   const [footer, setFooter] = useState<string | null>(null);
 
-  document.documentElement.style.setProperty("--accent-color", theme.color);
+  document.documentElement.style.setProperty("--accent-color", theme.accent);
   document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
   document.documentElement.style.setProperty("--hover-color", theme.type === "dark" ? "#000000" : "#ffffff");
   document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
@@ -143,12 +143,14 @@ export function Preload() {
     <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
       <img
         src={theme.background}
-        style={{ filter: `blur(${theme.blur})` }}
+        style={{ filter: `blur(${theme.overall.blur})` }}
         className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
       />
 
-      <div className="absolute inset-0 -z-40 h-full w-full bg-white" style={{ opacity: theme.tint.white.overall }} />
-      <div className="absolute inset-0 -z-30 h-full w-full bg-black" style={{ opacity: theme.tint.black.overall }} />
+      <div
+        className="absolute inset-0 -z-30 h-full w-full"
+        style={{ backgroundColor: hexToRgba(theme.overall.tint.color, theme.overall.tint.opacity) }}
+      />
 
       <div className="absolute inset-0 h-7 w-full cursor-pointer" style={{ WebkitAppRegion: "drag" } as any} />
 

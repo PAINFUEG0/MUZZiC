@@ -6,6 +6,14 @@ export function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+export function hexToRgba(hex: string, opacity: number) {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
 export function flatten(node: Tree): Tree["files"];
 export function flatten(node: DirNode): DirNode["files"];
 export function flatten(node: DirNode | Tree) {

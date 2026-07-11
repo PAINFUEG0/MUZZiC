@@ -5,6 +5,7 @@ import { Body } from "./Body";
 import { Tail } from "./Tail";
 import { motion } from "framer-motion";
 import { themeStore } from "../../../utils/globalStores";
+import { hexToRgba } from "../../../../shared/helpers";
 
 export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean; setSettingsOpen: (arg: boolean) => void }) {
   const [theme] = themeStore.use();
@@ -12,10 +13,15 @@ export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean
   return (
     <motion.div
       animate={{ width: sidebarOpen ? "calc(var(--spacing) * 65)" : 0 }}
-      className="relative flex h-full shrink-0 flex-col overflow-hidden backdrop-blur-sm"
+      className="relative flex h-full shrink-0 flex-col overflow-hidden"
     >
-      <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
-      <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
+      <div
+        className="absolute inset-0 -z-10 h-full w-full"
+        style={{
+          backdropFilter: `blur(${theme.sidebar.blur})`,
+          backgroundColor: hexToRgba(theme.sidebar.tint.color, theme.sidebar.tint.opacity),
+        }}
+      />
 
       <Head />
       <Body />

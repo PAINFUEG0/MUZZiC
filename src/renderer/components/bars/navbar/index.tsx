@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
 import { needsRestart, searchBox, themeStore } from "../../../utils/globalStores";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
+import { hexToRgba } from "../../../../shared/helpers";
 
 export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
   const [rs] = needsRestart.use();
@@ -21,9 +22,14 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
   }, []);
 
   return (
-    <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3 backdrop-blur-md">
-      <div className="absolute inset-0 -z-9 h-full w-full bg-white" style={{ opacity: theme.tint.white.bars }} />
-      <div className="absolute inset-0 -z-10 h-full w-full bg-black" style={{ opacity: theme.tint.black.bars }} />
+    <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3">
+      <div
+        className="absolute inset-0 -z-10 h-full w-full"
+        style={{
+          backdropFilter: `blur(${theme.navbar.blur})`,
+          backgroundColor: hexToRgba(theme.navbar.tint.color, theme.navbar.tint.opacity),
+        }}
+      />
 
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
