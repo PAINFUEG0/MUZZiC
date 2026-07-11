@@ -142,7 +142,7 @@ export function Preload() {
   return (
     <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
       <img
-        src={theme.backgrground}
+        src={theme.background}
         style={{ filter: `blur(${theme.blur})` }}
         className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
       />
