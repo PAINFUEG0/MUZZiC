@@ -1,19 +1,18 @@
 /** @format */
 
-import { BiHeart } from "react-icons/bi";
 import { MdDownloading } from "react-icons/md";
 import { TbMicrophone2 } from "react-icons/tb";
 import { ExpandableItem, Item } from "./Items";
 import { PiMusicNoteBold } from "react-icons/pi";
 import { view } from "../../../utils/globalStores";
-import { RiFolderMusicLine, RiPlayListFill } from "react-icons/ri";
+import { RiFolderMusicLine, RiHeartLine, RiPlayListFill } from "react-icons/ri";
 import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 
 const mainItems = [
   { icon: <LuFolderSearch />, label: ". . .", toSet: { scene: "explorer" } },
   { icon: <LuRadio />, label: "Radio", toSet: { scene: "radio" } },
   { icon: <MdDownloading />, label: "Downloader", toSet: { scene: "downloads" } },
-  { icon: <BiHeart />, label: "Liked Songs", toSet: { scene: "liked" } },
+  { icon: <RiHeartLine />, label: "Liked Songs", toSet: { scene: "liked" } },
 ];
 
 const libraryItems = [
@@ -25,13 +24,6 @@ const libraryItems = [
 const playlistItems = [
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Hip-hop / Rap", toSet: { scene: "playlist", id: "Playlist 1" } },
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Soul music ( Lithe-like )", toSet: { scene: "playlist", id: "Playlist 2" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
-  { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
   { icon: <PiMusicNoteBold className="ml-8" />, label: "Random songs", toSet: { scene: "playlist", id: "Playlist 3" } },
 ];
 

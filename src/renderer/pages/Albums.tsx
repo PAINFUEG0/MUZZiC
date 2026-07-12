@@ -3,7 +3,7 @@
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
-import { RiFolderMusicLine } from "react-icons/ri";
+import { RiErrorWarningLine, RiFolderMusicLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,11 +14,11 @@ import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 export function Albums() {
   type Row = { type: "tracks"; data: NonNullable<(typeof albums)[keyof typeof albums]> } | { type: "albums"; data: string[][] };
 
-  const [data] = treeStore.use();
+  const [tree] = treeStore.use();
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const flat = flatten(tree).sort((a, b) => a.album.localeCompare(b.album));
 
-  const flat = flatten(data);
   const [liked, setLiked] = likedSongsStore.use();
   const albums = Object.groupBy(flat, (e) => e.album);
   const [selected, setSelected] = useState<string | null>(null);
@@ -107,55 +107,62 @@ export function Albums() {
             style={{ height: virtualizer.getTotalSize(), position: "relative" }}
             initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
           >
-            {virtualizer.getVirtualItems().map((vItem) => {
-              return (
-                <div
-                  key={vItem.index}
-                  data-index={vItem.index}
-                  ref={virtualizer.measureElement}
-                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                  children={
-                    rows.type === "tracks" ? (
-                      <Track
-                        index={vItem.index}
-                        initial={vItem.index === 0}
-                        file={rows.data[vItem.index]!}
-                        key={rows.data[vItem.index]!.id}
-                        end={vItem.index === rows.data.length - 1}
-                        isLiked={liked.includes(rows.data[vItem.index]!.id)}
-                        onLike={() =>
-                          setLiked((liked) =>
-                            liked.includes(rows.data[vItem.index]!.id)
-                              ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
-                              : [...liked, rows.data[vItem.index]!.id],
-                          )
-                        }
-                        onClick={() => console.log({ current: vItem.index, queue: rows.data })}
-                      />
-                    ) : (
-                      <ThumbGrid
-                        index={vItem.index}
-                        len={rows.data.length}
-                        children={rows.data[vItem.index]!.map((album) => (
-                          <Card
-                            label1={album}
-                            thumb={albums[album]![0]!.thumb}
-                            onClick={() => setSelected(album)}
-                            label2={
-                              albums[album]
-                                ?.flatMap((track) => track.artists)
-                                .filter((artist) => artist.toLowerCase() !== "unknown artists")
-                                .filter((artist, i, arr) => arr.indexOf(artist) == i)
-                                .join(", ") || "Unknown Artists"
-                            }
-                          />
-                        ))}
-                      />
-                    )
-                  }
-                />
-              );
-            })}
+            {virtualizer.getVirtualItems().length === 0 ? (
+              <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+                <RiErrorWarningLine className="mt-0.5" />
+                <div>No items to display</div>
+              </div>
+            ) : (
+              virtualizer.getVirtualItems().map((vItem) => {
+                return (
+                  <div
+                    key={vItem.index}
+                    data-index={vItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
+                    children={
+                      rows.type === "tracks" ? (
+                        <Track
+                          index={vItem.index}
+                          initial={vItem.index === 0}
+                          file={rows.data[vItem.index]!}
+                          key={rows.data[vItem.index]!.id}
+                          end={vItem.index === rows.data.length - 1}
+                          isLiked={liked.includes(rows.data[vItem.index]!.id)}
+                          onLike={() =>
+                            setLiked((liked) =>
+                              liked.includes(rows.data[vItem.index]!.id)
+                                ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
+                                : [...liked, rows.data[vItem.index]!.id],
+                            )
+                          }
+                          onClick={() => console.log({ current: vItem.index, queue: rows.data })}
+                        />
+                      ) : (
+                        <ThumbGrid
+                          index={vItem.index}
+                          len={rows.data.length}
+                          children={rows.data[vItem.index]!.map((album) => (
+                            <Card
+                              label1={album}
+                              thumb={albums[album]![0]!.thumb}
+                              onClick={() => setSelected(album)}
+                              label2={
+                                albums[album]
+                                  ?.flatMap((track) => track.artists)
+                                  .filter((artist) => artist.toLowerCase() !== "unknown artists")
+                                  .filter((artist, i, arr) => arr.indexOf(artist) == i)
+                                  .join(", ") || "Unknown Artists"
+                              }
+                            />
+                          ))}
+                        />
+                      )
+                    }
+                  />
+                );
+              })
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

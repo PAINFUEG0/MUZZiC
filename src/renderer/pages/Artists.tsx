@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 export function Artists() {
   type Row = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> } | { type: "artists"; data: string[][] };
@@ -20,12 +21,14 @@ export function Artists() {
   const [liked, setLiked] = likedSongsStore.use();
 
   const flat = flatten(data);
-  const artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
+  let artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
 
   const T = Object.groupBy(flat, (e) => e.artists.join(", "));
   for (const artist in T)
     if (artists[artist] === undefined) artists[artist] = T[artist];
     else artists[artist] = Array.from(new Set([...artists[artist], ...T[artist]!]));
+
+  artists = Object.fromEntries(Object.entries(artists).sort((a, b) => a[0].localeCompare(b[0])));
 
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
@@ -106,49 +109,56 @@ export function Artists() {
             style={{ height: virtualizer.getTotalSize(), position: "relative" }}
             initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
           >
-            {virtualizer.getVirtualItems().map((vItem) => {
-              return (
-                <div
-                  key={vItem.index}
-                  data-index={vItem.index}
-                  ref={virtualizer.measureElement}
-                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                  children={
-                    rows.type === "tracks" ? (
-                      <Track
-                        index={vItem.index}
-                        initial={vItem.index === 0}
-                        file={rows.data[vItem.index]!}
-                        key={rows.data[vItem.index]!.id}
-                        end={vItem.index === rows.data.length - 1}
-                        isLiked={liked.includes(rows.data[vItem.index]!.id)}
-                        onLike={() =>
-                          setLiked((liked) =>
-                            liked.includes(rows.data[vItem.index]!.id)
-                              ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
-                              : [...liked, rows.data[vItem.index]!.id],
-                          )
-                        }
-                        onClick={() => console.log({ current: vItem.index, queue: rows.data })}
-                      />
-                    ) : (
-                      <ThumbGrid
-                        index={vItem.index}
-                        len={rows.data.length}
-                        children={rows.data[vItem.index]!.map((artist) => (
-                          <Card
-                            label1={artist}
-                            thumb={artists[artist]![0]!.thumb}
-                            onClick={() => setSelected(artist)}
-                            label2={`${artists[artist]?.length} track/s`}
-                          />
-                        ))}
-                      />
-                    )
-                  }
-                />
-              );
-            })}
+            {virtualizer.getVirtualItems().length === 0 ? (
+              <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+                <RiErrorWarningLine className="mt-0.5" />
+                <div>No items to display</div>
+              </div>
+            ) : (
+              virtualizer.getVirtualItems().map((vItem) => {
+                return (
+                  <div
+                    key={vItem.index}
+                    data-index={vItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
+                    children={
+                      rows.type === "tracks" ? (
+                        <Track
+                          index={vItem.index}
+                          initial={vItem.index === 0}
+                          file={rows.data[vItem.index]!}
+                          key={rows.data[vItem.index]!.id}
+                          end={vItem.index === rows.data.length - 1}
+                          isLiked={liked.includes(rows.data[vItem.index]!.id)}
+                          onLike={() =>
+                            setLiked((liked) =>
+                              liked.includes(rows.data[vItem.index]!.id)
+                                ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
+                                : [...liked, rows.data[vItem.index]!.id],
+                            )
+                          }
+                          onClick={() => console.log({ current: vItem.index, queue: rows.data })}
+                        />
+                      ) : (
+                        <ThumbGrid
+                          index={vItem.index}
+                          len={rows.data.length}
+                          children={rows.data[vItem.index]!.map((artist) => (
+                            <Card
+                              label1={artist}
+                              thumb={artists[artist]![0]!.thumb}
+                              onClick={() => setSelected(artist)}
+                              label2={`${artists[artist]?.length} track/s`}
+                            />
+                          ))}
+                        />
+                      )
+                    }
+                  />
+                );
+              })
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

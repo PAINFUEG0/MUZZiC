@@ -1,11 +1,11 @@
 /** @format */
 
-import { LuDisc } from "react-icons/lu";
 import { flatten } from "../../shared/helpers";
 import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { RiErrorWarningLine, RiHeartLine } from "react-icons/ri";
 
 export function Liked() {
   const [data] = treeStore.use();
@@ -24,7 +24,9 @@ export function Liked() {
           ? "linear-gradient(to bottom, transparent 0%, black 5%)"
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
-  const flat = flatten(data).filter((e) => liked.includes(e.id));
+  const flat = flatten(data)
+    .filter((e) => liked.includes(e.id))
+    .sort((a, b) => a.title.localeCompare(b.title));
   const [tracks, setTracks] = useState(flat);
 
   const virtualizer = useVirtualizer({
@@ -35,6 +37,8 @@ export function Liked() {
     measureElement: (el) => el.getBoundingClientRect().height,
   });
 
+  useEffect(() => setTracks(flat.filter((e) => liked.includes(e.id))), [liked]);
+
   useEffect(() => setQuery(""), []);
   useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
 
@@ -43,7 +47,7 @@ export function Liked() {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button
-            children={<LuDisc />}
+            children={<RiHeartLine />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
           <div className="font-medium">Liked songs</div>
@@ -63,29 +67,36 @@ export function Liked() {
         className="flex h-full w-full scrollbar-none flex-col overflow-y-auto"
       >
         <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-          {virtualizer.getVirtualItems().map((vItem) => {
-            const track = tracks[vItem.index]!;
+          {virtualizer.getVirtualItems().length === 0 ? (
+            <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+              <RiErrorWarningLine className="mt-0.5" />
+              <div>No items to display</div>
+            </div>
+          ) : (
+            virtualizer.getVirtualItems().map((vItem) => {
+              const track = tracks[vItem.index]!;
 
-            return (
-              <div
-                key={track.id}
-                data-index={vItem.index}
-                ref={virtualizer.measureElement}
-                style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-              >
-                <Track
-                  file={track}
+              return (
+                <div
                   key={track.id}
-                  isLiked={true}
-                  index={vItem.index}
-                  initial={vItem.index === 0}
-                  end={vItem.index === tracks.length - 1}
-                  onClick={() => console.log({ current: vItem.index, queue: tracks })}
-                  onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
-                />
-              </div>
-            );
-          })}
+                  data-index={vItem.index}
+                  ref={virtualizer.measureElement}
+                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
+                >
+                  <Track
+                    file={track}
+                    key={track.id}
+                    isLiked={true}
+                    index={vItem.index}
+                    initial={vItem.index === 0}
+                    end={vItem.index === tracks.length - 1}
+                    onClick={() => console.log({ current: vItem.index, queue: tracks })}
+                    onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
+                  />
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

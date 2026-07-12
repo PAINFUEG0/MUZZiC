@@ -1,26 +1,29 @@
 /** @format */
 
 import { chunk } from "../../shared/helpers";
+import { MdRestartAlt } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import { LuFolderSearch } from "react-icons/lu";
 import { Track } from "../components/utils/Track";
 import { useEffect, useRef, useState } from "react";
+import { RiErrorWarningLine } from "react-icons/ri";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
-import { treeStore, searchBox, likedSongsStore } from "../utils/globalStores";
+import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/globalStores";
 
 export function List() {
-  const [data] = treeStore.use();
-  const [path, setPath] = useState([data]);
+  const [tree] = treeStore.use();
+  const [rs, setRs] = needsRestart.use();
+  const [path, setPath] = useState([tree]);
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
   const current = path[path.length - 1]!;
-  const [dirs, setDirs] = useState(current.dirs);
-  const [files, setFiles] = useState(current.files);
+  const [dirs, setDirs] = useState(current.dirs.sort((a, b) => a.name.localeCompare(b.name)));
+  const [files, setFiles] = useState(current.files.sort((a, b) => a.title.localeCompare(b.title)));
 
   const [atTop, setAtTop] = useState(true);
   const [atBottom, setAtBottom] = useState(false);
@@ -102,52 +105,92 @@ export function List() {
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.15 }}
             initial={{ x: direction > 0 ? "20%" : "-20%", opacity: 0 }}
-            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+            style={{
+              position: "relative",
+              height: tree.dirs.length === 0 && tree.files.length === 0 ? "100%" : virtualizer.getTotalSize(),
+            }}
           >
-            {virtualizer.getVirtualItems().map((vItem) => {
-              const row = rows[vItem.index]!;
+            {tree.dirs.length === 0 && tree.files.length === 0 ? (
+              <div className="flex h-[95%] w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5">
+                <div className="flex flex-row items-center gap-2 text-xl font-medium">
+                  <RiErrorWarningLine className="mt-0.5" />
+                  <div>Media folder has no items to display</div>
+                </div>
+                <div className="pt-2 text-xs opacity-60">
+                  Please add some tracks to your media folder. Or to change your media folder using the button below.
+                </div>
+                <div className="pb-2 text-[11px] opacity-60">You need to restart the app for the changes to take effect.</div>
+                <div className="flex flex-row items-center gap-2">
+                  <button
+                    onClick={() => window.location.reload()}
+                    children={<MdRestartAlt className="mb-0.5" />}
+                    className="flex aspect-square h-8 cursor-pointer flex-row items-center justify-center gap-1 rounded-full border-2 border-(--border-color)/15 bg-(--border-color)/10 p-1 text-xl transition-all duration-100 hover:scale-110 hover:bg-(--accent-color)/10 active:scale-95"
+                  />
 
-              return (
-                <div
-                  key={vItem.index}
-                  data-index={vItem.index}
-                  ref={virtualizer.measureElement}
-                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
-                  children={
-                    row.type === "label" ? (
-                      <div
-                        key={row.label}
-                        className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${vItem.index === 0 ? "pb-6" : "py-6"}`}
-                      >
-                        <div className="font-medium">{row.label}</div>
-                        <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
-                      </div>
-                    ) : row.type === "dir" ? (
-                      <DirectoryGrid index={row.index} len={row.len}>
-                        {row.dirs.map((dir, i) => (
-                          <Directory dir={dir} key={dir.name} onClick={() => goForward([...path, row.dirs[i]!])} />
-                        ))}
-                      </DirectoryGrid>
-                    ) : (
-                      <Track
-                        file={row.file}
-                        index={row.index}
-                        key={row.file.id}
-                        initial={row.index === 0}
-                        end={row.index === row.len - 1}
-                        isLiked={liked.includes(row.file.id)}
-                        onClick={() => console.log({ current: vItem.index, queue: current.files })}
-                        onLike={() =>
-                          setLiked((liked) =>
-                            liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id],
-                          )
-                        }
-                      />
-                    )
-                  }
-                />
-              );
-            })}
+                  <button
+                    children={"Change media folder"}
+                    className="flex h-8 w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--border-color)/10 px-5 text-xs transition-all duration-100 hover:scale-102 hover:bg-(--accent-color)/10 active:scale-95"
+                    onClick={async () => {
+                      const newMediaFolder = await window.api.openFolderDialog();
+                      if (!newMediaFolder || newMediaFolder === tree.path) return;
+                      localStorage.setItem("mediaFolder", newMediaFolder);
+                      await window.api.setMediaFolder(newMediaFolder);
+                      !rs && setRs(true);
+                    }}
+                  />
+                </div>
+              </div>
+            ) : virtualizer.getVirtualItems().length === 0 ? (
+              <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+                <RiErrorWarningLine className="mt-0.5" />
+                <div>No items to display</div>
+              </div>
+            ) : (
+              virtualizer.getVirtualItems().map((vItem) => {
+                const row = rows[vItem.index]!;
+
+                return (
+                  <div
+                    key={vItem.index}
+                    data-index={vItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
+                    children={
+                      row.type === "label" ? (
+                        <div
+                          key={row.label}
+                          className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${vItem.index === 0 ? "pb-6" : "py-6"}`}
+                        >
+                          <div className="font-medium">{row.label}</div>
+                          <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
+                        </div>
+                      ) : row.type === "dir" ? (
+                        <DirectoryGrid index={row.index} len={row.len}>
+                          {row.dirs.map((dir, i) => (
+                            <Directory dir={dir} key={dir.name} onClick={() => goForward([...path, row.dirs[i]!])} />
+                          ))}
+                        </DirectoryGrid>
+                      ) : (
+                        <Track
+                          file={row.file}
+                          index={row.index}
+                          key={row.file.id}
+                          initial={row.index === 0}
+                          end={row.index === row.len - 1}
+                          isLiked={liked.includes(row.file.id)}
+                          onClick={() => console.log({ current: vItem.index, queue: current.files })}
+                          onLike={() =>
+                            setLiked((liked) =>
+                              liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id],
+                            )
+                          }
+                        />
+                      )
+                    }
+                  />
+                );
+              })
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

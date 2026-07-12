@@ -4,6 +4,7 @@ import { LuDisc } from "react-icons/lu";
 import { flatten } from "../../shared/helpers";
 import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
+import { RiErrorWarningLine } from "react-icons/ri";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
@@ -63,31 +64,38 @@ export function Tracks() {
         className="flex h-full w-full scrollbar-none flex-col overflow-y-auto"
       >
         <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-          {virtualizer.getVirtualItems().map((vItem) => {
-            const track = tracks[vItem.index]!;
+          {virtualizer.getVirtualItems().length === 0 ? (
+            <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+              <RiErrorWarningLine className="mt-0.5" />
+              <div>No items to display</div>
+            </div>
+          ) : (
+            virtualizer.getVirtualItems().map((vItem) => {
+              const track = tracks[vItem.index]!;
 
-            return (
-              <div
-                key={track.id}
-                data-index={vItem.index}
-                ref={virtualizer.measureElement}
-                style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-              >
-                <Track
-                  file={track}
+              return (
+                <div
                   key={track.id}
-                  index={vItem.index}
-                  initial={vItem.index === 0}
-                  isLiked={liked.includes(track.id)}
-                  end={vItem.index === tracks.length - 1}
-                  onClick={() => console.log({ current: vItem.index, queue: tracks })}
-                  onLike={() =>
-                    setLiked((liked) => (liked.includes(track.id) ? liked.filter((e) => e !== track.id) : [...liked, track.id]))
-                  }
-                />
-              </div>
-            );
-          })}
+                  data-index={vItem.index}
+                  ref={virtualizer.measureElement}
+                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
+                >
+                  <Track
+                    file={track}
+                    key={track.id}
+                    index={vItem.index}
+                    initial={vItem.index === 0}
+                    isLiked={liked.includes(track.id)}
+                    end={vItem.index === tracks.length - 1}
+                    onClick={() => console.log({ current: vItem.index, queue: tracks })}
+                    onLike={() =>
+                      setLiked((liked) => (liked.includes(track.id) ? liked.filter((e) => e !== track.id) : [...liked, track.id]))
+                    }
+                  />
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>
