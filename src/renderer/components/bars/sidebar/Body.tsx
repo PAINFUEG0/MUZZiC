@@ -9,7 +9,7 @@ import { RiFolderMusicLine, RiHeartLine, RiPlayListFill } from "react-icons/ri";
 import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 
 const mainItems = [
-  { icon: <LuFolderSearch />, label: ". . .", toSet: { scene: "explorer" } },
+  { icon: <LuFolderSearch />, label: "Explorer", toSet: { scene: "explorer" } },
   { icon: <LuRadio />, label: "Radio", toSet: { scene: "radio" } },
   { icon: <MdDownloading />, label: "Downloader", toSet: { scene: "downloads" } },
   { icon: <RiHeartLine />, label: "Liked Songs", toSet: { scene: "liked" } },
