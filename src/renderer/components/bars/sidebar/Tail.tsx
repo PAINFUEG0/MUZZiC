@@ -2,9 +2,10 @@
 
 import { Stats } from "./Stats";
 import { useRef, useState } from "react";
-import { IoAnalyticsOutline } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
-import { LuArrowBigUpDash, LuSettings2 } from "react-icons/lu";
+import { LuInfo } from "react-icons/lu";
+import { BsGearWide } from "react-icons/bs";
+import { RiDonutChartFill } from "react-icons/ri";
 
 export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) {
   const [direction, setDirection] = useState(1);
@@ -58,19 +59,19 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
 
           <div className="flex flex-row items-center gap-1">
             <button
-              children={<LuArrowBigUpDash />}
+              children={<LuInfo className="group-hover:scale-110" />}
               onClick={() => (setDirection(!view || view === "x" ? 0 : -1), setView(view === "x" ? null : "x"))}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
+              className="group flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
             />
             <button
-              children={<IoAnalyticsOutline />}
+              children={<RiDonutChartFill className="group-hover:scale-110" />}
               onClick={() => (setDirection(!view || view === "stats" ? 0 : 1), setView(view === "stats" ? null : "stats"))}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
+              className="group flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
             />
             <button
               onClick={() => setisSettingsOpen(true)}
-              children={<LuSettings2 />}
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-lg active:scale-95"
+              children={<BsGearWide className="group-hover:scale-110" />}
+              className="group flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-(--border-color)/20 p-1 text-base active:scale-95"
             />
           </div>
         </div>
