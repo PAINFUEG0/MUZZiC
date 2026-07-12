@@ -3,12 +3,13 @@
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
-import { pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
+import { likedSongsStore, pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
 
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
+  const [liked] = likedSongsStore.use();
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [, setPcmFormat] = pcmFormatStore.use();
@@ -19,6 +20,8 @@ export function Preload() {
   document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
   document.documentElement.style.setProperty("--hover-color", theme.type === "dark" ? "#000000" : "#ffffff");
   document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
+
+  useEffect(() => localStorage.setItem("liked", JSON.stringify(liked)), [liked]);
 
   useEffect(() => {
     const run = async () => {

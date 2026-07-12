@@ -8,14 +8,15 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Directory } from "../components/utils/Directory";
-import { treeStore, searchBox } from "../utils/globalStores";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
+import { treeStore, searchBox, likedSongsStore } from "../utils/globalStores";
 
 export function List() {
   const [data] = treeStore.use();
   const [path, setPath] = useState([data]);
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [liked, setLiked] = likedSongsStore.use();
 
   const current = path[path.length - 1]!;
   const [dirs, setDirs] = useState(current.dirs);
@@ -134,7 +135,13 @@ export function List() {
                         key={row.file.id}
                         initial={row.index === 0}
                         end={row.index === row.len - 1}
+                        isLiked={liked.includes(row.file.id)}
                         onClick={() => console.log({ current: vItem.index, queue: current.files })}
+                        onLike={() =>
+                          setLiked((liked) =>
+                            liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id],
+                          )
+                        }
                       />
                     )
                   }

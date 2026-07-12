@@ -1,23 +1,21 @@
 /** @format */
 
-import { LuHeart } from "react-icons/lu";
 import { Tree } from "../../../shared/types";
 import { TbFileMusicFilled } from "react-icons/tb";
+import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
-export function Track({
-  end,
-  file,
-  index,
-  initial,
-  onClick,
-}: {
-  file: Tree["files"][number];
+type Props = {
   end: boolean;
   index: number;
   initial: boolean;
-  onClick: (e: Tree["files"][number]) => void;
-}) {
+  isLiked: boolean;
+  onLike: () => void;
+  onClick: () => void;
+  file: Tree["files"][number];
+};
+
+export function Track({ end, file, index, initial, onClick, isLiked, onLike }: Props) {
   return (
     <div
       className={
@@ -33,16 +31,13 @@ export function Track({
         }`
       }
     >
-      <div
-        onClick={onClick.bind(null, file)}
-        className="grid w-full shrink-0 cursor-pointer grid-cols-15 rounded-md px-2 py-1 transition-transform duration-100 hover:bg-(--hover-color)/20 active:scale-[99%]"
-      >
+      <div className="grid w-full shrink-0 cursor-pointer grid-cols-15 rounded-md px-2 py-1 transition-transform duration-50 hover:bg-(--hover-color)/20">
         <div className="flex h-full w-full flex-row items-center justify-between px-0.5">
           <div className="flex w-2.5 shrink-0 justify-end text-xs opacity-50">{index + 1}</div>
           <TbFileMusicFilled className="aspect-square h-8 w-8 shrink-0 text-(--accent-color)" />
         </div>
 
-        <div className="col-span-8 flex w-full flex-col px-3">
+        <div className="group col-span-8 flex w-full flex-col px-3" onClick={onClick}>
           <div className="text-no-wrap min-w-0 truncate text-xs" children={file.title} />
           <div className="flex w-full flex-row gap-3 text-[10px] opacity-50">
             <div className="text-no-wrap min-w-0 truncate" children={file.artists?.join(", ")} />
@@ -51,7 +46,11 @@ export function Track({
           </div>
         </div>
 
-        <div className="col-span-1 flex items-center justify-center" children={<LuHeart />} />
+        <div
+          className="col-span-1 flex items-center justify-center transition-all duration-100 active:scale-70"
+          children={isLiked ? <RiHeartFill className="text-(--accent-color)" /> : <RiHeartLine />}
+          onClick={onLike}
+        />
 
         <div
           children={

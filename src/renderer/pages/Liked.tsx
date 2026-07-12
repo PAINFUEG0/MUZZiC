@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
-export function Tracks() {
+export function Liked() {
   const [data] = treeStore.use();
   const [atTop, setAtTop] = useState(true);
   const [query, setQuery] = searchBox.use();
@@ -24,7 +24,7 @@ export function Tracks() {
           ? "linear-gradient(to bottom, transparent 0%, black 5%)"
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
-  const flat = flatten(data);
+  const flat = flatten(data).filter((e) => liked.includes(e.id));
   const [tracks, setTracks] = useState(flat);
 
   const virtualizer = useVirtualizer({
@@ -46,7 +46,7 @@ export function Tracks() {
             children={<LuDisc />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
-          <div className="font-medium">Playable tracks</div>
+          <div className="font-medium">Liked songs</div>
         </div>
 
         <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
@@ -76,14 +76,12 @@ export function Tracks() {
                 <Track
                   file={track}
                   key={track.id}
+                  isLiked={true}
                   index={vItem.index}
                   initial={vItem.index === 0}
-                  isLiked={liked.includes(track.id)}
                   end={vItem.index === tracks.length - 1}
                   onClick={() => console.log({ current: vItem.index, queue: tracks })}
-                  onLike={() =>
-                    setLiked((liked) => (liked.includes(track.id) ? liked.filter((e) => e !== track.id) : [...liked, track.id]))
-                  }
+                  onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
                 />
               </div>
             );

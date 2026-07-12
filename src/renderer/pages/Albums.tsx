@@ -9,7 +9,7 @@ import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { searchBox, treeStore } from "../utils/globalStores";
+import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Albums() {
   type Row = { type: "tracks"; data: NonNullable<(typeof albums)[keyof typeof albums]> } | { type: "albums"; data: string[][] };
@@ -19,6 +19,7 @@ export function Albums() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const flat = flatten(data);
+  const [liked, setLiked] = likedSongsStore.use();
   const albums = Object.groupBy(flat, (e) => e.album);
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });
@@ -121,6 +122,14 @@ export function Albums() {
                         file={rows.data[vItem.index]!}
                         key={rows.data[vItem.index]!.id}
                         end={vItem.index === rows.data.length - 1}
+                        isLiked={liked.includes(rows.data[vItem.index]!.id)}
+                        onLike={() =>
+                          setLiked((liked) =>
+                            liked.includes(rows.data[vItem.index]!.id)
+                              ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
+                              : [...liked, rows.data[vItem.index]!.id],
+                          )
+                        }
                         onClick={() => console.log({ current: vItem.index, queue: rows.data })}
                       />
                     ) : (

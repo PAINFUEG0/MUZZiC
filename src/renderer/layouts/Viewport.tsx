@@ -7,6 +7,7 @@ import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { hexToRgba } from "../../shared/helpers";
 import { themeStore, view } from "../utils/globalStores";
+import { Liked } from "../pages/Liked";
 
 export function Viewport() {
   let page;
@@ -25,6 +26,9 @@ export function Viewport() {
       break;
     case "artists":
       page = <Artists />;
+      break;
+    case "liked":
+      page = <Liked />;
       break;
   }
 
