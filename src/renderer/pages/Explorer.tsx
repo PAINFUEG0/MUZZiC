@@ -5,11 +5,11 @@ import { MdRestartAlt } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import { LuFolderSearch } from "react-icons/lu";
 import { Track } from "../components/utils/Track";
-import { useEffect, useRef, useState } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { AnimatePresence, motion } from "framer-motion";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualList } from "../hooks/useVirtualList";
 import { Directory } from "../components/utils/Directory";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
 import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/stores";
 
@@ -21,40 +21,23 @@ export function List() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
-  const current = path[path.length - 1]!;
+  const current = useMemo(() => path[path.length - 1]!, [path]);
   const [dirs, setDirs] = useState(current.dirs.sort((a, b) => a.name.localeCompare(b.name)));
   const [files, setFiles] = useState(current.files.sort((a, b) => a.title.localeCompare(b.title)));
-
-  const [atTop, setAtTop] = useState(true);
-  const [atBottom, setAtBottom] = useState(false);
-
-  const maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
   const [direction, setDirection] = useState(1);
   const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
   const goBack = (newPath: typeof path) => (setDirection(-1), setPath(newPath));
 
-  const rows = [
-    ...(dirs.length ? ([{ type: "label", label: "Directories", count: dirs.length }] as const) : []),
-    ...(dirs.length ? chunk(dirs, 5).map((c, i, arr) => ({ type: "dir", dirs: c, index: i, len: arr.length }) as const) : []),
-    ...(files.length ? [{ type: "label", label: "Playable tracks", count: files.length } as const] : []),
-    ...(files.length ? files.map((f, i, arr) => ({ type: "file", file: f, index: i, len: arr.length }) as const) : []),
-  ];
-
-  const virtualizer = useVirtualizer({
-    overscan: 5,
-    count: rows.length,
-    estimateSize: () => 61,
-    getScrollElement: () => scrollRef.current,
-    measureElement: (el) => el.getBoundingClientRect().height,
-  });
+  const rows = useMemo(
+    () => [
+      ...(dirs.length ? ([{ type: "label", label: "Directories", count: dirs.length }] as const) : []),
+      ...(dirs.length ? chunk(dirs, 5).map((c, i, arr) => ({ type: "dir", dirs: c, index: i, len: arr.length }) as const) : []),
+      ...(files.length ? [{ type: "label", label: "Playable tracks", count: files.length } as const] : []),
+      ...(files.length ? files.map((f, i, arr) => ({ type: "file", file: f, index: i, len: arr.length }) as const) : []),
+    ],
+    [dirs, files],
+  );
 
   useEffect(() => setQuery(""), []);
   useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
@@ -63,6 +46,53 @@ export function List() {
     setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
     setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
   }, [query]);
+
+  const make = useCallback(
+    ({ index }: { index: number }) => {
+      const row = rows[index]!;
+
+      switch (row.type) {
+        case "dir":
+          return (
+            <DirectoryGrid index={row.index} len={row.len}>
+              {row.dirs.map((dir, i) => (
+                <Directory dir={dir} key={dir.name} onClick={() => goForward([...path, row.dirs[i]!])} />
+              ))}
+            </DirectoryGrid>
+          );
+
+        case "file":
+          return (
+            <Track
+              file={row.file}
+              index={row.index}
+              key={row.file.id}
+              initial={row.index === 0}
+              end={row.index === row.len - 1}
+              isLiked={liked.includes(row.file.id)}
+              onClick={() => console.log({ current: index, queue: current.files })}
+              onLike={() =>
+                setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))
+              }
+            />
+          );
+
+        case "label":
+          return (
+            <div
+              key={row.label}
+              className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${index === 0 ? "pb-6" : "py-6"}`}
+            >
+              <div className="font-medium">{row.label}</div>
+              <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
+            </div>
+          );
+      }
+    },
+    [rows],
+  );
+
+  const [list, virtualizer] = useVirtualList({ scrollRef, Component: make, list: rows.map((_, i) => i), getItemKey: (index) => index });
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
@@ -89,16 +119,7 @@ export function List() {
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        onScroll={() => {
-          const el = scrollRef.current;
-          el && setAtTop(el.scrollTop <= 0);
-          el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-        }}
-        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
-        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
-      >
+      <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={current.name}
@@ -146,50 +167,7 @@ export function List() {
                 <div>No items to display</div>
               </div>
             ) : (
-              virtualizer.getVirtualItems().map((vItem) => {
-                const row = rows[vItem.index]!;
-
-                return (
-                  <div
-                    key={vItem.index}
-                    data-index={vItem.index}
-                    ref={virtualizer.measureElement}
-                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px) ` }}
-                    children={
-                      row.type === "label" ? (
-                        <div
-                          key={row.label}
-                          className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${vItem.index === 0 ? "pb-6" : "py-6"}`}
-                        >
-                          <div className="font-medium">{row.label}</div>
-                          <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
-                        </div>
-                      ) : row.type === "dir" ? (
-                        <DirectoryGrid index={row.index} len={row.len}>
-                          {row.dirs.map((dir, i) => (
-                            <Directory dir={dir} key={dir.name} onClick={() => goForward([...path, row.dirs[i]!])} />
-                          ))}
-                        </DirectoryGrid>
-                      ) : (
-                        <Track
-                          file={row.file}
-                          index={row.index}
-                          key={row.file.id}
-                          initial={row.index === 0}
-                          end={row.index === row.len - 1}
-                          isLiked={liked.includes(row.file.id)}
-                          onClick={() => console.log({ current: vItem.index, queue: current.files })}
-                          onLike={() =>
-                            setLiked((liked) =>
-                              liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id],
-                            )
-                          }
-                        />
-                      )
-                    }
-                  />
-                );
-              })
+              list
             )}
           </motion.div>
         </AnimatePresence>
