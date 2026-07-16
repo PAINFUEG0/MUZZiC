@@ -56,16 +56,17 @@ export function Albums() {
         if (!query) return selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) };
         if (selected)
           return { type: "tracks", data: albums[selected]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
-        const keys = Object.keys(albums).filter(
-          (album) =>
-            album.toLowerCase().includes(query.toLowerCase()) ||
-            albums[album]
-              ?.flatMap((track) => track.artists)
-              .toString()
-              .toLowerCase()
-              .includes(query.toLowerCase()),
+
+        const keys = Object.keys(albums);
+        const matchingAlbums = keys.filter((album) => album.toLowerCase().includes(query.toLowerCase()));
+        const matchingArtists = keys.filter((album) =>
+          albums[album]!.flatMap((track) => track.artists)
+            .toString()
+            .toLowerCase()
+            .includes(query.toLowerCase()),
         );
-        return { type: "albums", data: chunk(keys, 6) };
+
+        return { type: "albums", data: chunk([...matchingAlbums, ...matchingArtists], 6) };
       }),
     [query],
   );

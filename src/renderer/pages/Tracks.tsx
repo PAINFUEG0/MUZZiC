@@ -25,7 +25,7 @@ export function Tracks() {
           ? "linear-gradient(to bottom, transparent 0%, black 5%)"
           : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
-  const flat = flatten(data);
+  const flat = flatten(data).sort((a, b) => a.title.localeCompare(b.title));
   const [tracks, setTracks] = useState(flat);
 
   const virtualizer = useVirtualizer({
