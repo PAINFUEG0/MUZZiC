@@ -3,12 +3,12 @@
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
-import { RiErrorWarningLine, RiFolderMusicLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
+import { RiErrorWarningLine, RiFolderMusicLine } from "react-icons/ri";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Albums() {
@@ -92,7 +92,7 @@ export function Albums() {
 
       <div
         ref={scrollRef}
-        className="flex h-full w-full scrollbar-none flex-col overflow-y-auto"
+        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
         onScroll={() => {
           const el = scrollRef.current;
           el && setAtTop(el.scrollTop <= 0);

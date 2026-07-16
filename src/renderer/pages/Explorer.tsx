@@ -96,8 +96,8 @@ export function List() {
           el && setAtTop(el.scrollTop <= 0);
           el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
         }}
+        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
         style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
-        className="relative inset-0 flex h-full w-full scrollbar-none flex-col overflow-auto overflow-y-auto"
       >
         <AnimatePresence mode="wait">
           <motion.div

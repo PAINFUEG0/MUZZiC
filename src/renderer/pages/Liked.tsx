@@ -4,8 +4,8 @@ import { flatten } from "../../shared/helpers";
 import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 import { RiErrorWarningLine, RiHeartLine } from "react-icons/ri";
+import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Liked() {
   const [data] = treeStore.use();
@@ -64,7 +64,7 @@ export function Liked() {
           el && setAtTop(el.scrollTop <= 0);
           el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
         }}
-        className="flex h-full w-full scrollbar-none flex-col overflow-y-auto"
+        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
       >
         <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
           {virtualizer.getVirtualItems().length === 0 ? (
