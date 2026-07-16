@@ -3,7 +3,7 @@
 import { IoMdClose } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
-import { needsRestart, searchBox, themeStore } from "../../../utils/globalStores";
+import { needsRestart, searchBox, themeStore } from "../../../utils/stores";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 import { hexToRgba } from "../../../../shared/helpers";
 

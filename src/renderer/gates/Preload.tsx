@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
-import { likedSongsStore, pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
+import { likedSongsStore, pcmFormatStore, themeStore, treeStore } from "../utils/stores.js";
 
 export function Preload() {
   const [theme] = themeStore.use();

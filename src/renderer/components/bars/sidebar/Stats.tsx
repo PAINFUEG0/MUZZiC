@@ -1,7 +1,7 @@
 /** @format */
 
 import { useState, useEffect, useRef } from "react";
-import { themeStore } from "../../../utils/globalStores";
+import { themeStore } from "../../../utils/stores";
 import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale } from "chart.js";
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale);

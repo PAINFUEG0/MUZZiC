@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
-import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/globalStores";
+import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/stores";
 
 export function List() {
   const [tree] = treeStore.use();

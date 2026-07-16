@@ -1,29 +1,31 @@
 /** @format */
 
-import { RefObject } from "react";
 import { useMask } from "./useMask";
+import { RefObject, useEffect } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 type Props = {
   list: any[];
-  K: (index: number) => number | string;
+  overscan?: number;
+  estimateSize?: (index: number) => number;
   scrollRef: RefObject<HTMLDivElement | null>;
-  V: React.ComponentType<{ index: number }>;
+  getItemKey: (index: number) => number | string;
+  Component: React.ComponentType<{ index: number }>;
 };
 
-export function useVirtualList({ list, scrollRef, K, V }: Props) {
+export function useVirtualList({ list, scrollRef, getItemKey, Component, overscan, estimateSize }: Props) {
   const virtualizer = useVirtualizer({
-    overscan: 5,
-    getItemKey: K,
+    getItemKey,
     count: list.length,
-    estimateSize: () => 50,
+    overscan: overscan || 5,
+    estimateSize: estimateSize || (() => 50),
     getScrollElement: () => scrollRef.current,
     measureElement: (el) => el.getBoundingClientRect().height,
   });
 
   useMask(scrollRef);
-  scrollRef.current && (scrollRef.current.style.willChange = "scroll-position");
+  useEffect(() => void (scrollRef.current && (scrollRef.current.style.willChange = "scroll-position")), [scrollRef]);
 
   const component = (
     <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
@@ -40,7 +42,7 @@ export function useVirtualList({ list, scrollRef, K, V }: Props) {
               key={vItem.key}
               data-index={vItem.index}
               ref={virtualizer.measureElement}
-              children={<V index={vItem.index} />}
+              children={<Component index={vItem.index} />}
               style={{ top: 0, left: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
             />
           ))

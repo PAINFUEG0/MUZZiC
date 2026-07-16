@@ -3,7 +3,7 @@
 import { themes } from "../utils/themes";
 import { useEffect, useState } from "react";
 import { flatten } from "../../shared/helpers";
-import { needsRestart, pcmFormatStore, themeStore, treeStore } from "../utils/globalStores";
+import { needsRestart, pcmFormatStore, themeStore, treeStore } from "../utils/stores";
 
 export function Settings() {
   const [tree] = treeStore.use();

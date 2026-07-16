@@ -6,7 +6,7 @@ import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { hexToRgba } from "../../shared/helpers";
-import { themeStore, view } from "../utils/globalStores";
+import { themeStore, view } from "../utils/stores";
 import { Liked } from "../pages/Liked";
 
 export function Viewport() {

@@ -4,9 +4,9 @@ import { LuDisc } from "react-icons/lu";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
-import { useState, useRef, useEffect } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
-import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
 export function Tracks() {
   const [data] = treeStore.use();
@@ -14,9 +14,9 @@ export function Tracks() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
-  const flat = flatten(data).sort((a, b) => a.title.localeCompare(b.title));
+  const flat = useMemo(() => flatten(data).sort((a, b) => a.title.localeCompare(b.title)), [data]);
   const [tracks, setTracks] = useState(flat);
-  const index = generateIndex(tracks);
+  const index = useMemo(() => generateIndex(tracks), [tracks]);
 
   useEffect(() => setQuery(""), []);
   useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
@@ -24,8 +24,8 @@ export function Tracks() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: tracks,
-    K: (index) => tracks[index]!.id,
-    V: ({ index }) => (
+    getItemKey: (index) => tracks[index]!.id,
+    Component: ({ index }) => (
       <Track
         index={index}
         file={tracks[index]!}

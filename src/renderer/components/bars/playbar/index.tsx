@@ -1,7 +1,7 @@
 /** @format */
 
 import { LuExpand } from "react-icons/lu";
-import { themeStore } from "../../../utils/globalStores";
+import { themeStore } from "../../../utils/stores";
 import { hexToRgba } from "../../../../shared/helpers";
 
 export function Playbar() {

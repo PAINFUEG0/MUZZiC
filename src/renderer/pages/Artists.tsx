@@ -4,12 +4,12 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
-import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
 export function Artists() {
   type Row = ArtistRow | TrackRow;
@@ -21,56 +21,64 @@ export function Artists() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
-  const flat = flatten(data);
-  let artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
+  const artists = useMemo(() => {
+    const flat = flatten(data);
+    const _artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
 
-  const T = Object.groupBy(flat, (e) => e.artists.join(", "));
-  for (const artist in T)
-    if (artists[artist] === undefined) artists[artist] = T[artist];
-    else artists[artist] = Array.from(new Set([...artists[artist], ...T[artist]!]));
+    const T = Object.groupBy(flat, (e) => e.artists.join(", "));
+    for (const artist in T)
+      if (_artists[artist] === undefined) _artists[artist] = T[artist];
+      else _artists[artist] = Array.from(new Set([..._artists[artist], ...T[artist]!]));
 
-  artists = Object.fromEntries(Object.entries(artists).sort((a, b) => a[0].localeCompare(b[0])));
+    return Object.fromEntries(Object.entries(_artists).sort((a, b) => a[0].localeCompare(b[0])));
+  }, [data]);
 
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
 
-  const makeGrid = (rows: ArtistRow, index: number) => (
-    <ThumbGrid
-      index={index}
-      len={rows.data.length}
-      children={rows.data[index]!.map((artist) => (
-        <Card
-          label1={artist}
-          thumb={artists[artist]![0]!.thumb}
-          onClick={() => setSelected(artist)}
-          label2={`${artists[artist]?.length} track/s`}
-        />
-      ))}
-    />
+  const makeGrid = useCallback(
+    (rows: ArtistRow, index: number) => (
+      <ThumbGrid
+        index={index}
+        len={rows.data.length}
+        children={rows.data[index]!.map((artist) => (
+          <Card
+            label1={artist}
+            thumb={artists[artist]![0]!.thumb}
+            onClick={() => setSelected(artist)}
+            label2={`${artists[artist]?.length} track/s`}
+          />
+        ))}
+      />
+    ),
+    [],
   );
 
-  const makeTrack = (rows: TrackRow, index: number) => (
-    <Track
-      index={index}
-      initial={index === 0}
-      file={rows.data[index]!}
-      key={rows.data[index]!.id}
-      end={index === rows.data.length - 1}
-      isLiked={liked.includes(rows.data[index]!.id)}
-      onLike={() =>
-        setLiked((liked) =>
-          liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
-        )
-      }
-      onClick={() => console.log({ current: index, queue: rows.data })}
-    />
+  const makeTrack = useCallback(
+    (rows: TrackRow, index: number) => (
+      <Track
+        index={index}
+        initial={index === 0}
+        file={rows.data[index]!}
+        key={rows.data[index]!.id}
+        end={index === rows.data.length - 1}
+        isLiked={liked.includes(rows.data[index]!.id)}
+        onLike={() =>
+          setLiked((liked) =>
+            liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
+          )
+        }
+        onClick={() => console.log({ current: index, queue: rows.data })}
+      />
+    ),
+    [],
   );
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
-    K: (index) => index,
+    getItemKey: (index) => index,
     list: rows.data as any[],
-    V: ({ index }) => (rows.type === "artists" ? makeGrid(rows, index) : makeTrack(rows, index)),
+    Component: ({ index }) => (rows.type === "artists" ? makeGrid(rows, index) : makeTrack(rows, index)),
   });
 
   useEffect(() => setQuery(""), [selected]);

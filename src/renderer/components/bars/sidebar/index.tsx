@@ -4,7 +4,7 @@ import { Head } from "./Head";
 import { Body } from "./Body";
 import { Tail } from "./Tail";
 import { motion } from "framer-motion";
-import { themeStore } from "../../../utils/globalStores";
+import { themeStore } from "../../../utils/stores";
 import { hexToRgba } from "../../../../shared/helpers";
 
 export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean; setSettingsOpen: (arg: boolean) => void }) {

@@ -4,7 +4,7 @@ import { MdDownloading } from "react-icons/md";
 import { TbMicrophone2 } from "react-icons/tb";
 import { ExpandableItem, Item } from "./Items";
 import { PiMusicNoteBold } from "react-icons/pi";
-import { view } from "../../../utils/globalStores";
+import { view } from "../../../utils/stores";
 import { RiFolderMusicLine, RiHeartLine, RiPlayListFill } from "react-icons/ri";
 import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
 

@@ -4,12 +4,12 @@ import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
 import { RiFolderMusicLine } from "react-icons/ri";
-import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
 export function Albums() {
   type Row = AlbumRow | TrackRow;
@@ -19,7 +19,7 @@ export function Albums() {
   const [tree] = treeStore.use();
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const flat = flatten(tree).sort((a, b) => a.album.localeCompare(b.album));
+  const flat = useMemo(() => flatten(tree).sort((a, b) => a.album.localeCompare(b.album)), [tree]);
 
   const [liked, setLiked] = likedSongsStore.use();
   const albums = Object.groupBy(flat, (e) => e.album);
@@ -53,49 +53,55 @@ export function Albums() {
     [query],
   );
 
-  const makeGrid = (rows: AlbumRow, index: number) => (
-    <ThumbGrid
-      index={index}
-      len={rows.data.length}
-      children={rows.data[index]!.map((album) => (
-        <Card
-          label1={album}
-          thumb={albums[album]![0]!.thumb}
-          onClick={() => setSelected(album)}
-          label2={
-            albums[album]
-              ?.flatMap((track) => track.artists)
-              .filter((artist) => artist.toLowerCase() !== "unknown artists")
-              .filter((artist, i, arr) => arr.indexOf(artist) == i)
-              .join(", ") || "Unknown Artists"
-          }
-        />
-      ))}
-    />
+  const makeGrid = useCallback(
+    (rows: AlbumRow, index: number) => (
+      <ThumbGrid
+        index={index}
+        len={rows.data.length}
+        children={rows.data[index]!.map((album) => (
+          <Card
+            label1={album}
+            thumb={albums[album]![0]!.thumb}
+            onClick={() => setSelected(album)}
+            label2={
+              albums[album]
+                ?.flatMap((track) => track.artists)
+                .filter((artist) => artist.toLowerCase() !== "unknown artists")
+                .filter((artist, i, arr) => arr.indexOf(artist) == i)
+                .join(", ") || "Unknown Artists"
+            }
+          />
+        ))}
+      />
+    ),
+    [],
   );
 
-  const makeTrack = (rows: TrackRow, index: number) => (
-    <Track
-      index={index}
-      initial={index === 0}
-      file={rows.data[index]!}
-      key={rows.data[index]!.id}
-      end={index === rows.data.length - 1}
-      isLiked={liked.includes(rows.data[index]!.id)}
-      onLike={() =>
-        setLiked((liked) =>
-          liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
-        )
-      }
-      onClick={() => console.log({ current: index, queue: rows.data })}
-    />
+  const makeTrack = useCallback(
+    (rows: TrackRow, index: number) => (
+      <Track
+        index={index}
+        initial={index === 0}
+        file={rows.data[index]!}
+        key={rows.data[index]!.id}
+        end={index === rows.data.length - 1}
+        isLiked={liked.includes(rows.data[index]!.id)}
+        onLike={() =>
+          setLiked((liked) =>
+            liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
+          )
+        }
+        onClick={() => console.log({ current: index, queue: rows.data })}
+      />
+    ),
+    [],
   );
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
-    K: (index) => index,
+    getItemKey: (index) => index,
     list: rows.data as any[],
-    V: ({ index }) => (rows.type === "tracks" ? makeTrack(rows, index) : makeGrid(rows, index)),
+    Component: ({ index }) => (rows.type === "tracks" ? makeTrack(rows, index) : makeGrid(rows, index)),
   });
 
   return (

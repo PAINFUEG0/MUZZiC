@@ -4,9 +4,9 @@ import { RiHeartLine } from "react-icons/ri";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
-import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
+import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
 export function Liked() {
   const [data] = treeStore.use();
@@ -14,17 +14,21 @@ export function Liked() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
-  const flat = flatten(data)
-    .filter((e) => liked.includes(e.id))
-    .sort((a, b) => a.title.localeCompare(b.title));
+  const flat = useMemo(
+    () =>
+      flatten(data)
+        .filter((e) => liked.includes(e.id))
+        .sort((a, b) => a.title.localeCompare(b.title)),
+    [data],
+  );
   const [tracks, setTracks] = useState(flat);
-  const index = generateIndex(tracks);
+  const index = useMemo(() => generateIndex(tracks), [tracks]);
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: tracks,
-    K: (index) => tracks[index]!.id,
-    V: ({ index }) => {
+    getItemKey: (index) => tracks[index]!.id,
+    Component: ({ index }) => {
       const track = tracks[index]!;
       return (
         <Track
