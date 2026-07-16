@@ -51,7 +51,7 @@ export function Artists() {
         ))}
       />
     ),
-    [],
+    [rows, artists],
   );
 
   const makeTrack = useCallback(
@@ -71,7 +71,7 @@ export function Artists() {
         onClick={() => console.log({ current: index, queue: rows.data })}
       />
     ),
-    [],
+    [liked, rows],
   );
 
   const [list, virtualizer] = useVirtualList({

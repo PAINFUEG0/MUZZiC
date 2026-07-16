@@ -4,7 +4,7 @@ import { RiHeartLine } from "react-icons/ri";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
@@ -19,9 +19,9 @@ export function Liked() {
       flatten(data)
         .filter((e) => liked.includes(e.id))
         .sort((a, b) => a.title.localeCompare(b.title)),
-    [data],
+    [data, liked],
   );
-  const [tracks, setTracks] = useState(flat);
+  const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
 
   const [list, virtualizer] = useVirtualList({
@@ -46,8 +46,6 @@ export function Liked() {
   });
 
   useEffect(() => setQuery(""), []);
-  useEffect(() => setTracks(flat.filter((e) => liked.includes(e.id))), [liked]);
-  useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">

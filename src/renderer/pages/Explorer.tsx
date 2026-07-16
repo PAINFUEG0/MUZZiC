@@ -89,7 +89,7 @@ export function List() {
           );
       }
     },
-    [rows],
+    [rows, liked],
   );
 
   const [list, virtualizer] = useVirtualList({ scrollRef, Component: make, list: rows.map((_, i) => i), getItemKey: (index) => index });
