@@ -1,25 +1,29 @@
 /** @format */
 
-import { useState } from "react";
+import { useEffect } from "react";
 
 export function useMask(ref: React.RefObject<HTMLDivElement | null>) {
-  const [atTop, setAtTop] = useState(true);
-  const [atBottom, setAtBottom] = useState(false);
-
-  if (!ref.current) return;
-
-  ref.current!.addEventListener("scroll", () => {
+  useEffect(() => {
     const el = ref.current;
-    el && setAtTop(el.scrollTop <= 0);
-    el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-  });
+    if (!el) return;
 
-  ref.current!.style.maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
+    const mask = () => {
+      const top = el.scrollTop <= 0;
+      const bottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 1;
+
+      el.style.maskImage =
+        top && bottom
+          ? "none"
+          : top
+            ? "linear-gradient(to bottom, black 95%, transparent 100%)"
+            : bottom
+              ? "linear-gradient(to bottom, transparent 0%, black 5%)"
+              : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
+    };
+
+    mask();
+
+    el.addEventListener("scroll", mask, { passive: true });
+    return () => el.removeEventListener("scroll", mask);
+  }, [ref]);
 }

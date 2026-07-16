@@ -1,7 +1,7 @@
 /** @format */
 
+import { RefObject } from "react";
 import { useMask } from "./useMask";
-import { ReactNode, RefObject } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -9,7 +9,7 @@ type Props = {
   list: any[];
   K: (index: number) => number | string;
   scrollRef: RefObject<HTMLDivElement | null>;
-  V: ({ index }: { index: number }) => ReactNode;
+  V: React.ComponentType<{ index: number }>;
 };
 
 export function useVirtualList({ list, scrollRef, K, V }: Props) {
