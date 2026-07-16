@@ -3,16 +3,18 @@
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
+import { RiFolderMusicLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { RiErrorWarningLine, RiFolderMusicLine } from "react-icons/ri";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Albums() {
-  type Row = { type: "tracks"; data: NonNullable<(typeof albums)[keyof typeof albums]> } | { type: "albums"; data: string[][] };
+  type Row = AlbumRow | TrackRow;
+  type AlbumRow = { type: "albums"; data: string[][] };
+  type TrackRow = { type: "tracks"; data: NonNullable<(typeof albums)[keyof typeof albums]> };
 
   const [tree] = treeStore.use();
   const [query, setQuery] = searchBox.use();
@@ -23,26 +25,6 @@ export function Albums() {
   const albums = Object.groupBy(flat, (e) => e.album);
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });
-
-  const virtualizer = useVirtualizer({
-    overscan: 5,
-    estimateSize: () => 50,
-    count: rows.data.length,
-    getScrollElement: () => scrollRef.current,
-    measureElement: (el) => el.getBoundingClientRect().height,
-  });
-
-  const [atTop, setAtTop] = useState(true);
-  const [atBottom, setAtBottom] = useState(false);
-
-  const maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
   useEffect(() => setQuery(""), [selected]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
@@ -71,6 +53,51 @@ export function Albums() {
     [query],
   );
 
+  const makeGrid = (rows: AlbumRow, index: number) => (
+    <ThumbGrid
+      index={index}
+      len={rows.data.length}
+      children={rows.data[index]!.map((album) => (
+        <Card
+          label1={album}
+          thumb={albums[album]![0]!.thumb}
+          onClick={() => setSelected(album)}
+          label2={
+            albums[album]
+              ?.flatMap((track) => track.artists)
+              .filter((artist) => artist.toLowerCase() !== "unknown artists")
+              .filter((artist, i, arr) => arr.indexOf(artist) == i)
+              .join(", ") || "Unknown Artists"
+          }
+        />
+      ))}
+    />
+  );
+
+  const makeTrack = (rows: TrackRow, index: number) => (
+    <Track
+      index={index}
+      initial={index === 0}
+      file={rows.data[index]!}
+      key={rows.data[index]!.id}
+      end={index === rows.data.length - 1}
+      isLiked={liked.includes(rows.data[index]!.id)}
+      onLike={() =>
+        setLiked((liked) =>
+          liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
+        )
+      }
+      onClick={() => console.log({ current: index, queue: rows.data })}
+    />
+  );
+
+  const [list, virtualizer] = useVirtualList({
+    scrollRef,
+    K: (index) => index,
+    list: rows.data as any[],
+    V: ({ index }) => (rows.type === "tracks" ? makeTrack(rows, index) : makeGrid(rows, index)),
+  });
+
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5 ease-in-out">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
@@ -90,81 +117,16 @@ export function Albums() {
         <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
-        onScroll={() => {
-          const el = scrollRef.current;
-          el && setAtTop(el.scrollTop <= 0);
-          el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-        }}
-        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
-      >
+      <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={selected}
+            children={list}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2 }}
             style={{ height: virtualizer.getTotalSize(), position: "relative" }}
             initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
-          >
-            {virtualizer.getVirtualItems().length === 0 ? (
-              <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
-                <RiErrorWarningLine className="mt-0.5" />
-                <div>No items to display</div>
-              </div>
-            ) : (
-              virtualizer.getVirtualItems().map((vItem) => {
-                return (
-                  <div
-                    key={vItem.index}
-                    data-index={vItem.index}
-                    ref={virtualizer.measureElement}
-                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                    children={
-                      rows.type === "tracks" ? (
-                        <Track
-                          index={vItem.index}
-                          initial={vItem.index === 0}
-                          file={rows.data[vItem.index]!}
-                          key={rows.data[vItem.index]!.id}
-                          end={vItem.index === rows.data.length - 1}
-                          isLiked={liked.includes(rows.data[vItem.index]!.id)}
-                          onLike={() =>
-                            setLiked((liked) =>
-                              liked.includes(rows.data[vItem.index]!.id)
-                                ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
-                                : [...liked, rows.data[vItem.index]!.id],
-                            )
-                          }
-                          onClick={() => console.log({ current: vItem.index, queue: rows.data })}
-                        />
-                      ) : (
-                        <ThumbGrid
-                          index={vItem.index}
-                          len={rows.data.length}
-                          children={rows.data[vItem.index]!.map((album) => (
-                            <Card
-                              label1={album}
-                              thumb={albums[album]![0]!.thumb}
-                              onClick={() => setSelected(album)}
-                              label2={
-                                albums[album]
-                                  ?.flatMap((track) => track.artists)
-                                  .filter((artist) => artist.toLowerCase() !== "unknown artists")
-                                  .filter((artist, i, arr) => arr.indexOf(artist) == i)
-                                  .join(", ") || "Unknown Artists"
-                              }
-                            />
-                          ))}
-                        />
-                      )
-                    }
-                  />
-                );
-              })
-            )}
-          </motion.div>
+          />
         </AnimatePresence>
       </div>
     </div>

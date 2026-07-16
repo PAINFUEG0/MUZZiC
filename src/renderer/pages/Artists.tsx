@@ -4,16 +4,17 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
-import { RiErrorWarningLine } from "react-icons/ri";
 import { useState, useRef, useEffect } from "react";
 import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Artists() {
-  type Row = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> } | { type: "artists"; data: string[][] };
+  type Row = ArtistRow | TrackRow;
+  type ArtistRow = { type: "artists"; data: string[][] };
+  type TrackRow = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> };
 
   const [data] = treeStore.use();
   const [query, setQuery] = searchBox.use();
@@ -33,25 +34,44 @@ export function Artists() {
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
 
-  const virtualizer = useVirtualizer({
-    overscan: 5,
-    estimateSize: () => 50,
-    count: rows.data.length,
-    getScrollElement: () => scrollRef.current,
-    measureElement: (el) => el.getBoundingClientRect().height,
+  const makeGrid = (rows: ArtistRow, index: number) => (
+    <ThumbGrid
+      index={index}
+      len={rows.data.length}
+      children={rows.data[index]!.map((artist) => (
+        <Card
+          label1={artist}
+          thumb={artists[artist]![0]!.thumb}
+          onClick={() => setSelected(artist)}
+          label2={`${artists[artist]?.length} track/s`}
+        />
+      ))}
+    />
+  );
+
+  const makeTrack = (rows: TrackRow, index: number) => (
+    <Track
+      index={index}
+      initial={index === 0}
+      file={rows.data[index]!}
+      key={rows.data[index]!.id}
+      end={index === rows.data.length - 1}
+      isLiked={liked.includes(rows.data[index]!.id)}
+      onLike={() =>
+        setLiked((liked) =>
+          liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
+        )
+      }
+      onClick={() => console.log({ current: index, queue: rows.data })}
+    />
+  );
+
+  const [list, virtualizer] = useVirtualList({
+    scrollRef,
+    K: (index) => index,
+    list: rows.data as any[],
+    V: ({ index }) => (rows.type === "artists" ? makeGrid(rows, index) : makeTrack(rows, index)),
   });
-
-  const [atTop, setAtTop] = useState(true);
-  const [atBottom, setAtBottom] = useState(false);
-
-  const maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
   useEffect(() => setQuery(""), [selected]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
@@ -91,75 +111,16 @@ export function Artists() {
         <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
-        onScroll={() => {
-          const el = scrollRef.current;
-          el && setAtTop(el.scrollTop <= 0);
-          el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-        }}
-        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
-      >
+      <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={selected}
+            children={list}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2 }}
             style={{ height: virtualizer.getTotalSize(), position: "relative" }}
             initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
-          >
-            {virtualizer.getVirtualItems().length === 0 ? (
-              <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
-                <RiErrorWarningLine className="mt-0.5" />
-                <div>No items to display</div>
-              </div>
-            ) : (
-              virtualizer.getVirtualItems().map((vItem) => {
-                return (
-                  <div
-                    key={vItem.index}
-                    data-index={vItem.index}
-                    ref={virtualizer.measureElement}
-                    style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                    children={
-                      rows.type === "tracks" ? (
-                        <Track
-                          index={vItem.index}
-                          initial={vItem.index === 0}
-                          file={rows.data[vItem.index]!}
-                          key={rows.data[vItem.index]!.id}
-                          end={vItem.index === rows.data.length - 1}
-                          isLiked={liked.includes(rows.data[vItem.index]!.id)}
-                          onLike={() =>
-                            setLiked((liked) =>
-                              liked.includes(rows.data[vItem.index]!.id)
-                                ? liked.filter((e) => e !== rows.data[vItem.index]!.id)
-                                : [...liked, rows.data[vItem.index]!.id],
-                            )
-                          }
-                          onClick={() => console.log({ current: vItem.index, queue: rows.data })}
-                        />
-                      ) : (
-                        <ThumbGrid
-                          index={vItem.index}
-                          len={rows.data.length}
-                          children={rows.data[vItem.index]!.map((artist) => (
-                            <Card
-                              label1={artist}
-                              thumb={artists[artist]![0]!.thumb}
-                              onClick={() => setSelected(artist)}
-                              label2={`${artists[artist]?.length} track/s`}
-                            />
-                          ))}
-                        />
-                      )
-                    }
-                  />
-                );
-              })
-            )}
-          </motion.div>
+          />
         </AnimatePresence>
       </div>
     </div>

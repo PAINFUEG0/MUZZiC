@@ -1,45 +1,48 @@
 /** @format */
 
+import { RiHeartLine } from "react-icons/ri";
 import { flatten } from "../../shared/helpers";
+import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
 import { useState, useRef, useEffect } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { RiErrorWarningLine, RiHeartLine } from "react-icons/ri";
+import { useVirtualList } from "../hooks/useVirtualList";
 import { likedSongsStore, searchBox, treeStore } from "../utils/globalStores";
 
 export function Liked() {
   const [data] = treeStore.use();
-  const [atTop, setAtTop] = useState(true);
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
-  const [atBottom, setAtBottom] = useState(false);
-
-  const maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-          : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)";
 
   const flat = flatten(data)
     .filter((e) => liked.includes(e.id))
     .sort((a, b) => a.title.localeCompare(b.title));
   const [tracks, setTracks] = useState(flat);
+  const index = generateIndex(tracks);
 
-  const virtualizer = useVirtualizer({
-    overscan: 5,
-    count: tracks.length,
-    estimateSize: () => 50,
-    getScrollElement: () => scrollRef.current,
-    measureElement: (el) => el.getBoundingClientRect().height,
+  const [list, virtualizer] = useVirtualList({
+    scrollRef,
+    list: tracks,
+    K: (index) => tracks[index]!.id,
+    V: ({ index }) => {
+      const track = tracks[index]!;
+      return (
+        <Track
+          file={track}
+          index={index}
+          key={track.id}
+          isLiked={true}
+          initial={index === 0}
+          end={index === tracks.length - 1}
+          onClick={() => console.log({ current: index, queue: tracks })}
+          onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
+        />
+      );
+    },
   });
 
-  useEffect(() => setTracks(flat.filter((e) => liked.includes(e.id))), [liked]);
-
   useEffect(() => setQuery(""), []);
+  useEffect(() => setTracks(flat.filter((e) => liked.includes(e.id))), [liked]);
   useEffect(() => void setTracks(query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [query]);
 
   return (
@@ -56,47 +59,18 @@ export function Liked() {
         <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
       </div>
 
-      <div
-        ref={scrollRef}
-        style={{ maskImage, WebkitMaskImage: maskImage, willChange: "scroll-position" }}
-        onScroll={() => {
-          const el = scrollRef.current;
-          el && setAtTop(el.scrollTop <= 0);
-          el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-        }}
-        className="h-full min-h-0 w-full scrollbar-none overflow-y-auto"
-      >
-        <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-          {virtualizer.getVirtualItems().length === 0 ? (
-            <div className="flex h-fit w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
-              <RiErrorWarningLine className="mt-0.5" />
-              <div>No items to display</div>
-            </div>
-          ) : (
-            virtualizer.getVirtualItems().map((vItem) => {
-              const track = tracks[vItem.index]!;
+      <div className="flex h-full w-full flex-row gap-2 overflow-hidden">
+        <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto" children={list} />
 
-              return (
-                <div
-                  key={track.id}
-                  data-index={vItem.index}
-                  ref={virtualizer.measureElement}
-                  style={{ top: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-                >
-                  <Track
-                    file={track}
-                    key={track.id}
-                    isLiked={true}
-                    index={vItem.index}
-                    initial={vItem.index === 0}
-                    end={vItem.index === tracks.length - 1}
-                    onClick={() => console.log({ current: vItem.index, queue: tracks })}
-                    onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
-                  />
-                </div>
-              );
-            })
-          )}
+        <div className="flex h-full w-5 flex-col items-center justify-between overflow-hidden rounded-sm border-2 border-(--border-color)/20 py-1 text-[10px]">
+          {index.map((e, i) => (
+            <div
+              key={i}
+              children={e.label}
+              onClick={() => e.status && virtualizer.scrollToIndex(e.index - 1, { align: "start" })}
+              className={"text-(--accent-color) " + (e.status ? "cursor-pointer opacity-100" : "opacity-50")}
+            />
+          ))}
         </div>
       </div>
     </div>
