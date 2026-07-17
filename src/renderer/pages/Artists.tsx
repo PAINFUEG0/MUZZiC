@@ -37,11 +37,11 @@ export function Artists() {
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
 
   const makeGrid = useCallback(
-    (rows: ArtistRow, index: number) => (
+    (data: ArtistRow["data"], index: number) => (
       <ThumbGrid
         index={index}
-        len={rows.data.length}
-        children={rows.data[index]!.map((artist) => (
+        len={data.length}
+        children={data[index]!.map((artist) => (
           <Card
             label1={artist}
             thumb={artists[artist]![0]!.thumb}
@@ -51,34 +51,35 @@ export function Artists() {
         ))}
       />
     ),
-    [rows, artists],
+    [artists],
   );
 
   const makeTrack = useCallback(
-    (rows: TrackRow, index: number) => (
+    (data: TrackRow["data"], index: number) => (
       <Track
         index={index}
+        file={data[index]!}
+        key={data[index]!.id}
         initial={index === 0}
-        file={rows.data[index]!}
-        key={rows.data[index]!.id}
-        end={index === rows.data.length - 1}
-        isLiked={liked.includes(rows.data[index]!.id)}
+        end={index === data.length - 1}
+        isLiked={liked.includes(data[index]!.id)}
         onLike={() =>
-          setLiked((liked) =>
-            liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
-          )
+          setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))
         }
-        onClick={() => console.log({ current: index, queue: rows.data })}
+        onClick={() => console.log({ current: index, queue: data })}
       />
     ),
-    [liked, rows],
+    [liked],
   );
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
-    getItemKey: (index) => index,
     list: rows.data as any[],
-    Component: ({ index }) => (rows.type === "artists" ? makeGrid(rows, index) : makeTrack(rows, index)),
+    Component: useCallback(
+      ({ index }) => (rows.type === "artists" ? makeGrid(rows.data, index) : makeTrack(rows.data, index)),
+      [rows, makeGrid, makeTrack],
+    ),
+    getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),
   });
 
   useEffect(() => setQuery(""), [selected]);

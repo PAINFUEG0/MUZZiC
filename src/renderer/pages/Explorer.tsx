@@ -48,8 +48,8 @@ export function List() {
   }, [query]);
 
   const make = useCallback(
-    ({ index }: { index: number }) => {
-      const row = rows[index]!;
+    (r: typeof rows, index: number) => {
+      const row = r[index]!;
 
       switch (row.type) {
         case "dir":
@@ -89,10 +89,23 @@ export function List() {
           );
       }
     },
-    [rows, liked],
+    [liked, path, current],
   );
 
-  const [list, virtualizer] = useVirtualList({ scrollRef, Component: make, list: rows.map((_, i) => i), getItemKey: (index) => index });
+  const [list, virtualizer] = useVirtualList({
+    scrollRef,
+    getItemKey: useCallback(
+      (index) =>
+        rows[index]?.type === "label"
+          ? rows[index]!.label
+          : rows[index]?.type === "file"
+            ? rows[index]!.file.title
+            : rows[index]!.dirs.map((e) => e.name).join("/"),
+      [rows],
+    ),
+    list: useMemo(() => rows.map((_, i) => i), [rows]),
+    Component: useCallback(({ index }) => make(rows, index), [make, rows]),
+  });
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">

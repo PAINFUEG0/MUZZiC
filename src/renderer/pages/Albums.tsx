@@ -19,10 +19,13 @@ export function Albums() {
   const [tree] = treeStore.use();
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const flat = useMemo(() => flatten(tree).sort((a, b) => a.album.localeCompare(b.album)), [tree]);
+
+  const albums = useMemo(() => {
+    const flat = flatten(tree).sort((a, b) => a.album.localeCompare(b.album));
+    return Object.groupBy(flat, (e) => e.album);
+  }, [tree]);
 
   const [liked, setLiked] = likedSongsStore.use();
-  const albums = Object.groupBy(flat, (e) => e.album);
   const [selected, setSelected] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });
 
@@ -54,11 +57,11 @@ export function Albums() {
   );
 
   const makeGrid = useCallback(
-    (rows: AlbumRow, index: number) => (
+    (data: AlbumRow["data"], index: number) => (
       <ThumbGrid
         index={index}
-        len={rows.data.length}
-        children={rows.data[index]!.map((album) => (
+        len={data.length}
+        children={data[index]!.map((album) => (
           <Card
             label1={album}
             thumb={albums[album]![0]!.thumb}
@@ -74,34 +77,35 @@ export function Albums() {
         ))}
       />
     ),
-    [albums, rows],
+    [albums],
   );
 
   const makeTrack = useCallback(
-    (rows: TrackRow, index: number) => (
+    (data: TrackRow["data"], index: number) => (
       <Track
         index={index}
         initial={index === 0}
-        file={rows.data[index]!}
-        key={rows.data[index]!.id}
-        end={index === rows.data.length - 1}
-        isLiked={liked.includes(rows.data[index]!.id)}
+        file={data[index]!}
+        key={data[index]!.id}
+        end={index === data.length - 1}
+        isLiked={liked.includes(data[index]!.id)}
         onLike={() =>
-          setLiked((liked) =>
-            liked.includes(rows.data[index]!.id) ? liked.filter((e) => e !== rows.data[index]!.id) : [...liked, rows.data[index]!.id],
-          )
+          setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))
         }
-        onClick={() => console.log({ current: index, queue: rows.data })}
+        onClick={() => console.log({ current: index, queue: data })}
       />
     ),
-    [liked, rows],
+    [liked],
   );
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
-    getItemKey: (index) => index,
     list: rows.data as any[],
-    Component: ({ index }) => (rows.type === "tracks" ? makeTrack(rows, index) : makeGrid(rows, index)),
+    Component: useCallback(
+      ({ index }) => (rows.type === "tracks" ? makeTrack(rows.data, index) : makeGrid(rows.data, index)),
+      [makeGrid, makeTrack, rows],
+    ),
+    getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),
   });
 
   return (

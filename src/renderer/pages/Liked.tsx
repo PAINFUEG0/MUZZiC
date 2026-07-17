@@ -4,8 +4,8 @@ import { RiHeartLine } from "react-icons/ri";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
-import { useRef, useEffect, useMemo } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
+import { useRef, useEffect, useMemo, useCallback } from "react";
 import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
 export function Liked() {
@@ -27,22 +27,25 @@ export function Liked() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: tracks,
-    getItemKey: (index) => tracks[index]!.id,
-    Component: ({ index }) => {
-      const track = tracks[index]!;
-      return (
-        <Track
-          file={track}
-          index={index}
-          key={track.id}
-          isLiked={true}
-          initial={index === 0}
-          end={index === tracks.length - 1}
-          onClick={() => console.log({ current: index, queue: tracks })}
-          onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
-        />
-      );
-    },
+    getItemKey: useCallback((index) => tracks[index]!.id, [tracks]),
+    Component: useCallback(
+      ({ index }) => {
+        const track = tracks[index]!;
+        return (
+          <Track
+            file={track}
+            index={index}
+            key={track.id}
+            isLiked={true}
+            initial={index === 0}
+            end={index === tracks.length - 1}
+            onClick={() => console.log({ current: index, queue: tracks })}
+            onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
+          />
+        );
+      },
+      [tracks],
+    ),
   });
 
   useEffect(() => setQuery(""), []);

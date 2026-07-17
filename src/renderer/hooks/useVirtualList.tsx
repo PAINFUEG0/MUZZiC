@@ -22,7 +22,6 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
     overscan: overscan || 5,
     estimateSize: estimateSize || (() => 50),
     getScrollElement: () => scrollRef.current,
-    measureElement: (el) => el.getBoundingClientRect().height,
   });
 
   useMask(scrollRef, list.length > 0);

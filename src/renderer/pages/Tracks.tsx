@@ -1,10 +1,10 @@
 /** @format */
 
 import { LuDisc } from "react-icons/lu";
-import { useRef, useMemo } from "react";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
+import { useRef, useMemo, useCallback } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
@@ -21,22 +21,25 @@ export function Tracks() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: tracks,
-    getItemKey: (index) => tracks[index]!.id,
-    Component: ({ index }) => (
-      <Track
-        index={index}
-        file={tracks[index]!}
-        initial={index === 0}
-        key={tracks[index]!.id}
-        end={index === tracks.length - 1}
-        isLiked={liked.includes(tracks[index]!.id)}
-        onClick={() => console.log({ current: index, queue: tracks })}
-        onLike={() =>
-          setLiked((liked) =>
-            liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id],
-          )
-        }
-      />
+    getItemKey: useCallback((index) => tracks[index]!.id, [tracks]),
+    Component: useCallback(
+      ({ index }) => (
+        <Track
+          index={index}
+          file={tracks[index]!}
+          initial={index === 0}
+          key={tracks[index]!.id}
+          end={index === tracks.length - 1}
+          isLiked={liked.includes(tracks[index]!.id)}
+          onClick={() => console.log({ current: index, queue: tracks })}
+          onLike={() =>
+            setLiked((liked) =>
+              liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id],
+            )
+          }
+        />
+      ),
+      [tracks, liked],
     ),
   });
 
