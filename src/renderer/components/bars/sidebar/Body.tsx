@@ -7,6 +7,8 @@ import { PiMusicNoteBold } from "react-icons/pi";
 import { view } from "../../../utils/stores";
 import { RiFolderMusicLine, RiHeartLine, RiPlayListFill } from "react-icons/ri";
 import { LuRadio, LuLibrary, LuDisc, LuFolderSearch } from "react-icons/lu";
+import { useRef } from "react";
+import { useMask } from "../../../hooks/useMask";
 
 const mainItems = [
   { icon: <LuFolderSearch />, label: "Explorer", toSet: { scene: "explorer" } },
@@ -34,9 +36,11 @@ const sections = [
 
 export function Body() {
   const [scene, setScene] = view.use();
+  const ref = useRef<HTMLDivElement>(null);
 
+  useMask(ref);
   return (
-    <div className="relative flex h-full w-67 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
+    <div ref={ref} className="relative flex h-full w-67 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
       {mainItems.map(({ icon, label, toSet }) => (
         <Item
           key={label}
