@@ -27,8 +27,6 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
   useMask(scrollRef, list.length > 0);
   useEffect(() => void (scrollRef.current && (scrollRef.current.style.willChange = "scroll-position")), [scrollRef]);
 
-  console.log(list.length > 0);
-
   const component = (
     <div style={{ height: list.length ? virtualizer.getTotalSize() : "100%", position: "relative" }}>
       {virtualizer.getVirtualItems().length === 0
