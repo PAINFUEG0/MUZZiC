@@ -25,7 +25,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
           : "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)";
 
   return (
-    <div className="flex h-fit w-65 shrink-0 scrollbar-none flex-col p-1">
+    <div className="flex h-fit w-67 shrink-0 scrollbar-none flex-col p-1">
       <div className="flex h-fit w-full flex-col gap-2 rounded-md border-2 border-(--border-color)/20 p-1 py-1.5">
         <AnimatePresence mode="wait">
           <motion.div
