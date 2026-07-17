@@ -36,7 +36,7 @@ export function Body() {
   const [scene, setScene] = view.use();
 
   return (
-    <div className="relative flex h-full w-65 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
+    <div className="relative flex h-full w-67 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
       {mainItems.map(({ icon, label, toSet }) => (
         <Item
           key={label}

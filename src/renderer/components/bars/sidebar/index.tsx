@@ -12,7 +12,7 @@ export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean
 
   return (
     <motion.div
-      animate={{ width: sidebarOpen ? "calc(var(--spacing) * 65)" : 0 }}
+      animate={{ width: sidebarOpen ? "calc(var(--spacing) * 67)" : 0 }}
       className="relative flex h-full shrink-0 flex-col overflow-hidden"
     >
       <div

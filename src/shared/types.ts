@@ -40,7 +40,12 @@ export type API = {
   minimize: () => Promise<void>;
   fullscreen: () => Promise<void>;
 
-  usage: () => Promise<{ cpu: number; mem: number }>;
+  usage: () => Promise<{
+    CPU: number;
+    RAM: number;
+    cpu: { gpu: number; tab: number; browser: number; utility: number };
+    mem: { gpu: number; tab: number; browser: number; utility: number };
+  }>;
 
   getPort: () => Promise<string>;
 

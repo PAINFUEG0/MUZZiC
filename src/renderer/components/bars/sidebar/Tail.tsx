@@ -1,11 +1,11 @@
 /** @format */
 
 import { Stats } from "./Stats";
-import { useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { LuInfo } from "react-icons/lu";
+import { useRef, useState } from "react";
 import { BsGearWide } from "react-icons/bs";
 import { RiDonutChartFill } from "react-icons/ri";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) {
   const [direction, setDirection] = useState(1);

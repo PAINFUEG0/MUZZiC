@@ -55,20 +55,39 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
 
-    usage: (_: eˉ.IpcMainInvokeEvent) =>
-      Promise.resolve(
-        eˉ.app
-          .getAppMetrics()
-          .filter((m) => m.type !== "GPU")
-          .reduce(
-            (acc, curr) => {
-              acc.cpu += curr.cpu.percentCPUUsage;
-              acc.mem += (curr.memory.privateBytes ?? curr.memory.workingSetSize) * 1024;
-              return acc;
-            },
-            { cpu: 0, mem: 0 },
-          ),
-      ),
+    usage: (_: eˉ.IpcMainInvokeEvent) => {
+      const usage = eˉ.app.getAppMetrics();
+
+      const F = (__: eˉ.ProcessMetric[]) => ({
+        cpu: __[0]?.cpu.percentCPUUsage || 0,
+        mem: Number((((__[0]?.memory.privateBytes ?? __[0]?.memory.workingSetSize) || 0) / 1024).toFixed(2)),
+      });
+
+      const gpuUsage = F(usage.filter((m) => m.type === "GPU"));
+      const tabUsage = F(usage.filter((m) => m.type === "Tab"));
+      const browserUsage = F(usage.filter((m) => m.type === "Browser"));
+      const utilityUsage = F(usage.filter((m) => m.type === "Utility"));
+
+      return Promise.resolve({
+        CPU: tabUsage.cpu + browserUsage.cpu + utilityUsage.cpu,
+        RAM: tabUsage.mem + browserUsage.mem + utilityUsage.mem,
+        cpu: { gpu: gpuUsage.cpu, tab: tabUsage.cpu, browser: browserUsage.cpu, utility: utilityUsage.cpu },
+        mem: { gpu: gpuUsage.mem, tab: tabUsage.mem, browser: browserUsage.mem, utility: utilityUsage.mem },
+      });
+    },
+    // Promise.resolve(
+    //   eˉ.app
+    //     .getAppMetrics()
+    //     .filter((m) => m.type !== "GPU")
+    //     .reduce(
+    //       (acc, curr) => {
+    //         acc.cpu += curr.cpu.percentCPUUsage;
+    //         acc.mem += (curr.memory.privateBytes ?? curr.memory.workingSetSize) * 1024;
+    //         return acc;
+    //       },
+    //       { cpu: 0, mem: 0 },
+    //     ),
+    // ),
   } satisfies {
     [K in keyof API]: (event: eˉ.IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
   }).forEach(([K, V]) => eˉ.ipcMain.handle(K, V));

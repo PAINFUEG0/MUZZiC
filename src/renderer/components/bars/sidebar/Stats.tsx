@@ -2,46 +2,110 @@
 
 import { useState, useEffect, useRef } from "react";
 import { themeStore } from "../../../utils/stores";
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale } from "chart.js";
+import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, ArcElement, PieController } from "chart.js";
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale);
+Chart.register(ArcElement, LineController, LineElement, PointElement, LinearScale, CategoryScale, PieController);
 
 export function Stats() {
   const count = 30;
-  const [data, setData] = useState<{ cpu: number; mem: number }[]>(Array.from({ length: count }, () => ({ cpu: 0, mem: 0 })));
+  const [theme] = themeStore.use();
+  const last = localStorage.getItem("resource_usage");
+  const usage = last
+    ? JSON.parse(last)
+    : { CPU: 0, RAM: 0, cpu: { gpu: 0, tab: 0, browser: 0, utility: 0 }, mem: { gpu: 0, tab: 0, browser: 0, utility: 0 } };
+  const [data, setData] = useState([...Array.from({ length: count }).map(() => usage)]);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    let interval: NodeJS.Timeout;
+
+    const fn = async () => {
       const usage = await window.api.usage();
-      setData((prev) => [...prev, { ...usage, mem: Number((usage.mem / 1024 / 1024).toFixed(2)) }].slice(-count));
-    }, 1000);
+      localStorage.setItem("resource_usage", JSON.stringify(usage));
+      setData((prev) => [...prev, usage].slice(-count));
+    };
+
+    fn().then(() => (interval = setInterval(fn, 1000 / 2)));
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 px-1">
+    <div className="flex h-full w-full flex-col gap-1.5 px-1">
       <div className="h-fit w-full text-center text-[10px] font-medium">Resource usage statistics</div>
-      <div className="-mt-1.25 mb-1 h-fit w-full text-center text-[9px] leading-none opacity-60">
+      <div className="h-fit w-full text-center text-[9px] leading-none opacity-60">
         The graphs below are relative to the last 30 seconds
       </div>
 
-      <div className="mb-px flex h-fit w-full flex-row items-center gap-1.5">
-        <div className="flex w-[20%] flex-col text-[10px] text-nowrap">
-          <div>CPU usage</div>
-          <div>{data.at(-1)!.cpu.toFixed(3).padStart(6, "0")} %</div>
+      <div className="mt-2 grid h-auto w-full grid-cols-2 gap-1 gap-y-3">
+        <div className="flex h-fit w-full flex-col gap-2">
+          <div className="w-full text-center text-[8px] font-medium opacity-70">CPU Distribution ( % )</div>
+
+          <div className="flex h-fit w-full flex-row gap-2">
+            <div className="flex items-center justify-center" children={<PieChart data={Object.values(data.at(-1)!.cpu)} />} />
+
+            <div className="flex h-full w-full flex-col items-start justify-center text-[8px]">
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}FF` }} />
+                <div>Gpu - {data.at(-1)!.cpu.gpu!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}99` }} />
+                <div>Tab - {data.at(-1)!.cpu.tab!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}66` }} />
+                <div>Main - {data.at(-1)!.cpu.utility!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}33` }} />
+                <div>Win - {data.at(-1)!.cpu.browser!.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <MiniChart data={data.map((d) => d.cpu)} />
-      </div>
+        <div className="flex h-fit w-full flex-col gap-2">
+          <div className="w-full text-center text-[8px] font-medium opacity-70">Memory Distribution ( MB )</div>
 
-      <div className="flex h-fit w-full flex-row items-center gap-1.5">
-        <div className="flex w-[20%] flex-col text-[10px] text-nowrap">
-          <div>RAM usage</div>
-          <div>{data.at(-1)!.mem} MB</div>
+          <div className="flex h-fit w-full flex-row gap-2">
+            <div className="flex items-center justify-center" children={<PieChart data={Object.values(data.at(-1)!.mem)} />} />
+
+            <div className="flex h-full w-full flex-col items-start justify-center text-[8px]">
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}FF` }} />
+                <div>Gpu - {data.at(-1)!.mem.gpu!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}99` }} />
+                <div>Tab - {data.at(-1)!.mem.tab!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}66` }} />
+                <div>Main - {data.at(-1)!.mem.utility!.toFixed(2)}</div>
+              </div>
+              <div className="flex flex-row items-center gap-1">
+                <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: `${theme.accent.substring(0, 7)}33` }} />
+                <div>Win - {data.at(-1)!.mem.browser!.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <MiniChart data={data.map((d) => d.mem)} />
+        <div className="mb-px flex h-fit w-full flex-col items-center gap-1.5">
+          <MiniChart data={data.map((d) => d.CPU!)} />
+          <div className="flex w-full flex-row justify-center gap-1 text-[8px] text-nowrap">
+            <div>CPU</div>
+            <div className="opacity-70">( {data.at(-1)!.CPU!.toFixed(3).padStart(6, "0")} % )</div>
+          </div>
+        </div>
+
+        <div className="mb-px flex h-fit w-full flex-col items-center gap-1.5">
+          <MiniChart data={data.map((d) => d.RAM!)} />
+          <div className="flex w-full flex-row justify-center gap-1 text-[8px] text-nowrap">
+            <div>RAM</div>
+            <div className="opacity-70">( {data.at(-1)!.RAM!.toFixed(2).padStart(6, "0")} MB )</div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -81,4 +145,54 @@ function MiniChart({ data }: { data: number[] }) {
   }, [data]);
 
   return <div className="h-7 w-full" children={<canvas ref={canvasRef} className="h-full w-full" />} />;
+}
+
+function PieChart({ data }: { data: number[] }) {
+  const [theme] = themeStore.use();
+  const chartRef = useRef<Chart<"pie">>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const colors = [
+    `${theme.accent.substring(0, 7)}FF`,
+    `${theme.accent.substring(0, 7)}AA`,
+    `${theme.accent.substring(0, 7)}88`,
+    `${theme.accent.substring(0, 7)}44`,
+  ];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    chartRef.current = new Chart(canvas, {
+      type: "pie",
+      data: {
+        labels: data.map((_, i) => `Item ${i + 1}`),
+        datasets: [{ data, borderWidth: 2, borderColor: "#00000022", backgroundColor: data.map((_, i) => colors[i % colors.length]) }],
+      },
+      options: {
+        animation: true,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      },
+    });
+
+    return () => chartRef.current?.destroy();
+  }, [theme]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    chart.data.datasets[0]!.data = data;
+    chart.data.labels = data.map((_, i) => `Item ${i + 1}`);
+    chart.data.datasets[0]!.backgroundColor = data.map((_, i) => colors[i % colors.length]);
+    chart.update("active");
+  }, [data]);
+
+  return (
+    <div className="aspect-square h-12">
+      <canvas ref={canvasRef} className="h-full w-full" />
+    </div>
+  );
 }
