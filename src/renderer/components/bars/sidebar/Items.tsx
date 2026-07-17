@@ -12,7 +12,7 @@ export const Item = ({ icon, label, onClick, highlighted = false }: ItemProps) =
       key={label}
       onClick={onClick}
       className={
-        "group relative flex w-full shrink-0 cursor-pointer flex-row items-center gap-3 overflow-hidden rounded-sm p-1 " +
+        "group relative flex w-full shrink-0 cursor-pointer flex-row items-center gap-3 overflow-hidden rounded-sm p-1 transition-all duration-100 active:scale-96 " +
         (highlighted ? "" : "hover:bg-(--hover-color)/25")
       }
     >
@@ -31,7 +31,7 @@ export const ExpandableItem = ({ icon, label, items, collapsable, defaultOpen }:
     <div
       key={label}
       onClick={() => setShow(!show)}
-      className="group flex w-full shrink-0 cursor-pointer flex-row items-center gap-3 rounded-sm p-1 hover:bg-(--hover-color)/25"
+      className="group flex w-full shrink-0 cursor-pointer flex-row items-center gap-3 rounded-sm p-1 transition-all duration-100 hover:bg-(--hover-color)/25 active:scale-96"
     >
       <div className="h-full w-1 shrink-0 rounded-sm group-hover:bg-(--accent-color)" />
       <div className="text-base group-hover:text-(--accent-color)" children={icon} />

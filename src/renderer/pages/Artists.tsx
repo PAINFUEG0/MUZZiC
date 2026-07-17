@@ -105,7 +105,7 @@ export function Artists() {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button
-            onClick={() => setSelected("")}
+            onClick={() => setSelected((_) => (_ === null ? null : ""))}
             children={!selected ? <TbMicrophone2 /> : <IoIosArrowBack />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
@@ -126,8 +126,8 @@ export function Artists() {
             children={list}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2 }}
-            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
             initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
+            style={{ height: rows.data.length ? virtualizer.getTotalSize() : "100%", position: "relative" }}
           />
         </AnimatePresence>
       </div>
