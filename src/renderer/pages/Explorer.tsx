@@ -9,8 +9,8 @@ import { RiErrorWarningLine } from "react-icons/ri";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { Directory } from "../components/utils/Directory";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/stores";
 
 export function List() {
@@ -40,8 +40,13 @@ export function List() {
   );
 
   useEffect(() => setQuery(""), []);
-  useEffect(() => (setDirs(current.dirs), setFiles(current.files)), [current]);
-  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [current]);
+
+  useEffect(() => {
+    setDirs(current.dirs);
+    setFiles(current.files);
+    scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+  }, [current]);
+
   useEffect(() => {
     setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
     setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
