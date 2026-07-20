@@ -1,11 +1,12 @@
 /** @format */
 
 import { IoMdClose } from "react-icons/io";
+import { themeStore } from "../../../utils/themes";
 import { useEffect, useRef, useState } from "react";
-import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
-import { needsRestart, searchBox, themeStore } from "../../../utils/stores";
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 import { hexToRgba } from "../../../../shared/helpers";
+import { needsRestart, searchBox } from "../../../utils/stores";
+import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
 
 export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
   const [rs] = needsRestart.use();

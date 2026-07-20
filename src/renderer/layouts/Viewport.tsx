@@ -1,13 +1,14 @@
 /** @format */
 
+import { view } from "../utils/stores";
+import { Liked } from "../pages/Liked";
 import { motion } from "framer-motion";
 import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
+import { themeStore } from "../utils/themes";
 import { hexToRgba } from "../../shared/helpers";
-import { themeStore, view } from "../utils/stores";
-import { Liked } from "../pages/Liked";
 
 export function Viewport() {
   let page;

@@ -1,9 +1,9 @@
 /** @format */
 
-import { themes } from "../utils/themes";
 import { useEffect, useState } from "react";
 import { flatten } from "../../shared/helpers";
-import { needsRestart, pcmFormatStore, themeStore, treeStore } from "../utils/stores";
+import { themes, themeStore } from "../utils/themes";
+import { needsRestart, pcmFormatStore, treeStore } from "../utils/stores";
 
 export function Settings() {
   const [tree] = treeStore.use();

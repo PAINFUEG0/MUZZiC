@@ -2,9 +2,10 @@
 
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { themeStore } from "../utils/themes.js";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
 import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
-import { likedSongsStore, pcmFormatStore, themeStore, treeStore } from "../utils/stores.js";
+import { likedSongsStore, pcmFormatStore, treeStore } from "../utils/stores.js";
 
 export function Preload() {
   const [theme] = themeStore.use();
