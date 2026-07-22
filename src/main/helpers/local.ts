@@ -1,5 +1,6 @@
 /** @format */
 
+import fs from "node:fs";
 import path from "node:path";
 import { api } from "../server";
 import { probe } from "../utils/probe";
@@ -34,6 +35,12 @@ export const extractAndSaveMetadata: API["extractAndSaveMetadata"] = async (flat
       ),
     ),
   );
+
+  const ids = Object.fromEntries(results.map(({ key }) => [key, true]));
+
+  for (const file of fs.readdirSync(directories.thumbnails))
+    !ids[file.replace(".jpg", "")] && fs.unlinkSync(path.resolve(directories.thumbnails, file));
+
   return results;
 };
 
