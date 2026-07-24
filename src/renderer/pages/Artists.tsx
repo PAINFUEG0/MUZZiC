@@ -8,8 +8,8 @@ import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { likedSongsStore, playerMethods, searchBox, treeStore } from "../utils/stores";
 
 export function Artists() {
   type Row = ArtistRow | TrackRow;
@@ -17,6 +17,7 @@ export function Artists() {
   type TrackRow = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> };
 
   const [data] = treeStore.use();
+  const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
@@ -66,7 +67,7 @@ export function Artists() {
         onLike={() =>
           setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))
         }
-        onClick={() => console.log({ current: index, queue: data })}
+        onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
     ),
     [liked],

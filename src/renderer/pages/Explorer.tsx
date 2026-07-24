@@ -11,10 +11,11 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/stores";
+import { treeStore, searchBox, likedSongsStore, needsRestart, playerMethods } from "../utils/stores";
 
 export function List() {
   const [tree] = treeStore.use();
+  const [methods] = playerMethods.use();
   const [rs, setRs] = needsRestart.use();
   const [path, setPath] = useState([tree]);
   const [query, setQuery] = searchBox.use();
@@ -75,7 +76,7 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
-              onClick={() => console.log({ current: index, queue: current.files })}
+              onClick={() => (methods.destroy(), methods.jumpTo(index - 1), methods.enqueue(current.files))}
               onLike={() =>
                 setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))
               }
