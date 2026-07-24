@@ -76,7 +76,11 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
-              onClick={() => (methods.destroy(), methods.jumpTo(index - 1), methods.enqueue(current.files))}
+              onClick={() => (
+                methods.destroy(),
+                methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)),
+                methods.enqueue(current.files)
+              )}
               onLike={() =>
                 setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))
               }

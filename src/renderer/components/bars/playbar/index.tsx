@@ -47,26 +47,22 @@ export function Playbar() {
                 Artist/s - {state.current?.artists.join(", ")}
               </div>
 
-              <div className="h-fit w-full min-w-0 flex-1 truncate text-[9px] font-medium">
-                <span className="opacity-80"> {state.current.resolution.bitrate ? "Bitrate is " : "Resolution is "}</span>
-                <span className="opacity-60">
-                  {state.current.resolution.bitrate
-                    ? `${state.current.resolution.bitrate / 1000} kbps`
-                    : `${state.current.resolution.bitDepth} bit - ${state.current.resolution.sampleRate / 1000} kHz`}
-                </span>
-                <span className="px-1">(</span>
-                <span className="text-(--accent-color)">
-                  {`${
-                    state.current.resolution.name === "DD"
-                      ? "Dolby Atmos"
-                      : state.current.resolution.name === "HR"
-                        ? "Hi-Res Lossless"
-                        : state.current.resolution.name === "CD"
-                          ? "CD Lossless"
-                          : "Lossy"
-                  }`}
-                </span>
-                <span className="px-1">)</span>
+              <div className="h-fit w-full min-w-0 flex-1 truncate text-[9px] font-light opacity-70">
+                <span className="">{state.current.path.split(".").at(-1)?.toUpperCase()}</span>
+                <span className="px-1">|</span>
+                <span className="">{state.current.resolution.bitDepth ? state.current.resolution.bitDepth + " bit" : "Bit depth N/A"}</span>
+                <span className="px-1">|</span>
+                <span className="">{state.current.resolution.sampleRate / 1000} kHz</span>
+                <span className="px-1">|</span>
+                <span className="">{Math.round(state.current.resolution.bitrate / 1000)} kbps</span>
+                <span className="px-1">|</span>
+                {state.current.resolution.name === "DD"
+                  ? "Dolby Atmos"
+                  : state.current.resolution.name === "HR"
+                    ? "Hi-Res Lossless"
+                    : state.current.resolution.name === "CD"
+                      ? "CD Lossless"
+                      : "Lossy"}
               </div>
             </div>
           ) : (
