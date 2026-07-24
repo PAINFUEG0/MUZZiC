@@ -106,9 +106,9 @@ export function Playbar() {
             <Slider
               min={0}
               step={1}
-              value={progress}
-              max={state.duration}
+              max={state.duration || 1}
               track={{ color: "#88888855" }}
+              value={state.duration ? progress : 0}
               thumb={{ height: "0.6rem", width: "0.2rem" }}
               onChange={(e) => methods.seekTo(Number(e.target.value))}
             />

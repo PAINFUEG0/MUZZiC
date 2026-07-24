@@ -6,7 +6,6 @@ import { playerQueue, playerIndex, playerMethods, playerState, playerProgress } 
 
 export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
-
   const component = <audio ref={audioRef} crossOrigin="anonymous" />;
 
   const [, setMethods] = playerMethods.use();
@@ -17,13 +16,6 @@ export default function Player() {
 
   const _queue = useRef(queue);
   const _progress = useRef(progress);
-
-  const play = useCallback(async (src: string) => {
-    audioRef.current!.src = "";
-    const res = await window.api.transcode(src);
-    audioRef.current!.src = res;
-    await audioRef.current!.play();
-  }, []);
 
   const pause = useCallback(() => audioRef.current!.pause(), []);
   const resume = useCallback(() => audioRef.current!.play(), []);
@@ -46,7 +38,7 @@ export default function Player() {
   }, []);
 
   const prev = useCallback(() => {
-    setState((_) => ({ ..._, duration: 0 }));
+    _progress.current < 10 && setState((_) => ({ ..._, duration: 0 }));
     _progress.current > 10 ? (audioRef.current!.currentTime = 0) : setIndex((i) => Math.max(0, i - 1));
   }, []);
 
@@ -70,18 +62,26 @@ export default function Player() {
 
   useEffect(() => void (_queue.current = queue), [queue]);
   useEffect(() => void (_progress.current = progress), [progress]);
-  useEffect(() => void (state.current && play(state.current.path)), [state.current?.path]);
+  useEffect(() => {
+    (async () => {
+      audioRef.current!.src = "";
+      if (!state.current?.path) return;
+      const res = await window.api.transcode(state.current?.path);
+      if (res) {
+        audioRef.current!.src = res;
+        await audioRef.current!.play();
+      }
+    })();
+  }, [state.current?.path]);
+
   useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);
-  useEffect(
-    () => setMethods({ play, pause, resume, clearQueue, enqueue, seekForward, seekBackward, seekTo, jumpTo, skip, prev, destroy }),
-    [],
-  );
+  useEffect(() => setMethods({ pause, resume, clearQueue, enqueue, seekForward, seekBackward, seekTo, jumpTo, skip, prev, destroy }), []);
 
   return component;
 }
 
 export interface PlayerMethods {
-  play: (src: string) => void;
+  // play: (src: string) => void;
   pause: () => void;
   resume: () => void;
   clearQueue: () => void;

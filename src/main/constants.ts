@@ -14,6 +14,7 @@ export const directories = {
   thumbnails: path.resolve(wd, "thumbnails"),
 };
 
+fs.existsSync(directories.temp) && fs.rmSync(directories.temp, { recursive: true, force: true });
 for (const directory of Object.values(directories)) if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
 
 export const bin = {

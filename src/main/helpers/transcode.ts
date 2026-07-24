@@ -17,23 +17,20 @@ export async function transcode(input: string) {
   const format = await getPcmFormat();
   const out = path.resolve(directories.temp, `${randomUUID()}.wav`);
 
-  const res = new Promise<string>((resolve, reject) => {
+  const res = await new Promise<string>((resolve) => {
     const args = ["-i", input, "-map", "0:a:0", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", format, out];
     child = spawn(bin.ffmpeg, args, { stdio: ["ignore", "ignore", "ignore"] });
 
-    child.on("error", () => {
-      child?.kill("SIGTERM");
-    });
+    child.on("error", resolve);
 
-    child.on("close", (code) => {
-      child?.kill("SIGTERM");
-      code !== 0
-        ? reject(new Error(`ffmpeg exited with code ${code}`))
-        : resolve("file:///" + encodeURIComponent(out.replace(/\\/g, "/")).replace(/%2F/g, "/"));
-    });
+    child.on("close", (code) =>
+      code !== 0 ? resolve("") : resolve("file:///" + encodeURIComponent(out.replace(/\\/g, "/")).replace(/%2F/g, "/")),
+    );
   });
 
-  last && (await rm(last, { force: true }).catch(() => null));
+  child?.kill("SIGKILL");
+  const toRemove = last;
+  toRemove && rm(toRemove, { force: true }).catch(() => setTimeout(() => rm(toRemove, { force: true }), 3000));
   last = out;
   return res;
 }
