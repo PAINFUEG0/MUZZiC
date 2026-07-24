@@ -28,18 +28,24 @@ export default function Player() {
   const seekTo = useCallback((time: number) => (audioRef.current!.currentTime = time), []);
 
   const jumpTo = useCallback((i: number) => {
-    setIndex(i);
     setState((_) => ({ ..._, duration: 0 }));
+    setIndex(i);
   }, []);
 
   const skip = useCallback(() => {
-    setState((_) => ({ ..._, duration: 0 }));
-    setIndex((i) => (i + 1 >= _queue.current.length ? i : i + 1));
+    setIndex((i) => {
+      if (i == _queue.current.length - 1) return i;
+      setState((_) => ({ ..._, duration: 0 }));
+      return i + 1;
+    });
   }, []);
 
   const prev = useCallback(() => {
-    _progress.current < 10 && setState((_) => ({ ..._, duration: 0 }));
-    _progress.current > 10 ? (audioRef.current!.currentTime = 0) : setIndex((i) => Math.max(0, i - 1));
+    setIndex((i) => {
+      if (_progress.current < 10 || i === 0) return (audioRef.current!.currentTime = 0);
+      setState((_) => ({ ..._, duration: 0 }));
+      return Math.max(0, i - 1);
+    });
   }, []);
 
   const destroy = useCallback(() => {
