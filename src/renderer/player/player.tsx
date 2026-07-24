@@ -20,7 +20,8 @@ export default function Player() {
 
   const play = useCallback(async (src: string) => {
     audioRef.current!.src = "";
-    audioRef.current!.src = await window.api.transcode(src);
+    const res = await window.api.transcode(src);
+    audioRef.current!.src = res;
     await audioRef.current!.play();
   }, []);
 
@@ -34,9 +35,20 @@ export default function Player() {
   const seekBackward = useCallback(() => (audioRef.current!.currentTime -= 10), []);
   const seekTo = useCallback((time: number) => (audioRef.current!.currentTime = time), []);
 
-  const jumpTo = useCallback((i: number) => setIndex(i), []);
-  const skip = useCallback(() => setIndex((i) => (i + 1 >= _queue.current.length ? i : i + 1)), []);
-  const prev = useCallback(() => (_progress.current > 10 ? (audioRef.current!.currentTime = 0) : setIndex((i) => Math.max(0, i - 1))), []);
+  const jumpTo = useCallback((i: number) => {
+    setIndex(i);
+    setState((_) => ({ ..._, duration: 0 }));
+  }, []);
+
+  const skip = useCallback(() => {
+    setState((_) => ({ ..._, duration: 0 }));
+    setIndex((i) => (i + 1 >= _queue.current.length ? i : i + 1));
+  }, []);
+
+  const prev = useCallback(() => {
+    setState((_) => ({ ..._, duration: 0 }));
+    _progress.current > 10 ? (audioRef.current!.currentTime = 0) : setIndex((i) => Math.max(0, i - 1));
+  }, []);
 
   const destroy = useCallback(() => {
     setIndex(0);
@@ -48,12 +60,12 @@ export default function Player() {
   }, []);
 
   useEffect(() => {
-    const _ = audioRef.current!;
-    _.addEventListener("ended", skip);
-    _.addEventListener("play", () => setState((s) => ({ ...s, isPlaying: true })));
-    _.addEventListener("pause", () => setState((s) => ({ ...s, isPlaying: false })));
-    _.addEventListener("timeupdate", () => setProgress(Math.floor(_.currentTime || 0)));
-    _.addEventListener("loadedmetadata", () => setState((s) => ({ ...s, duration: Math.floor(_.duration) })));
+    const __ = audioRef.current!;
+    __.addEventListener("ended", (setState((_) => ({ ..._, duration: 0 })), skip));
+    __.addEventListener("play", () => setState((_) => ({ ..._, isPlaying: true })));
+    __.addEventListener("pause", () => setState((_) => ({ ..._, isPlaying: false })));
+    __.addEventListener("timeupdate", () => setProgress(Math.floor(__.currentTime || 0)));
+    __.addEventListener("loadedmetadata", () => setState((_) => ({ ..._, duration: Math.floor(__.duration) })));
   }, []);
 
   useEffect(() => void (_queue.current = queue), [queue]);
