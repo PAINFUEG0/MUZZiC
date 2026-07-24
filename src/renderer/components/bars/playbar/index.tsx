@@ -5,7 +5,7 @@ import Slider from "../../utils/Slider";
 import { themeStore } from "../../../utils/themes";
 import { formatDuration, hexToRgba } from "../../../../shared/helpers";
 import { playerState, playerMethods, playerProgress, playerQueue, playerIndex } from "../../../utils/stores";
-import { LuExpand, LuFastForward, LuList, LuPause, LuPlay, LuShuffle, LuSkipBack, LuSkipForward } from "react-icons/lu";
+import { LuExpand, LuFastForward, LuList, LuLoaderCircle, LuPause, LuPlay, LuShuffle, LuSkipBack, LuSkipForward } from "react-icons/lu";
 
 export function Playbar() {
   const [theme] = themeStore.use();
@@ -34,12 +34,7 @@ export function Playbar() {
               children={<LuExpand />}
               className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl text-white/70 opacity-0 transition-opacity duration-300 hover:opacity-100"
             />
-            <img
-              ref={ref}
-              src={state.current?.thumb || "./logo.png"}
-              className="-z-1 h-full w-full object-contain"
-              style={{ filter: theme.type === "dark" ? "invert(100%)" : "" }}
-            />
+            <img ref={ref} src={state.current?.thumb || "./logo.png"} className="-z-1 h-full w-full object-contain" />
           </button>
 
           {state.current ? (
@@ -90,7 +85,9 @@ export function Playbar() {
               onClick={methods.seekBackward}
             />
             <LuSkipBack className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.prev} />
-            {state.current && state.isPlaying ? (
+            {state.current && !state.duration ? (
+              <LuLoaderCircle className="animate-spin" />
+            ) : state.current && state.isPlaying ? (
               <LuPause className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.pause} />
             ) : (
               <LuPlay className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.resume} />
