@@ -6,7 +6,7 @@ import { themes, themeStore } from "../utils/themes";
 import { useMask } from "../hooks/useMask";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { needsRestart, pcmFormatStore, treeStore } from "../utils/stores";
-import { Modal } from "../components/Modal";
+import { Modal } from "../components/utils/Modal";
 import { PiWaveformBold } from "react-icons/pi";
 import { LuInfo, LuLibrary } from "react-icons/lu";
 import { MdWarning } from "react-icons/md";

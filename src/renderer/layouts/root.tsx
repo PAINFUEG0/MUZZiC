@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Popup } from "../components/Popup";
-import { Modal } from "../components/Modal";
+import { Popup } from "../components/utils/Popup";
+import { Modal } from "../components/utils/Modal";
 import { Settings } from "../pages/Settings";
 import { Navbar } from "../components/bars/navbar";
 import { Sidebar } from "../components/bars/sidebar";
