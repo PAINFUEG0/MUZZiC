@@ -1,10 +1,11 @@
 /** @format */
 
+import Player from "../player/player.js";
 import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { themeStore } from "../utils/themes.js";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
-import { API, DirNode, MessagePayload, Track, Tree } from "../../shared/types";
+import { API, DirNode, MessagePayload, BaseTrack, Tree } from "../../shared/types";
 import { likedSongsStore, pcmFormatStore, treeStore } from "../utils/stores.js";
 
 export function Preload() {
@@ -120,13 +121,13 @@ export function Preload() {
       setFooter(`Indexed ${needsExtraction.length} files and removed index for ${needsDeletion.length} files`);
       await sleep(200);
 
-      const populateTreeWithMeta = (node: DirNode, metadata: { [K: string]: Track }) => {
+      const populateTreeWithMeta = (node: DirNode, metadata: { [K: string]: BaseTrack }) => {
         for (let i = 0; i < node.files.length; i++)
           (node.files[i] as any) = {
             ...node.files[i],
             ...metadata[node.files[i]!.id]!,
             thumb: `http://localhost:${port}/thumb/${node.files[i]!.id}`,
-          } satisfies Track;
+          } satisfies BaseTrack;
 
         node.dirs.forEach((e) => populateTreeWithMeta(e, metadata));
 
@@ -147,6 +148,7 @@ export function Preload() {
 
   return (
     <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
+      <Player />
       <img
         src={theme.background}
         style={{ filter: `blur(${theme.overall.blur})` }}
