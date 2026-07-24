@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { PopupItem } from "./PopupItem";
 import { AnimatePresence } from "framer-motion";
-import { popupStore } from "../utils/stores";
-import type { MessagePayload } from "../../shared/types";
+import { popupStore } from "../../utils/stores";
+import type { MessagePayload } from "../../../shared/types";
 
 export function Popup() {
   const [popups, setPopups] = popupStore.use();
