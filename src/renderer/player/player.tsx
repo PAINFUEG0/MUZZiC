@@ -42,7 +42,7 @@ export default function Player() {
 
   const prev = useCallback(() => {
     setIndex((i) => {
-      if (_progress.current < 10 || i === 0) return (audioRef.current!.currentTime = 0);
+      if (_progress.current > 10 || i === 0) return (audioRef.current!.currentTime = 0);
       setState((_) => ({ ..._, duration: 0 }));
       return Math.max(0, i - 1);
     });
