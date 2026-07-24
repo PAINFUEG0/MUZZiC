@@ -18,11 +18,12 @@ export type MessagePayload = Prettify<
   | { type: "PROGRESS"; current: number; total: number; data: string }
 >;
 
+export type Track = BaseTrack & DirNode["files"][number];
 export type File = { path: string; name: string; id: string };
+export type Tree = { name: string; path: string; files: Track[]; dirs: Tree[] };
 export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode[] };
-export type Tree = { name: string; path: string; files: (Track & DirNode["files"][number])[]; dirs: Tree[] };
 
-export type Track = {
+export type BaseTrack = {
   id: string;
   title: string;
   thumb: string;
@@ -69,14 +70,14 @@ export type API = {
   getTree: (K: string) => Promise<DirNode | null>;
   setTree: (K: string, V: DirNode) => Promise<DirNode>;
 
-  extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: Track }[]>;
+  extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
 
-  getAllMeta: () => Promise<{ [K: string]: Track }>;
+  getAllMeta: () => Promise<{ [K: string]: BaseTrack }>;
   deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;
-  getMeta: <T extends string | string[], R extends Track | null>(K: T) => Promise<T extends string ? R : R[]>;
-  setMeta: <T extends [string, Track] | [{ key: string; value: Track }[]], R extends Track>(
+  getMeta: <T extends string | string[], R extends BaseTrack | null>(K: T) => Promise<T extends string ? R : R[]>;
+  setMeta: <T extends [string, BaseTrack] | [{ key: string; value: BaseTrack }[]], R extends BaseTrack>(
     ...args: T
-  ) => Promise<T extends [string, Track] ? R : R[]>;
+  ) => Promise<T extends [string, BaseTrack] ? R : R[]>;
 
   getPcmFormat: () => Promise<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">;
   setPcmFormat: (format: "pcm_s16le" | "pcm_s24le" | "pcm_s32le") => Promise<void>;

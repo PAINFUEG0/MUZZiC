@@ -3,7 +3,7 @@
 import path from "node:path";
 import { bin } from "../constants";
 import { File } from "../../shared/types";
-import { Track } from "../../shared/types";
+import { BaseTrack } from "../../shared/types";
 import { spawn } from "node:child_process";
 
 const regex = /,|;| feat\.?| ft\.?| & /i;
@@ -18,7 +18,7 @@ export async function probe(file: File) {
   const codec = (stream?.codec_name || "").toLowerCase();
   const bitDepth = Number(stream?.bits_per_raw_sample || stream?.bits_per_sample || 0);
 
-  let resolution: Track["resolution"]["name"] = "CD";
+  let resolution: BaseTrack["resolution"]["name"] = "CD";
   if (codec === "ac3" || codec === "eac3") resolution = "DD";
   else if (codec === "mp3" || codec === "aac" || codec === "opus" || codec === "vorbis") resolution = "SR";
   else if (bitDepth > 16 || sampleRate > 44100) resolution = "HR";
@@ -37,7 +37,7 @@ export async function probe(file: File) {
     resolution: { name: resolution, bitDepth: bitDepth, sampleRate: sampleRate, bitrate: streamBitrate },
     lyrics: tags["LYRICS"] || tags["lyrics"] || tags["UNSYNCEDLYRICS"] || tags["lyrics-eng"] || "No lyrics found",
     explicit: ["1", "true", "yes", "explicit"].includes(String(tags.explicit || tags.ITUNESADVISORY || tags.EXPLICIT).toLowerCase()),
-  } satisfies Track;
+  } satisfies BaseTrack;
 }
 
 function ffprobe(path: string): Promise<string> {
