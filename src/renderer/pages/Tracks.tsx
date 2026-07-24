@@ -6,11 +6,12 @@ import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
 import { useRef, useMemo, useCallback } from "react";
 import { useVirtualList } from "../hooks/useVirtualList";
-import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
+import { likedSongsStore, playerMethods, searchBox, treeStore } from "../utils/stores";
 
 export function Tracks() {
   const [data] = treeStore.use();
   const [query] = searchBox.use();
+  const [methods] = playerMethods.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -31,7 +32,7 @@ export function Tracks() {
           key={tracks[index]!.id}
           end={index === tracks.length - 1}
           isLiked={liked.includes(tracks[index]!.id)}
-          onClick={() => console.log({ current: index, queue: tracks })}
+          onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
           onLike={() =>
             setLiked((liked) =>
               liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id],

@@ -1,7 +1,16 @@
 /** @format */
 
+import { PlayerMethods } from "../player/player";
 import { createGlobalStore } from "./createGlobalStore";
-import { PopupPayload, Tree } from "../../shared/types";
+import { PopupPayload, Track, Tree } from "../../shared/types";
+
+const _ = { volume: 100, duration: 0, loop: false, muted: false, shuffle: false, isPlaying: false, current: null as Track | null };
+
+export const playerState = createGlobalStore(_);
+export const playerIndex = createGlobalStore<number>(0);
+export const playerQueue = createGlobalStore<Track[]>([]);
+export const playerProgress = createGlobalStore<number>(0);
+export const playerMethods = createGlobalStore<PlayerMethods>({} as PlayerMethods);
 
 export const searchBox = createGlobalStore<string>("");
 export const treeStore = createGlobalStore<Tree>({} as Tree);

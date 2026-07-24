@@ -32,3 +32,9 @@ export async function safeAwait<T, E extends Error>(promiseLike: Promise<T>) {
 export function chunk<T>(arr: T[], size: number) {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, (i + 1) * size));
 }
+
+export function formatDuration(duration: number) {
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+  return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+}
