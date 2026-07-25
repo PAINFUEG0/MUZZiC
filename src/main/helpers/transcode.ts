@@ -2,32 +2,40 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { once } from "node:events";
 import { spawn } from "child_process";
+import { settings } from "../database";
 import { randomUUID } from "node:crypto";
-import { getPcmFormat } from "./settings";
 import { directories, bin } from "../constants";
-import type { ChildProcessByStdio } from "node:child_process";
+import { ChildProcessByStdio } from "node:child_process";
 
-let last = "";
+let transcoded: string[] = [];
 let child: ChildProcessByStdio<null, null, null> | undefined;
 
 export async function transcode(input: string) {
   if (child && !child.killed) child.kill("SIGKILL");
-  fs.promises.rm(last, { force: true }).catch(() => null);
 
-  const format = await getPcmFormat();
   const out = path.resolve(directories.temp, `${randomUUID()}.wav`);
+  const format = (settings.get("pcmFormat") || "pcm_s16le") as string;
 
-  const res = await new Promise<string>((resolve) => {
-    const args = ["-i", input, "-map", "0:a:0", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", format, out];
-    const proc = spawn(bin.ffmpeg, args, { stdio: ["ignore", "ignore", "ignore"] });
-    child = proc;
-    proc.on("error", resolve);
-    proc.on("close", (code) =>
-      code !== 0 ? resolve("") : resolve("file:///" + encodeURIComponent(out.replace(/\\/g, "/")).replace(/%2F/g, "/")),
-    );
-  });
+  transcoded.push(out);
 
-  last = out;
-  return res;
+  const args = ["-i", input, "-map", "0:a:0", "-map_metadata", "-1", "-map_chapters", "-1", "-c:a", format, out];
+  const proc = spawn(bin.ffmpeg.path, args, { stdio: ["ignore", "ignore", "ignore"] });
+  child = proc;
+
+  const result = await Promise.race([once(proc, "close").then(() => proc.exitCode), once(proc, "error").then(() => "X")]);
+
+  if (result !== 0) return "";
+  return "file:///" + encodeURIComponent(out.replace(/\\/g, "/")).replace(/%2F/g, "/");
 }
+
+setInterval(async () => {
+  for (let i = 0; i < transcoded.length - 1; i++)
+    await fs.promises
+      .rm(transcoded[i]!, { force: true })
+      .then(() => (transcoded[i] = ""))
+      .catch(() => null);
+
+  transcoded = transcoded.filter((t) => !!t);
+}, 10_000);

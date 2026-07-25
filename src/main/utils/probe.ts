@@ -54,7 +54,7 @@ function ffprobe(path: string): Promise<string> {
 
     let stdout = "";
     let stderr = "";
-    const child = spawn(bin.ffprobe, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(bin.ffprobe.path, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     child.on("error", reject);
     child.stdout.on("data", (chunk) => (stdout += chunk.toString()));

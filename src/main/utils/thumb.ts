@@ -9,7 +9,7 @@ export async function thumb(source: string, dest: string) {
 
     let stdout = "";
     let stderr = "";
-    const child = spawn(bin.ffmpeg, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(bin.ffmpeg.path, args, { stdio: ["ignore", "pipe", "pipe"] });
 
     child.on("error", reject);
     child.stdout.on("data", (chunk) => (stdout += chunk.toString()));

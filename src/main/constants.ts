@@ -19,13 +19,18 @@ fs.existsSync(directories.temp) &&
 for (const directory of Object.values(directories)) if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
 
 export const bin = {
-  dlp: path.resolve(directories.bin, WIN32 ? "yt-dlp.exe" : "yt-dlp"),
-  ffmpeg: path.resolve(directories.bin, WIN32 ? "ffmpeg.exe" : "ffmpeg"),
-  ffprobe: path.resolve(directories.bin, WIN32 ? "ffprobe.exe" : "ffprobe"),
+  dlp: {
+    path: path.resolve(directories.bin, WIN32 ? "yt-dlp.exe" : "yt-dlp"),
+    remoteResourceURI: `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${WIN32 ? ".exe" : ""}`,
+  },
+  ffmpeg: {
+    path: path.resolve(directories.bin, WIN32 ? "ffmpeg.exe" : "ffmpeg"),
+    remoteResourceURI: `https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-${process.platform}-${process.arch}`,
+  },
+  ffprobe: {
+    path: path.resolve(directories.bin, WIN32 ? "ffprobe.exe" : "ffprobe"),
+    remoteResourceURI: `https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffprobe-${process.platform}-${process.arch}`,
+  },
 };
-
-export const DLP_BIN_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${WIN32 ? ".exe" : ""}`;
-export const FFMPEG_BIN_URL = `http://ffmpeg.execaman.xyz/ffmpeg-${process.platform}-${process.arch}`;
-export const FFPROBE_BIN_URL = `http://ffmpeg.execaman.xyz/ffprobe-${process.platform}-${process.arch}`;
 
 export const AUDIO_EXTENSIONS = new Set([".mp3", ".wav", ".ogg", ".flac", ".m4a", ".aac", ".opus", ".webm"]);
