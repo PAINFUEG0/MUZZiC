@@ -38,3 +38,12 @@ export function formatDuration(duration: number) {
   const seconds = Math.floor(duration % 60);
   return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
 }
+
+export function gainToDb(gain: number): number {
+  if (gain <= 0) return -Infinity;
+  return 20 * Math.log10(gain);
+}
+
+export function dbToGain(db: number): number {
+  return Math.pow(10, db / 20);
+}

@@ -33,7 +33,7 @@ const component = forwardRef<HTMLInputElement, Props>(
         style={
           {
             "--track-h": track?.height || "3px",
-            "--track-color": track?.color || "#505050",
+            "--track-color": track?.color || "#88888855",
 
             "--thumb-w": thumb?.width || "10px",
             "--thumb-h": thumb?.height || "10px",

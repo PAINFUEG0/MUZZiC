@@ -1,21 +1,26 @@
 /** @format */
 
+import { AudioGraph } from "./graph";
 import { Track } from "../../shared/types";
 import { useCallback, useEffect, useRef } from "react";
-import { playerQueue, playerIndex, playerMethods, playerState, playerProgress } from "../utils/stores";
+import { playerQueue, playerIndex, playerMethods, playerState, playerProgress, playerEffects } from "../utils/stores";
 
 export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const component = <audio ref={audioRef} crossOrigin="anonymous" />;
 
+  const [, setFX] = playerEffects.use();
   const [, setMethods] = playerMethods.use();
   const [queue, setQueue] = playerQueue.use();
   const [index, setIndex] = playerIndex.use();
   const [state, setState] = playerState.use();
   const [progress, setProgress] = playerProgress.use();
 
+  const _state = useRef(state);
   const _queue = useRef(queue);
   const _progress = useRef(progress);
+
+  const { initializeAudioGraph } = AudioGraph({ audioRef });
 
   const pause = useCallback(() => audioRef.current!.pause(), []);
   const resume = useCallback(() => audioRef.current!.play(), []);
@@ -57,8 +62,40 @@ export default function Player() {
     setState((s) => ({ ...s, isPlaying: false, duration: 0, current: null }));
   }, []);
 
+  useEffect(() => void (_state.current = state), [state]);
+  useEffect(() => void (_queue.current = queue), [queue]);
+  useEffect(() => void (_progress.current = progress), [progress]);
+
   useEffect(() => {
+    initializeAudioGraph();
+
     const __ = audioRef.current!;
+
+    if (!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.setActionHandler("play", resume);
+    navigator.mediaSession.setActionHandler("pause", pause);
+    navigator.mediaSession.setActionHandler("nexttrack", skip);
+    navigator.mediaSession.setActionHandler("previoustrack", prev);
+
+    window.addEventListener("keydown", (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
+
+      const key = e.code;
+
+      const keybinds: Record<string, () => void> = {
+        ArrowLeft: seekBackward,
+        ArrowRight: seekForward,
+        KeyM: () => setFX((_) => ({ ..._, muted: !_.muted })),
+        Space: () => (e.preventDefault(), _state.current.isPlaying ? pause() : resume()),
+        ArrowUp: () => (e.preventDefault(), setFX((_) => ({ ..._, volume: Math.min(100, _.volume + 5) }))),
+        ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, volume: Math.max(0, _.volume - 5) }))),
+      };
+
+      key in keybinds && keybinds[key]!();
+    });
+
     __.addEventListener("ended", (setState((_) => ({ ..._, duration: 0 })), skip));
     __.addEventListener("play", () => setState((_) => ({ ..._, isPlaying: true })));
     __.addEventListener("pause", () => setState((_) => ({ ..._, isPlaying: false })));
@@ -66,37 +103,15 @@ export default function Player() {
     __.addEventListener("loadedmetadata", () => setState((_) => ({ ..._, duration: Math.floor(__.duration) })));
   }, []);
 
-  useEffect(() => void (_queue.current = queue), [queue]);
-  useEffect(() => void (_progress.current = progress), [progress]);
+  useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);
+
   useEffect(() => {
-    (async () => {
-      audioRef.current!.src = "";
-      if (!state.current?.path) return;
-      const res = await window.api.transcode(state.current?.path);
-      if (res) {
-        audioRef.current!.src = res;
-        await audioRef.current!.play();
-      }
-    })();
+    audioRef.current!.src = "";
+    if (!state.current?.path) return;
+    window.api.transcode(state.current?.path).then((res) => void (res && ((audioRef.current!.src = res), audioRef.current!.play())));
   }, [state.current?.path]);
 
-  useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);
   useEffect(() => setMethods({ pause, resume, clearQueue, enqueue, seekForward, seekBackward, seekTo, jumpTo, skip, prev, destroy }), []);
 
   return component;
-}
-
-export interface PlayerMethods {
-  // play: (src: string) => void;
-  pause: () => void;
-  resume: () => void;
-  clearQueue: () => void;
-  enqueue: (track: Track[]) => void;
-  seekForward: () => void;
-  seekBackward: () => void;
-  seekTo: (time: number) => void;
-  jumpTo: (i: number) => void;
-  skip: () => void;
-  prev: () => void;
-  destroy: () => void;
 }

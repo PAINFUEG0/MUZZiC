@@ -1,19 +1,24 @@
 /** @format */
 
+import Volume from "./Volume";
 import { useRef } from "react";
+import * as LU from "react-icons/lu";
 import Slider from "../../utils/Slider";
+import { SiDolby } from "react-icons/si";
+import * as stores from "../../../utils/stores";
 import { themeStore } from "../../../utils/themes";
+import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { formatDuration, hexToRgba } from "../../../../shared/helpers";
-import { playerState, playerMethods, playerProgress, playerQueue, playerIndex } from "../../../utils/stores";
-import { LuExpand, LuFastForward, LuList, LuLoaderCircle, LuPause, LuPlay, LuShuffle, LuSkipBack, LuSkipForward } from "react-icons/lu";
 
 export function Playbar() {
   const [theme] = themeStore.use();
-  const [state] = playerState.use();
-  const [index] = playerIndex.use();
-  const [methods] = playerMethods.use();
-  const [, setQueue] = playerQueue.use();
-  const [progress] = playerProgress.use();
+  const [state] = stores.playerState.use();
+  const [index] = stores.playerIndex.use();
+  const [methods] = stores.playerMethods.use();
+  const [, setQueue] = stores.playerQueue.use();
+  const [progress] = stores.playerProgress.use();
+  const [fx, setFx] = stores.playerEffects.use();
+  const [liked, setLiked] = stores.likedSongsStore.use();
 
   const ref = useRef<HTMLImageElement>(null);
 
@@ -31,7 +36,7 @@ export function Playbar() {
         <div className="flex h-20 w-full min-w-0 flex-row gap-3 p-2">
           <button className="relative flex aspect-square h-full shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md transition-all duration-100 active:scale-95">
             <div
-              children={<LuExpand />}
+              children={<LU.LuExpand />}
               className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl text-white/70 opacity-0 transition-opacity duration-300 hover:opacity-100"
             />
             <img ref={ref} src={state.current?.thumb || "./logo.png"} className="-z-1 h-full w-full object-contain" />
@@ -75,22 +80,22 @@ export function Playbar() {
 
         <div className="flex h-full w-full flex-col items-center justify-center gap-3">
           <div className="mt-2 flex w-full flex-row items-center justify-center gap-5">
-            <LuList className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={() => {}} />
-            <LuFastForward
+            <LU.LuList className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={() => {}} />
+            <LU.LuFastForward
               className="rotate-180 cursor-pointer p-px hover:text-(--accent-color) active:scale-85"
               onClick={methods.seekBackward}
             />
-            <LuSkipBack className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.prev} />
+            <LU.LuSkipBack className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.prev} />
             {state.current && !state.duration ? (
-              <LuLoaderCircle className="animate-spin" />
+              <LU.LuLoaderCircle className="animate-spin" />
             ) : state.current && state.isPlaying ? (
-              <LuPause className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.pause} />
+              <LU.LuPause className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.pause} />
             ) : (
-              <LuPlay className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.resume} />
+              <LU.LuPlay className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.resume} />
             )}
-            <LuSkipForward className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.skip} />
-            <LuFastForward className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.seekForward} />
-            <LuShuffle
+            <LU.LuSkipForward className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.skip} />
+            <LU.LuFastForward className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" onClick={methods.seekForward} />
+            <LU.LuShuffle
               className="cursor-pointer p-px text-[15px] hover:text-(--accent-color) active:scale-85"
               onClick={() => setQueue((q) => [...q.slice(0, index + 1), ...q.slice(index + 2).sort(() => Math.random() - 0.5)])}
             />
@@ -103,13 +108,39 @@ export function Playbar() {
               min={0}
               step={1}
               max={state.duration || 1}
-              track={{ color: "#88888855" }}
               value={state.duration ? progress : 0}
               thumb={{ height: "0.6rem", width: "0.2rem" }}
               onChange={(e) => methods.seekTo(Number(e.target.value))}
             />
 
             <div className="text-nowrap">{formatDuration(state.duration)}</div>
+          </div>
+        </div>
+
+        <div className="flex h-full w-full flex-row items-center justify-between gap-2">
+          <div className="flex w-full flex-row items-center justify-between px-10">
+            <div className="flex w-full flex-row items-center justify-center gap-5">
+              <SiDolby
+                className={"cursor-pointer hover:text-(--accent-color) active:scale-85 " + (fx.crossfeed ? "text-(--accent-color)" : "")}
+                onClick={() => setFx((s) => ({ ...s, crossfeed: !s.crossfeed }))}
+              />
+              {state.current && liked.includes(state.current.id) ? (
+                <RiHeartFill
+                  className="cursor-pointer text-lg text-(--accent-color) active:scale-85"
+                  onClick={() => setLiked((liked) => liked.filter((e) => e !== state.current!.id))}
+                />
+              ) : (
+                <RiHeartLine
+                  className="cursor-pointer text-lg hover:text-(--accent-color) active:scale-85"
+                  onClick={() => setLiked((liked) => [...liked, state.current!.id])}
+                />
+              )}
+
+              <LU.LuCircleGauge className="cursor-pointer hover:text-(--accent-color) active:scale-85" onClick={() => {}} />
+              <LU.LuSlidersVertical className="cursor-pointer hover:text-(--accent-color) active:scale-85" onClick={() => {}} />
+            </div>
+
+            <Volume />
           </div>
         </div>
       </div>
