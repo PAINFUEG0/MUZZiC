@@ -129,16 +129,26 @@ export function List() {
           />
         </div>
 
-        <div className="flex w-full flex-row gap-2">
-          {path.map((dir, i) => (
-            <span key={i} className="flex items-center gap-1 text-sm font-medium">
-              <span className="cursor-pointer hover:underline" onClick={() => goBack(path.slice(0, i + 1))}>
-                {dir.name.charAt(0).toUpperCase() + dir.name.slice(1)}
-              </span>
+        <div className="flex w-full flex-row gap-1 text-sm font-medium">
+          {path.length === 1
+            ? tree.path
+                .replaceAll("\\", "/")
+                .split("/")
+                .map((dir, i, arr) => (
+                  <span key={i} className="flex items-center gap-1">
+                    <span>{dir.charAt(0).toUpperCase() + dir.slice(1)}</span>
+                    {i < arr.length - 1 && <span className="mx-1">/</span>}
+                  </span>
+                ))
+            : path.map((dir, i) => (
+                <span key={i} className="flex items-center gap-1">
+                  <span className="cursor-pointer hover:underline" onClick={() => goBack(path.slice(0, i + 1))}>
+                    {dir.name.charAt(0).toUpperCase() + dir.name.slice(1)}
+                  </span>
 
-              {i < path.length - 1 && <span className="ml-1">/</span>}
-            </span>
-          ))}
+                  {i < path.length - 1 && <span className="mx-1">/</span>}
+                </span>
+              ))}
         </div>
       </div>
 

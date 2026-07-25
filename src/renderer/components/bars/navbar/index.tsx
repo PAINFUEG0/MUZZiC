@@ -1,5 +1,6 @@
 /** @format */
 
+import useVU from "../../../player/VU";
 import { IoMdClose } from "react-icons/io";
 import { themeStore } from "../../../utils/themes";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,58 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const { VUL, VUR } = useVU();
+  const dbfsToLevel = (dbfs: number) => Math.min(100, Math.max(0, ((60 + dbfs) * 3) / 1.8));
+
+  function VUMeter({ dbfs }: { dbfs: number }) {
+    const level = dbfsToLevel(dbfs);
+
+    const ORANGEZONE_START = dbfsToLevel(-8);
+    const REDZONE_START = dbfsToLevel(-5);
+
+    const litNormal = Math.min(level, ORANGEZONE_START);
+    const litOrangeEnd = Math.max(Math.min(level, REDZONE_START), ORANGEZONE_START);
+    const litRedEnd = Math.max(level, REDZONE_START);
+
+    const orangeLit = level > ORANGEZONE_START;
+    const redLit = level > REDZONE_START;
+
+    const accentLit = "var(--accent-color)";
+    const accentDim = "color-mix(in srgb, var(--accent-color) 25%, transparent)";
+    const orangeLitColor = "var(--warning-color, #fd974e)";
+    const orangeDimColor = "color-mix(in srgb, var(--warning-color, #fd974e) 25%, transparent)";
+    const redLitColor = "var(--danger-color, #ef4444)";
+    const redDimColor = "color-mix(in srgb, var(--danger-color, #ef4444) 25%, transparent)";
+
+    return (
+      <div
+        className="flex h-2 w-full"
+        style={
+          {
+            "--level": `${level}%`,
+            background: `linear-gradient(
+            to right,
+            ${accentLit} 0%,
+            ${accentLit} ${litNormal}%,
+            ${accentDim} ${litNormal}%,
+            ${accentDim} ${ORANGEZONE_START}%,
+            ${orangeLit ? orangeLitColor : orangeDimColor} ${ORANGEZONE_START}%,
+            ${orangeLit ? orangeLitColor : orangeDimColor} ${litOrangeEnd}%,
+            ${orangeDimColor} ${litOrangeEnd}%,
+            ${orangeDimColor} ${REDZONE_START}%,
+            ${redLit ? redLitColor : redDimColor} ${REDZONE_START}%,
+            ${redLit ? redLitColor : redDimColor} ${litRedEnd}%,
+            ${redDimColor} ${litRedEnd}%,
+            ${redDimColor} 100%
+          )`,
+            maskImage: "repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 3px)",
+            WebkitMaskImage: "repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 3px)",
+          } as React.CSSProperties
+        }
+      />
+    );
+  }
+
   return (
     <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3">
       <div
@@ -32,11 +85,23 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
         }}
       />
 
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="aspect-square h-fit w-fit text-xl text-(--accent-color)"
-        children={sidebarOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
-      />
+      <div className="flex w-full flex-col">
+        <div className="flex w-full flex-row items-center">
+          <div className="w-5 shrink-0 px-2 text-[8px] text-nowrap opacity-80">L</div>
+          <VUMeter dbfs={VUL} />
+          <div className="w-fit min-w-0 shrink px-2 text-[8px] text-nowrap opacity-80">
+            {"- " + (VUL * -1).toFixed(2).padStart(5, "0")} dBFS
+          </div>
+        </div>
+
+        <div className="flex w-full flex-row items-center">
+          <div className="w-5 shrink-0 px-2 text-[8px] text-nowrap opacity-80">R</div>
+          <VUMeter dbfs={VUR} />
+          <div className="w-fit min-w-0 shrink px-2 text-[8px] text-nowrap opacity-80">
+            {"- " + (VUR * -1).toFixed(2).padStart(5, "0")} dBFS
+          </div>
+        </div>
+      </div>
 
       <div className="flex h-full w-full items-center justify-end gap-3">
         <div className="mx-5 flex h-full w-full" style={{ WebkitAppRegion: "drag" } as any} />
@@ -85,6 +150,10 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
             )}
 
             {[
+              {
+                Icon: sidebarOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />,
+                onclick: () => setSidebarOpen(!sidebarOpen),
+              },
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
               { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
               { Icon: <IoMdClose />, onclick: () => window.api.close() },
@@ -101,4 +170,11 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
       </div>
     </div>
   );
+}
+
+{
+  /* <button
+        onClick={() => }
+        className="aspect-square h-fit w-fit text-xl text-(--accent-color)"
+        children={ */
 }
