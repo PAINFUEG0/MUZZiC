@@ -3,6 +3,9 @@
 import { analyzersNodes } from "../utils/stores";
 import { useRef, useEffect, RefObject, useState } from "react";
 
+const TARGET_FPS = 30;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
 export default function useVU() {
   const smoothedL = useRef(-60);
   const smoothedR = useRef(-60);
@@ -14,32 +17,46 @@ export default function useVU() {
   const [VUO, setVUO] = useState(0);
 
   useEffect(() => {
-    const DBFS = (analyser: AnalyserNode, smoothed: RefObject<number>) => {
-      const bufferLength = analyser.fftSize;
-      const dataArray = new Float32Array(bufferLength);
-      analyser.getFloatTimeDomainData(dataArray);
+    if (!analyser.left || !analyser.right || !analyser.overall) return;
+
+    const bufL = new Float32Array(analyser.left.fftSize);
+    const bufR = new Float32Array(analyser.right.fftSize);
+    const bufT = new Float32Array(analyser.overall.fftSize);
+
+    const DBFS = (node: AnalyserNode, buf: Float32Array, smoothed: RefObject<number>) => {
+      node.getFloatTimeDomainData(buf as any);
 
       let sum = 0;
       const attack = 0.9;
       const release = 0.2;
-      for (let i = 0; i < bufferLength; i++) sum += dataArray[i]! * dataArray[i]!;
+      for (let i = 0; i < buf.length; i++) sum += buf[i]! * buf[i]!;
 
-      const rms = Math.sqrt(sum / bufferLength);
+      const rms = Math.sqrt(sum / buf.length);
       const db = 20 * Math.log10(rms);
 
-      const delta = Math.max(db ?? -60, -60) - smoothed.current;
+      const delta = Math.max(Number.isFinite(db) ? db : -60, -60) - smoothed.current;
       smoothed.current += delta * (delta > 0 ? attack : release);
       return smoothed.current;
     };
 
-    const id = setInterval(() => {
-      setVUL(DBFS(analyser.left, smoothedL));
-      setVUR(DBFS(analyser.right, smoothedR));
-      setVUO(DBFS(analyser.overall, smoothedT));
-    }, 1000 / 120);
+    let rafId: number;
+    let lastTick = 0;
 
-    return () => clearInterval(id);
-  }, [analyser.overall]);
+    const tick = (now: number) => {
+      rafId = requestAnimationFrame(tick);
+
+      if (now - lastTick < FRAME_INTERVAL) return;
+      lastTick = now;
+
+      setVUL(DBFS(analyser.left, bufL, smoothedL));
+      setVUR(DBFS(analyser.right, bufR, smoothedR));
+      setVUO(DBFS(analyser.overall, bufT, smoothedT));
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(rafId);
+  }, [analyser.left, analyser.right, analyser.overall]);
 
   return { VUL, VUR, VUO };
 }
