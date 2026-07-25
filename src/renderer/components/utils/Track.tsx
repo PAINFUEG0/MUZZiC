@@ -19,7 +19,7 @@ type Props = {
 export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike }: Props) => (
   <div
     className={
-      `flex h-fit w-full flex-col border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
+      `flex h-fit w-full flex-col border-(--border-color)/20 bg-(--hover-color)/5 px-5 ` +
       `${
         initial && end
           ? "rounded-md border-2 pt-5 pb-5"
