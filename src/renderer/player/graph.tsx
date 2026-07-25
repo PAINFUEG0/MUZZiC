@@ -48,11 +48,6 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
     VOL.current.gain.value = FX.muted ? 0 : Math.pow(FX.volume / 100, 2);
   }, [FX.volume, FX.muted]);
 
-  useEffect(
-    () => setAnalyzer({ left: analyserLeft.current!, right: analyserRight.current!, overall: analyserOverall.current! }),
-    [analyserLeft.current, analyserRight.current, analyserOverall.current],
-  );
-
   function initializeAudioGraph() {
     ctx.current = new AudioContext({ latencyHint: "interactive" });
     source.current = ctx.current.createMediaElementSource(audioRef.current!);
@@ -80,6 +75,8 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 
     VOL.current.connect(analyserOverall.current);
     analyserOverall.current.connect(ctx.current.destination);
+
+    setAnalyzer({ left: analyserLeft.current!, right: analyserRight.current!, overall: analyserOverall.current! });
   }
 
   return { initializeAudioGraph };
