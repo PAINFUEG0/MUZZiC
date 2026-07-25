@@ -4,11 +4,12 @@ import Volume from "./Volume";
 import { useRef } from "react";
 import * as LU from "react-icons/lu";
 import Slider from "../../utils/Slider";
-import { SiDolby } from "react-icons/si";
 import * as stores from "../../../utils/stores";
 import { themeStore } from "../../../utils/themes";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { formatDuration, hexToRgba } from "../../../../shared/helpers";
+import { SiDolby } from "react-icons/si";
+import { TbBrandDolbyDigital } from "react-icons/tb";
 
 export function Playbar() {
   const [theme] = themeStore.use();
@@ -120,10 +121,17 @@ export function Playbar() {
         <div className="flex h-full w-full flex-row items-center justify-between gap-2">
           <div className="flex w-full flex-row items-center justify-between px-10">
             <div className="flex w-full flex-row items-center justify-center gap-5">
-              <SiDolby
-                className={"cursor-pointer hover:text-(--accent-color) active:scale-85 " + (fx.crossfeed ? "text-(--accent-color)" : "")}
-                onClick={() => setFx((s) => ({ ...s, crossfeed: !s.crossfeed }))}
-              />
+              {fx.crossfeed ? (
+                <SiDolby
+                  className="m-0.5 cursor-pointer text-(--accent-color) active:scale-85"
+                  onClick={() => setFx((s) => ({ ...s, crossfeed: false }))}
+                />
+              ) : (
+                <TbBrandDolbyDigital
+                  className="cursor-pointer text-xl hover:text-(--accent-color) active:scale-85"
+                  onClick={() => setFx((s) => ({ ...s, crossfeed: true }))}
+                />
+              )}
               {state.current && liked.includes(state.current.id) ? (
                 <RiHeartFill
                   className="cursor-pointer text-lg text-(--accent-color) active:scale-85"

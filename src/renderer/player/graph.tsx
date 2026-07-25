@@ -38,6 +38,7 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 
   useEffect(() => {
     if (!CF.current) return;
+    localStorage.setItem("crossfeed", FX.crossfeed.toString());
     CF.current.cross.left.gain.value = CF.current.cross.right.gain.value = FX.crossfeed ? 0.5 : 0;
   }, [FX.crossfeed]);
 
