@@ -3,14 +3,14 @@
 import Volume from "./Volume";
 import { useRef } from "react";
 import * as LU from "react-icons/lu";
-import Slider from "../../utils/Slider";
+import Slider from "../utils/Slider";
 import { SiDolby } from "react-icons/si";
-import { themeStore } from "../../../utils/themes";
+import { themeStore } from "../../utils/themes";
 import { TbBrandDolbyDigital } from "react-icons/tb";
-import { likedSongsStore } from "../../../utils/stores";
+import { likedSongsStore } from "../../utils/stores";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
-import { formatDuration, hexToRgba } from "../../../../shared/helpers";
-import { playerState, playerIndex, playerMethods, playerQueue, playerProgress, playerEffects } from "../../../player";
+import { formatDuration, hexToRgba } from "../../../shared/helpers";
+import { playerState, playerIndex, playerMethods, playerQueue, playerProgress, playerEffects } from "../../player";
 
 export function Playbar() {
   const [theme] = themeStore.use();

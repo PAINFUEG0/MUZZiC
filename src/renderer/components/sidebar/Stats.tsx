@@ -1,9 +1,9 @@
 /** @format */
 
-import { MiniChart } from "../../charts/Line";
-import { themeStore } from "../../../utils/themes";
+import { MiniChart } from "../charts/Line";
+import { themeStore } from "../../utils/themes";
 import { useState, useEffect, useMemo } from "react";
-import { DoughnutChart } from "../../charts/Doughnut";
+import { DoughnutChart } from "../charts/Doughnut";
 
 export function Stats() {
   const count = 30;

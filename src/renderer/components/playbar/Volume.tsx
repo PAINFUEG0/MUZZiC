@@ -1,7 +1,7 @@
 /** @format */
 
-import Slider from "../../utils/Slider";
-import { playerEffects } from "../../../player";
+import Slider from "../utils/Slider";
+import { playerEffects } from "../../player";
 import { LuVolumeOff, LuVolume, LuVolume1, LuVolume2 } from "react-icons/lu";
 
 export default function Volume() {

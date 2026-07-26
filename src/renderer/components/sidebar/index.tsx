@@ -4,8 +4,8 @@ import { Head } from "./Head";
 import { Body } from "./Body";
 import { Tail } from "./Tail";
 import { motion } from "framer-motion";
-import { themeStore } from "../../../utils/themes";
-import { hexToRgba } from "../../../../shared/helpers";
+import { themeStore } from "../../utils/themes";
+import { hexToRgba } from "../../../shared/helpers";
 
 export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean; setSettingsOpen: (arg: boolean) => void }) {
   const [theme] = themeStore.use();

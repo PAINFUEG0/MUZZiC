@@ -1,11 +1,11 @@
 /** @format */
 
 import { IoMdClose } from "react-icons/io";
-import useVU from "../../../player/volumeUnit";
-import { themeStore } from "../../../utils/themes";
+import useVU from "../../player/volumeUnit";
+import { themeStore } from "../../utils/themes";
 import { useEffect, useRef, useState } from "react";
-import { hexToRgba } from "../../../../shared/helpers";
-import { needsRestart, searchBox } from "../../../utils/stores";
+import { hexToRgba } from "../../../shared/helpers";
+import { needsRestart, searchBox } from "../../utils/stores";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch, TbX } from "react-icons/tb";
 
