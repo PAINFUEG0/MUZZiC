@@ -36,13 +36,11 @@ export const extractAndSaveMetadata: API["extractAndSaveMetadata"] = async (flat
     ),
   );
 
-  const ids = Object.fromEntries(results.map(({ key }) => [key, true]));
-
-  for (const file of fs.readdirSync(directories.thumbnails))
-    !ids[file.replace(".jpg", "")] && fs.unlinkSync(path.resolve(directories.thumbnails, file));
-
   return results;
 };
+
+export const deleteThumbnails = async (ids: string[]) =>
+  ids.forEach((id) => fs.unlinkSync(path.resolve(directories.thumbnails, `${id}.jpg`)));
 
 export const getAllMeta: API["getAllMeta"] = async () => meta.all();
 export const setMeta: API["setMeta"] = async (...args) =>

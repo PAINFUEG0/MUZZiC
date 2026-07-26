@@ -40,6 +40,7 @@ export function registerHandles(win: eˉ.BrowserWindow) {
 
     scan: (_: eˉ.IpcMainInvokeEvent, ...args) => local.scan(...args),
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
+    deleteThumbnails: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteThumbnails(...args),
     extractAndSaveMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractAndSaveMetadata(...args),
 
     close: () => Promise.resolve(eˉ.app.quit()),

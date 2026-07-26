@@ -5,8 +5,8 @@ import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { themeStore } from "../utils/themes.js";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
-import { API, DirNode, MessagePayload, BaseTrack, Tree } from "../../shared/types";
 import { likedSongsStore, pcmFormatStore, treeStore } from "../utils/stores.js";
+import { API, DirNode, MessagePayload, BaseTrack, Tree } from "../../shared/types";
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -114,12 +114,15 @@ export function Preload() {
         ws.onmessage = null;
       }
 
-      if (needsDeletion.length) await window.api.deleteMeta(needsDeletion);
-
       setProgress(90);
+      setTask(`Cleaning up residual data and files`);
+      needsDeletion.length && (await window.api.deleteMeta(needsDeletion));
+      needsDeletion.length && (await window.api.deleteThumbnails(needsDeletion));
+
+      setProgress(95);
       setTask(`Syncing changes and generating tree`);
       setFooter(`Indexed ${needsExtraction.length} files and removed index for ${needsDeletion.length} files`);
-      await sleep(200);
+      await sleep(100);
 
       const populateTreeWithMeta = (node: DirNode, metadata: { [K: string]: BaseTrack }) => {
         for (let i = 0; i < node.files.length; i++)
