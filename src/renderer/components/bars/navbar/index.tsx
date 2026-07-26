@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { hexToRgba } from "../../../../shared/helpers";
 import { needsRestart, searchBox } from "../../../utils/stores";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch } from "react-icons/tb";
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch, TbX } from "react-icons/tb";
 
 export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
   const [rs] = needsRestart.use();
@@ -85,6 +85,12 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
         }}
       />
 
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        children={sidebarOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />}
+        className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.75 text-xl text-(--accent-color) transition-all duration-100 active:scale-99"
+      />
+
       <div className="flex w-full flex-col">
         <div className="flex w-full flex-row items-center">
           <div className="w-5 shrink-0 px-2 text-[8px] text-nowrap opacity-80">L</div>
@@ -128,6 +134,14 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
             style={{ left: value ? "auto" : "0.5rem", right: value ? "0.5rem" : "auto" }}
           />
 
+          {value && (
+            <button
+              onClick={() => setValue("")}
+              children={<TbX className="text-[22px] text-(--accent-color)" />}
+              className="absolute right-8 h-full cursor-pointer text-(--theme) opacity-90 active:scale-85"
+            />
+          )}
+
           <div
             style={{ opacity: !value ? 0.8 : 0 }}
             className="pointer-events-none absolute right-0 flex h-full shrink-0 flex-row items-center justify-center gap-1 px-2 text-xs font-bold"
@@ -150,10 +164,6 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
             )}
 
             {[
-              {
-                Icon: sidebarOpen ? <TbLayoutSidebarLeftCollapse /> : <TbLayoutSidebarLeftExpand />,
-                onclick: () => setSidebarOpen(!sidebarOpen),
-              },
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
               { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
               { Icon: <IoMdClose />, onclick: () => window.api.close() },
@@ -170,11 +180,4 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
       </div>
     </div>
   );
-}
-
-{
-  /* <button
-        onClick={() => }
-        className="aspect-square h-fit w-fit text-xl text-(--accent-color)"
-        children={ */
 }
