@@ -4,22 +4,23 @@ import Volume from "./Volume";
 import { useRef } from "react";
 import * as LU from "react-icons/lu";
 import Slider from "../../utils/Slider";
-import * as stores from "../../../utils/stores";
+import { SiDolby } from "react-icons/si";
 import { themeStore } from "../../../utils/themes";
+import { TbBrandDolbyDigital } from "react-icons/tb";
+import { likedSongsStore } from "../../../utils/stores";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { formatDuration, hexToRgba } from "../../../../shared/helpers";
-import { SiDolby } from "react-icons/si";
-import { TbBrandDolbyDigital } from "react-icons/tb";
+import { playerState, playerIndex, playerMethods, playerQueue, playerProgress, playerEffects } from "../../../player";
 
 export function Playbar() {
   const [theme] = themeStore.use();
-  const [state] = stores.playerState.use();
-  const [index] = stores.playerIndex.use();
-  const [methods] = stores.playerMethods.use();
-  const [, setQueue] = stores.playerQueue.use();
-  const [progress] = stores.playerProgress.use();
-  const [fx, setFx] = stores.playerEffects.use();
-  const [liked, setLiked] = stores.likedSongsStore.use();
+  const [state] = playerState.use();
+  const [index] = playerIndex.use();
+  const [methods] = playerMethods.use();
+  const [, setQueue] = playerQueue.use();
+  const [progress] = playerProgress.use();
+  const [fx, setFx] = playerEffects.use();
+  const [liked, setLiked] = likedSongsStore.use();
 
   const ref = useRef<HTMLImageElement>(null);
 
