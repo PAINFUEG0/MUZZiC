@@ -1,79 +1,19 @@
 /** @format */
 
+import { VU } from "./VU";
+import { Search } from "./Search";
+import { memo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import useVU from "../../player/volumeUnit";
 import { themeStore } from "../../utils/themes";
-import { useEffect, useRef, useState } from "react";
+import { needsRestart } from "../../utils/stores";
 import { hexToRgba } from "../../../shared/helpers";
-import { needsRestart, searchBox } from "../../utils/stores";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus, TbSearch, TbX } from "react-icons/tb";
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus } from "react-icons/tb";
 
-export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) {
+export const Navbar = memo(({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) => {
   const [rs] = needsRestart.use();
   const [theme] = themeStore.use();
   const [fs, setFs] = useState(true);
-  const [value, setValue] = searchBox.use();
-  const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) =>
-      (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k" && (e.preventDefault(), ref.current?.focus());
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  const { VUL, VUR } = useVU();
-  const dbfsToLevel = (dbfs: number) => Math.min(100, Math.max(0, ((60 + dbfs) * 3) / 1.8));
-
-  function VUMeter({ dbfs }: { dbfs: number }) {
-    const level = dbfsToLevel(dbfs);
-
-    const ORANGEZONE_START = dbfsToLevel(-8);
-    const REDZONE_START = dbfsToLevel(-5);
-
-    const litNormal = Math.min(level, ORANGEZONE_START);
-    const litOrangeEnd = Math.max(Math.min(level, REDZONE_START), ORANGEZONE_START);
-    const litRedEnd = Math.max(level, REDZONE_START);
-
-    const orangeLit = level > ORANGEZONE_START;
-    const redLit = level > REDZONE_START;
-
-    const accentLit = "var(--accent-color)";
-    const accentDim = "color-mix(in srgb, var(--accent-color) 25%, transparent)";
-    const orangeLitColor = "var(--warning-color, #fd974e)";
-    const orangeDimColor = "color-mix(in srgb, var(--warning-color, #fd974e) 25%, transparent)";
-    const redLitColor = "var(--danger-color, #ef4444)";
-    const redDimColor = "color-mix(in srgb, var(--danger-color, #ef4444) 25%, transparent)";
-
-    return (
-      <div
-        className="flex h-2 w-full"
-        style={
-          {
-            "--level": `${level}%`,
-            background: `linear-gradient(
-            to right,
-            ${accentLit} 0%,
-            ${accentLit} ${litNormal}%,
-            ${accentDim} ${litNormal}%,
-            ${accentDim} ${ORANGEZONE_START}%,
-            ${orangeLit ? orangeLitColor : orangeDimColor} ${ORANGEZONE_START}%,
-            ${orangeLit ? orangeLitColor : orangeDimColor} ${litOrangeEnd}%,
-            ${orangeDimColor} ${litOrangeEnd}%,
-            ${orangeDimColor} ${REDZONE_START}%,
-            ${redLit ? redLitColor : redDimColor} ${REDZONE_START}%,
-            ${redLit ? redLitColor : redDimColor} ${litRedEnd}%,
-            ${redDimColor} ${litRedEnd}%,
-            ${redDimColor} 100%
-          )`,
-            maskImage: "repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 3px)",
-            WebkitMaskImage: "repeating-linear-gradient(90deg, #000 0 2px, transparent 2px 3px)",
-          } as React.CSSProperties
-        }
-      />
-    );
-  }
 
   return (
     <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3">
@@ -91,65 +31,10 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
         className="flex aspect-square h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 p-0.75 text-xl text-(--accent-color) transition-all duration-100 active:scale-99"
       />
 
-      <div className="flex w-full flex-col">
-        <div className="flex w-full flex-row items-center">
-          <div className="w-5 shrink-0 px-2 text-[8px] text-nowrap opacity-80">L</div>
-          <VUMeter dbfs={VUL} />
-          <div className="w-fit min-w-0 shrink px-2 text-[8px] text-nowrap opacity-80">
-            {"- " + (VUL * -1).toFixed(2).padStart(5, "0")} dBFS
-          </div>
-        </div>
-
-        <div className="flex w-full flex-row items-center">
-          <div className="w-5 shrink-0 px-2 text-[8px] text-nowrap opacity-80">R</div>
-          <VUMeter dbfs={VUR} />
-          <div className="w-fit min-w-0 shrink px-2 text-[8px] text-nowrap opacity-80">
-            {"- " + (VUR * -1).toFixed(2).padStart(5, "0")} dBFS
-          </div>
-        </div>
-      </div>
+      <VU />
 
       <div className="flex h-full w-full items-center justify-end gap-3">
-        <div className="mx-5 flex h-full w-full" style={{ WebkitAppRegion: "drag" } as any} />
-
-        <div className="relative flex">
-          <input
-            ref={ref}
-            type="text"
-            value={value}
-            spellCheck={false}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Search for music / albums / artists . . ."
-            onKeyDown={(e) => {
-              e.key.toLowerCase() === "enter" && ref.current?.blur();
-              e.key.toLowerCase() === "escape" && (ref.current?.blur(), setValue(""));
-            }}
-            style={{ paddingLeft: value ? "0.75rem" : "2.25rem", paddingRight: value ? "2.25rem" : "4rem" }}
-            className="flex h-fit w-md flex-row items-center rounded-md bg-(--accent-color)/10 py-1.25 text-sm focus:outline-0"
-          />
-
-          <button
-            className="absolute h-full text-(--theme)"
-            children={<TbSearch className="text-xl text-(--accent-color)" />}
-            style={{ left: value ? "auto" : "0.5rem", right: value ? "0.5rem" : "auto" }}
-          />
-
-          {value && (
-            <button
-              onClick={() => setValue("")}
-              children={<TbX className="text-[22px] text-(--accent-color)" />}
-              className="absolute right-8 h-full cursor-pointer text-(--theme) opacity-90 active:scale-85"
-            />
-          )}
-
-          <div
-            style={{ opacity: !value ? 0.8 : 0 }}
-            className="pointer-events-none absolute right-0 flex h-full shrink-0 flex-row items-center justify-center gap-1 px-2 text-xs font-bold"
-          >
-            <div className="rounded-sm border-2 border-(--border-color)/10 px-1.5 py-px text-(--accent-color)/70" children="Ctrl" />
-            <div className="rounded-sm border-2 border-(--border-color)/10 px-1.5 py-px text-(--accent-color)/70" children="K" />
-          </div>
-        </div>
+        <Search />
 
         <div className="flex flex-row items-center justify-end">
           <div className="flex flex-row items-center justify-center gap-2.5">
@@ -180,4 +65,4 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; 
       </div>
     </div>
   );
-}
+});

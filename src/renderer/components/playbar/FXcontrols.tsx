@@ -23,7 +23,7 @@ export const FXControls = memo(({ id, repeatMode, setState }: { id: string | nul
       <div className="flex h-full w-fit flex-row items-center gap-5 pl-5">
         <div
           onClick={() => setFx((s) => ({ ...s, crossfeed: !s.crossfeed }))}
-          children={fx.crossfeed ? <SiDolby className="m-0.5" /> : <TbBrandDolbyDigital />}
+          children={fx.crossfeed ? <SiDolby className="m-0.5" /> : <TbBrandDolbyDigital className="text-xl" />}
           className={"cursor-pointer active:scale-85 " + (fx.crossfeed ? " text-(--accent-color)" : "hover:text-(--accent-color)")}
         />
 
