@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Popup } from "../components/utils/Popup";
-import { Modal } from "../components/utils/Modal";
 import { Settings } from "../pages/Settings";
+import { Modal } from "../components/utils/Modal";
 import { Navbar } from "../components/bars/navbar";
 import { Sidebar } from "../components/bars/sidebar";
 import { Playbar } from "../components/bars/playbar";
@@ -15,8 +14,6 @@ export function Root() {
 
   return (
     <div className="relative flex h-full w-full shrink-0 flex-col overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
-      <Popup />
-
       <div className="relative flex h-full w-full flex-row overflow-hidden">
         <Sidebar sidebarOpen={sidebarOpen} setSettingsOpen={setSettingsOpen} />
 

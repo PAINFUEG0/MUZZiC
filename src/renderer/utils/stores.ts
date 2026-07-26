@@ -1,14 +1,14 @@
 /** @format */
 
+import { Track, Tree } from "../../shared/types";
 import { frequencies } from "../player/equalizer";
 import { createGlobalStore } from "./createGlobalStore";
-import { PopupPayload, Track, Tree } from "../../shared/types";
 
 const __ = {
   muted: false,
+  volume: Number(localStorage.getItem("volume") || "100"),
   crossfeed: localStorage.getItem("crossfeed") === "true",
   equalizer: localStorage.getItem("equalizer") === "true",
-  volume: Number(localStorage.getItem("volume") || "100"),
   inputGain: Number(localStorage.getItem("inputGain") || "0"),
   gains: JSON.parse(localStorage.getItem("gains") || JSON.stringify(frequencies.map(() => 0))),
 };
@@ -26,7 +26,6 @@ export const analyzersNodes = createGlobalStore({} as { [K in "left" | "right" |
 export const searchBox = createGlobalStore<string>("");
 export const treeStore = createGlobalStore<Tree>({} as Tree);
 export const needsRestart = createGlobalStore<boolean>(false);
-export const popupStore = createGlobalStore<PopupPayload[]>([]);
 export const view = createGlobalStore<{ scene: string }>({ scene: "explorer" });
 export const pcmFormatStore = createGlobalStore<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">("pcm_s16le");
 export const likedSongsStore = createGlobalStore<string[]>(JSON.parse(localStorage.getItem("liked") ?? "[]"));

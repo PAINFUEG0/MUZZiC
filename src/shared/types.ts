@@ -1,21 +1,10 @@
 /** @format */
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
-
-export type PopupPayload = Prettify<
-  { type: "POPUP" } & (
-    | { category: "INFO"; data: string; duration: number }
-    | { category: "ERROR"; data: string; duration: number }
-    | { category: "SUCCESS"; data: string; duration: number }
-    | { category: "WARNING"; data: string; duration: number }
-  )
->;
+type UsageComponents = { gpu: number; tab: number; browser: number; utility: number };
 
 export type MessagePayload = Prettify<
-  | PopupPayload
-  | { type: "MODAL"; data: string }
-  | { type: "FULLSCREEN"; data: string }
-  | { type: "PROGRESS"; current: number; total: number; data: string }
+  { type: "MESSAGE"; data: string } | { type: "PROGRESS"; current: number; total: number; data: string }
 >;
 
 export type Track = BaseTrack & DirNode["files"][number];
@@ -37,50 +26,40 @@ export type BaseTrack = {
 };
 
 export type API = {
-  close: () => Promise<void>;
-  minimize: () => Promise<void>;
-  fullscreen: () => Promise<void>;
-
-  usage: () => Promise<{
-    CPU: number;
-    RAM: number;
-    cpu: { gpu: number; tab: number; browser: number; utility: number };
-    mem: { gpu: number; tab: number; browser: number; utility: number };
-  }>;
-
   getPort: () => Promise<string>;
 
   checkDLP: () => Promise<boolean>;
-  downloadDLP: () => Promise<void>;
-
   checkFFMPEG: () => Promise<boolean>;
-  downloadFFMPEG: () => Promise<void>;
-
   checkFFPROBE: () => Promise<boolean>;
+
+  downloadDLP: () => Promise<void>;
+  downloadFFMPEG: () => Promise<void>;
   downloadFFPROBE: () => Promise<void>;
 
   getMediaFolder: () => Promise<string | null>;
-  setMediaFolder: (dir: string) => Promise<void>;
-
-  openFolderDialog: () => Promise<string | null>;
-
-  scan: (dir: string) => Promise<DirNode>;
-
-  deleteTree: (K: string) => Promise<boolean>;
   getTree: (K: string) => Promise<DirNode | null>;
-  setTree: (K: string, V: DirNode) => Promise<DirNode>;
-
-  extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
-
   getAllMeta: () => Promise<{ [K: string]: BaseTrack }>;
-  deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;
+  getPcmFormat: () => Promise<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">;
   getMeta: <T extends string | string[], R extends BaseTrack | null>(K: T) => Promise<T extends string ? R : R[]>;
+
+  setMediaFolder: (dir: string) => Promise<void>;
+  setTree: (K: string, V: DirNode) => Promise<DirNode>;
+  setPcmFormat: (format: "pcm_s16le" | "pcm_s24le" | "pcm_s32le") => Promise<void>;
   setMeta: <T extends [string, BaseTrack] | [{ key: string; value: BaseTrack }[]], R extends BaseTrack>(
     ...args: T
   ) => Promise<T extends [string, BaseTrack] ? R : R[]>;
 
-  getPcmFormat: () => Promise<"pcm_s16le" | "pcm_s24le" | "pcm_s32le">;
-  setPcmFormat: (format: "pcm_s16le" | "pcm_s24le" | "pcm_s32le") => Promise<void>;
+  deleteTree: (K: string) => Promise<boolean>;
+  deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;
 
+  scan: (dir: string) => Promise<DirNode>;
   transcode: (input: string) => Promise<string>;
+  deleteThumbnails: (ids: string[]) => Promise<void>;
+  extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
+
+  close: () => Promise<void>;
+  minimize: () => Promise<void>;
+  fullscreen: () => Promise<void>;
+  openFolderDialog: () => Promise<string | null>;
+  usage: () => Promise<{ CPU: number; RAM: number; cpu: UsageComponents; mem: UsageComponents }>;
 };
