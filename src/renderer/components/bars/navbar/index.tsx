@@ -1,7 +1,7 @@
 /** @format */
 
-import useVU from "../../../player/volumeUnit";
 import { IoMdClose } from "react-icons/io";
+import useVU from "../../../player/volumeUnit";
 import { themeStore } from "../../../utils/themes";
 import { useEffect, useRef, useState } from "react";
 import { hexToRgba } from "../../../../shared/helpers";
