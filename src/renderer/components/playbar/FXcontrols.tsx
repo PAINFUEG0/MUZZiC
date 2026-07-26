@@ -4,10 +4,10 @@ import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
 import { SiDolby } from "react-icons/si";
+import { LuSlidersVertical } from "react-icons/lu";
+import { TbBrandDolbyDigital } from "react-icons/tb";
 import { playerEffects, playerState } from "../../player";
 import { likedSongsStore, sleepTimer } from "../../utils/stores";
-import { TbBrandDolbyDigital } from "react-icons/tb";
-import { LuSlidersVertical } from "react-icons/lu";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
 type T = ReturnType<(typeof playerState)["use"]>;

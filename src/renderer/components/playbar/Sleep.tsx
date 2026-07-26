@@ -3,12 +3,12 @@
 import { Modal } from "../utils/Modal";
 import { LuInfo } from "react-icons/lu";
 import { sleepTimer } from "../../utils/stores";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, memo, SetStateAction, useEffect, useState } from "react";
 
 type T = ReturnType<(typeof sleepTimer)["use"]>;
 type Props = { show: boolean; setShow: Dispatch<SetStateAction<boolean>>; sleepTime: T[0]; setSleepTime: T[1] };
 
-export function Sleep({ show, setShow, sleepTime, setSleepTime }: Props) {
+export const Sleep = memo(({ show, setShow, sleepTime, setSleepTime }: Props) => {
   const [current, setCurrent] = useState(Date.now());
 
   useEffect(() => {
@@ -60,4 +60,4 @@ export function Sleep({ show, setShow, sleepTime, setSleepTime }: Props) {
       </div>
     </Modal>
   );
-}
+});

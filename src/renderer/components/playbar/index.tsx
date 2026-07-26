@@ -1,5 +1,6 @@
 /** @format */
 
+import { memo } from "react";
 import { FXControls } from "./FXcontrols";
 import { NowPlaying } from "./NowPlaying";
 import { Progressbar } from "./Progressbar";
@@ -8,7 +9,7 @@ import { hexToRgba } from "../../../shared/helpers";
 import { PlaybackControls } from "./PlaybackControls";
 import { playerState, playerIndex, playerQueue } from "../../player";
 
-export function Playbar() {
+export const Playbar = memo(() => {
   const [theme] = themeStore.use();
   const [index] = playerIndex.use();
   const [queue, setQueue] = playerQueue.use();
@@ -36,4 +37,4 @@ export function Playbar() {
       </div>
     </div>
   );
-}
+});
