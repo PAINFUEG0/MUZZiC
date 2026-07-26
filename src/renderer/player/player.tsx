@@ -2,6 +2,7 @@
 
 import { AudioGraph } from "./audioGraph";
 import { Track } from "../../shared/types";
+import { sleepTimer } from "../utils/stores";
 import { useCallback, useEffect, useRef } from "react";
 import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress } from "./store";
 
@@ -14,11 +15,13 @@ export default function Player() {
   const [queue, setQueue] = playerQueue.use();
   const [index, setIndex] = playerIndex.use();
   const [state, setState] = playerState.use();
+  const [sleepTime, setSleepTime] = sleepTimer.use();
   const [progress, setProgress] = playerProgress.use();
 
   const _state = useRef(state);
   const _queue = useRef(queue);
   const _progress = useRef(progress);
+  const _sleepTime = useRef(sleepTime);
 
   const { initializeAudioGraph } = AudioGraph({ audioRef });
 
@@ -65,6 +68,7 @@ export default function Player() {
   useEffect(() => void (_state.current = state), [state]);
   useEffect(() => void (_queue.current = queue), [queue]);
   useEffect(() => void (_progress.current = progress), [progress]);
+  useEffect(() => void (_sleepTime.current = sleepTime), [sleepTime]);
 
   useEffect(() => {
     initializeAudioGraph();
@@ -93,14 +97,23 @@ export default function Player() {
         ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, volume: Math.max(0, _.volume - 5) }))),
       };
 
+      for (let i = 0; i < 10; i++) keybinds[`Numpad${i}`] = keybinds[`Digit${i}`] = () => seekTo(_state.current.duration * (i / 10));
+
       key in keybinds && keybinds[key]!();
     });
 
-    __.addEventListener("ended", (setState((_) => ({ ..._, duration: 0 })), skip));
+    __.addEventListener("timeupdate", () => {
+      if (!_sleepTime.current) return;
+      if (Date.now() < _sleepTime.current) return;
+      if (Date.now() - _sleepTime.current < 2000) pause();
+      setSleepTime(0);
+    });
+
     __.addEventListener("play", () => setState((_) => ({ ..._, isPlaying: true })));
     __.addEventListener("pause", () => setState((_) => ({ ..._, isPlaying: false })));
     __.addEventListener("timeupdate", () => setProgress(Math.floor(__.currentTime || 0)));
     __.addEventListener("loadedmetadata", () => setState((_) => ({ ..._, duration: Math.floor(__.duration) })));
+    __.addEventListener("ended", () => (_state.current.loop ? resume() : (setState((_) => ({ ..._, duration: 0 })), skip())));
   }, []);
 
   useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);

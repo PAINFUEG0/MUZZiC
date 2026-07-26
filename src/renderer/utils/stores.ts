@@ -4,6 +4,7 @@ import { Tree } from "../../shared/types";
 import { createGlobalStore } from "./createGlobalStore";
 
 export const searchBox = createGlobalStore<string>("");
+export const sleepTimer = createGlobalStore<number>(0);
 export const treeStore = createGlobalStore<Tree>({} as Tree);
 export const needsRestart = createGlobalStore<boolean>(false);
 export const view = createGlobalStore<{ scene: string }>({ scene: "explorer" });

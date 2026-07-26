@@ -10,9 +10,9 @@ import { playerState, playerIndex, playerQueue } from "../../player";
 
 export function Playbar() {
   const [theme] = themeStore.use();
-  const [state] = playerState.use();
   const [index] = playerIndex.use();
   const [queue, setQueue] = playerQueue.use();
+  const [state, setState] = playerState.use();
 
   return (
     <div className="relative flex h-20 w-full shrink-0 overflow-hidden border-t-2 border-(--border-color)/10">
@@ -32,7 +32,7 @@ export function Playbar() {
           <Progressbar />
         </div>
 
-        <FXControls id={state.current?.id || null} />
+        <FXControls id={state.current?.id || null} repeatMode={state.loop} setState={setState} />
       </div>
     </div>
   );
