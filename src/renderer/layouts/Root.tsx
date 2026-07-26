@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Viewport } from "./Viewport";
 import { Settings } from "../pages/Settings";
 import { Navbar } from "../components/navbar";
@@ -8,7 +8,7 @@ import { Sidebar } from "../components/sidebar";
 import { Playbar } from "../components/playbar";
 import { Modal } from "../components/utils/Modal";
 
-export function Root() {
+export const Root = memo(() => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -33,4 +33,4 @@ export function Root() {
       />
     </div>
   );
-}
+});

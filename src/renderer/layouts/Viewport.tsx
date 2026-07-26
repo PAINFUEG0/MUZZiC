@@ -1,5 +1,6 @@
 /** @format */
 
+import { memo } from "react";
 import { view } from "../utils/stores";
 import { Liked } from "../pages/Liked";
 import { motion } from "framer-motion";
@@ -10,7 +11,7 @@ import { Artists } from "../pages/Artists";
 import { themeStore } from "../utils/themes";
 import { hexToRgba } from "../../shared/helpers";
 
-export function Viewport() {
+export const Viewport = memo(() => {
   let page;
   const [state] = view.use();
   const [theme] = themeStore.use();
@@ -52,4 +53,4 @@ export function Viewport() {
       {page}
     </motion.div>
   );
-}
+});
