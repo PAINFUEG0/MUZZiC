@@ -1,12 +1,12 @@
 /** @format */
 
 import { useState } from "react";
+import { Viewport } from "./Viewport";
 import { Settings } from "../pages/Settings";
 import { Modal } from "../components/utils/Modal";
 import { Navbar } from "../components/bars/navbar";
 import { Sidebar } from "../components/bars/sidebar";
 import { Playbar } from "../components/bars/playbar";
-import { Viewport } from "./Viewport";
 
 export function Root() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
