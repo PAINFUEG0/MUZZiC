@@ -1,3 +1,0 @@
-# @format
-
-{ "printWidth": 140, "insertPragma": true, "plugins": ["prettier-plugin-tailwindcss"] }
