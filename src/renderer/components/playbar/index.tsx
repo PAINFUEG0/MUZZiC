@@ -33,7 +33,7 @@ export const Playbar = memo(() => {
           <Progressbar />
         </div>
 
-        <FXControls id={state.current?.id || null} repeatMode={state.loop} setState={setState} />
+        <FXControls id={state.current?.id || null} repeatMode={state.loop} setState={setState} canCF={state.current?.channels === 2} />
       </div>
     </div>
   );
