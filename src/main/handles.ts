@@ -8,13 +8,14 @@ import * as constants from "./constants";
 import * as bin from "./helpers/binaries.js";
 import * as settings from "./helpers/settings";
 import { transcode } from "./helpers/transcode";
+import { getResourceUsages } from "./helpers/usages";
 
 import type { AxiosProgressEvent } from "axios";
-import { getResourceUsages } from "./helpers/usages";
 
 export function registerHandles(win: eˉ.BrowserWindow) {
   Object.entries({
     getPort: () => Promise.resolve(api.port),
+    getThumbPath: () => Promise.resolve(constants.directories.thumbnails),
 
     checkDLP: () => bin.checkBinary(constants.bin.dlp.path, "--version"),
     checkFFMPEG: () => bin.checkBinary(constants.bin.ffmpeg.path, "-v", "quiet"),

@@ -10,7 +10,11 @@ export const NowPlaying = memo(({ index, queueLength, track }: { index: number; 
   return (
     <div className="flex h-20 w-full min-w-0 flex-row gap-3 p-2">
       <button className="relative aspect-square h-full shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-100 active:scale-95">
-        <img src={track?.thumb || "./logo.png"} className="-z-1 h-full w-full object-contain" />
+        <img
+          src={track?.thumb || "./logo.png"}
+          className="-z-1 h-full w-full object-contain"
+          onError={(e) => (e.currentTarget.src = "./logo.png")}
+        />
         <div
           children={<LuExpand className="opacity-70" />}
           className="absolute inset-0 flex h-full w-full items-center justify-center bg-black/70 text-2xl opacity-0 transition-opacity duration-300 hover:opacity-100"
@@ -34,7 +38,7 @@ export const NowPlaying = memo(({ index, queueLength, track }: { index: number; 
           <div className="h-fit w-full text-[9px] font-light opacity-70">
             {[
               <span children={`${index + 1} / ${queueLength}`} />,
-              <span children={track.path.split(".").at(-1)?.toUpperCase()} />,
+              <span children={track.codec.toUpperCase()} />,
               track.resolution.bitDepth ? [<span children={`${track.resolution.bitDepth} bit`} />] : null,
               track.resolution.sampleRate ? <span children={`${track.resolution.sampleRate / 1000} kHz`} /> : null,
               track.resolution.bitrate ? <span children={`${Math.round(track.resolution.bitrate / 1000)} kbps`} /> : null,

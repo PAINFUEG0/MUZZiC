@@ -3,12 +3,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { api } from "../server";
-import { probe } from "../utils/probe";
 import { thumb } from "../utils/thumb";
 import { tree, meta } from "../database";
 import { directories } from "../constants";
+import { metadata } from "../utils/metadata";
 import { API, File } from "../../shared/types";
-import { Semaphore } from "../utils/sepmaphore";
+import { Semaphore } from "../utils/semaphore";
 import { scanMediaFolder } from "../utils/scan";
 
 const sem = new Semaphore(8);
@@ -22,25 +22,25 @@ export const scan: API["scan"] = async (dir) =>
 
 export const extractAndSaveMetadata: API["extractAndSaveMetadata"] = async (flat: File[]) => {
   let count = 1;
-  const results = await Promise.all(
+  return await Promise.all(
     flat.map((file) =>
       sem.run(() =>
-        Promise.all([probe(file), thumb(file.path, path.resolve(directories.thumbnails, `${file.id}.jpg`)).catch(() => null)]).then(
-          async ([meta]) => {
-            api.broadcast({ type: "PROGRESS", data: "PROBE", current: count++, total: flat.length });
-            await setMeta(file.id, meta);
-            return { key: file.id, value: meta };
-          },
-        ),
+        Promise.all([metadata(file), thumb(file.path, file.id).catch(() => null)]).then(async ([meta]) => {
+          api.broadcast({ type: "PROGRESS", data: "PROBE", current: count++, total: flat.length });
+          return (await setMeta(file.id, meta), { key: file.id, value: meta });
+        }),
       ),
     ),
   );
-
-  return results;
 };
 
-export const deleteThumbnails = async (ids: string[]) =>
-  ids.forEach((id) => fs.unlinkSync(path.resolve(directories.thumbnails, `${id}.jpg`)));
+export const deleteThumbnails = async (ids: string[]) => {
+  for (const id of ids)
+    await Promise.all([
+      fs.promises.rm(path.resolve(directories.thumbnails, `artwork.${id}.jpg`), { force: true }).catch(() => null),
+      fs.promises.rm(path.resolve(directories.thumbnails, `thumbnail.${id}.jpg`), { force: true }).catch(() => null),
+    ]);
+};
 
 export const getAllMeta: API["getAllMeta"] = async () => meta.all();
 export const setMeta: API["setMeta"] = async (...args) =>

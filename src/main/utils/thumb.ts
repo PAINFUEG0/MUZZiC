@@ -1,19 +1,17 @@
 /** @format */
 
-import { bin } from "../constants";
+import path from "node:path";
 import { spawn } from "node:child_process";
+import { bin, directories } from "../constants";
 
-export async function thumb(source: string, dest: string) {
-  return new Promise((resolve, reject) => {
-    const args = ["-i", source, "-an", "-vf", `scale=${750}:-1`, "-frames:v", "1", "-q:v", "2", "-y", dest];
+export async function thumb(source: string, id: string) {
+  return new Promise<void>((resolve) => {
+    const scaled = path.resolve(directories.thumbnails, `thumbnail.${id}.jpg`);
+    const original = path.resolve(directories.thumbnails, `artwork.${id}.jpg`);
 
-    let stdout = "";
-    let stderr = "";
-    const child = spawn(bin.ffmpeg.path, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const T = ["-frames:v", "1", "-q:v", "2", "-y"];
+    const args = ["-i", source, "-an", ...T, original, "-vf", `scale=${240}:-1`, ...T, scaled];
 
-    child.on("error", reject);
-    child.stdout.on("data", (chunk) => (stdout += chunk.toString()));
-    child.stderr.on("data", (chunk) => (stderr += chunk.toString()));
-    child.on("close", (code) => (code !== 0 ? reject(new Error(`ffmpeg exited with code ${code}\n${stderr}`)) : resolve(stdout)));
+    spawn(bin.ffmpeg.path, args, { stdio: "ignore" }).on("error", resolve).on("close", resolve);
   });
 }
