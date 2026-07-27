@@ -3,8 +3,8 @@
 import { EqNodes } from "./equalizer";
 import { CrossFeed } from "./crossfeed";
 import { useEffect, useRef } from "react";
-import { dbToGain } from "../../shared/helpers";
-import { analyzersNodes, playerEffects } from "./store";
+import { dbToGain, safeAwait } from "../../shared/helpers";
+import { analyzersNodes, playerEffects, playerState } from "./store";
 
 export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement | null> }) {
   const ctx = useRef<AudioContext | null>(null);
@@ -16,6 +16,7 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
   const analyserOverall = useRef<AnalyserNode | null>(null);
 
   const [FX] = playerEffects.use();
+  const [state] = playerState.use();
   const initialVolume = useRef(FX.volume);
   const PRE = useRef<GainNode | null>(null);
   const VOL = useRef<GainNode | null>(null);
@@ -43,6 +44,17 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
   }, [FX.crossfeed]);
 
   useEffect(() => {
+    if (!EQ.current || !CF.current || !VOL.current) return;
+
+    safeAwait((async () => EQ.current?.finalEQNode.disconnect())());
+    safeAwait((async () => CF.current?.merger.disconnect())());
+
+    if (state.current?.channels !== 2) return void EQ.current.finalEQNode.connect(VOL.current);
+    EQ.current.finalEQNode.connect(CF.current.splitter);
+    CF.current.merger.connect(VOL.current);
+  }, [state.current?.channels]);
+
+  useEffect(() => {
     if (!VOL.current) return;
     localStorage.setItem("volume", FX.volume.toString());
     VOL.current.gain.value = FX.muted ? 0 : Math.pow(FX.volume / 100, 2);
@@ -64,6 +76,7 @@ export function AudioGraph({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 
     source.current.connect(PRE.current);
     PRE.current.connect(EQ.current.initialEQNode);
+
     EQ.current.finalEQNode.connect(CF.current.splitter);
     CF.current.merger.connect(VOL.current);
 
