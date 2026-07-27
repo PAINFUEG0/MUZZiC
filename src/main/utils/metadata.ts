@@ -28,7 +28,7 @@ export async function metadata(file: File): Promise<BaseTrack> {
   const sampleRate = stream?.sample_rate || 0;
   const sampleFormat = stream?.sample_fmt || "";
   const bitDepth = stream?.bits_per_raw_sample || stream?.bits_per_sample || 0;
-  const resolution = { name: classifyResolution(codec, bitDepth, sampleRate), bitDepth, sampleRate, bitrate, sampleFormat };
+  const resolution = { name: classifyResolution(codec, bitDepth), bitDepth, sampleRate, bitrate, sampleFormat };
 
   const album = (tags.album || tags.ALBUM || "Unknown") as string;
   const artists = (tags.artist || tags.ARTIST || "Unknown").split(regex).filter((_: any) => Boolean(_?.trim?.()));

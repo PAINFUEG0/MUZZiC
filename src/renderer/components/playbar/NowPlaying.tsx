@@ -4,7 +4,7 @@ import { memo } from "react";
 import { LuExpand } from "react-icons/lu";
 import { Track } from "../../../shared/types";
 
-const _ = { DD: "Dolby Atmos", CD: "CD Lossless", HR: "Hi-Res Lossless", SR: "Standard / Lossy" };
+const _ = { DD: "Spatial ( DD / DTS )", CD: "CD Lossless", HR: "Hi-Res Lossless", SR: "Standard (Lossy)" };
 
 export const NowPlaying = memo(({ index, queueLength, track }: { index: number; queueLength: number; track: Track | null }) => {
   return (
@@ -39,6 +39,7 @@ export const NowPlaying = memo(({ index, queueLength, track }: { index: number; 
             {[
               <span children={`${index + 1} / ${queueLength}`} />,
               <span children={track.codec.toUpperCase()} />,
+              <span children={`${track.layout.toUpperCase().replaceAll("(", " ( ").replaceAll(")", " ) ")}`} />,
               track.resolution.bitDepth ? [<span children={`${track.resolution.bitDepth} bit`} />] : null,
               track.resolution.sampleRate ? <span children={`${track.resolution.sampleRate / 1000} kHz`} /> : null,
               track.resolution.bitrate ? <span children={`${Math.round(track.resolution.bitrate / 1000)} kbps`} /> : null,
