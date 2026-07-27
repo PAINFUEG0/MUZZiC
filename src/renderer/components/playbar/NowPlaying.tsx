@@ -42,7 +42,7 @@ export const NowPlaying = memo(({ index, queueLength, track }: { index: number; 
               <span children={`${track.layout.toUpperCase().replaceAll("(", " ( ").replaceAll(")", " ) ")}`} />,
               track.resolution.bitDepth ? [<span children={`${track.resolution.bitDepth} bit`} />] : null,
               track.resolution.sampleRate ? <span children={`${track.resolution.sampleRate / 1000} kHz`} /> : null,
-              track.resolution.bitrate ? <span children={`${Math.round(track.resolution.bitrate / 1000)} kbps`} /> : null,
+              track.resolution.bitrate ? <span children={`${Math.round(track.resolution.bitrate / 1024)} kbps`} /> : null,
               <span children={_[track.resolution.name]} />,
             ]
               .filter(Boolean)
