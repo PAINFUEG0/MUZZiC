@@ -14,19 +14,28 @@ export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode
 
 export type BaseTrack = {
   id: string;
-  title: string;
   thumb: string;
-  album: string;
-  lyrics: string;
+  title: string;
+
   duration: number;
+
+  layout: string;
+  channels: number;
+
+  codec: string;
+
+  resolution: { name: "SR" | "CD" | "HR" | "DD"; bitDepth: number; sampleRate: number; bitrate: number; sampleFormat: string };
+
+  album: string;
   artists: string[];
+
+  lyrics: string;
   explicit: boolean;
-  needsTranscoding: boolean;
-  resolution: { name: "SR" | "CD" | "HR" | "DD"; bitDepth: number; sampleRate: number; bitrate: number };
 };
 
 export type API = {
   getPort: () => Promise<string>;
+  getThumbPath: () => Promise<string>;
 
   checkDLP: () => Promise<boolean>;
   checkFFMPEG: () => Promise<boolean>;
