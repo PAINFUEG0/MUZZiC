@@ -38,6 +38,7 @@ export function Preload() {
       setTask("Initializing conns, deps and peers");
 
       const port = await window.api.getPort();
+      const thumbPath = await window.api.getThumbPath();
       const ws = new WebSocket(`ws://localhost:${port}/ws`);
       await new Promise((r) => (ws.onopen = r));
 
@@ -129,7 +130,7 @@ export function Preload() {
           (node.files[i] as any) = {
             ...node.files[i],
             ...metadata[node.files[i]!.id]!,
-            thumb: `http://localhost:${port}/thumb/${node.files[i]!.id}`,
+            thumb: `${thumbPath}/thumbnail.${node.files[i]!.id}.jpg`,
           } satisfies BaseTrack;
 
         node.dirs.forEach((e) => populateTreeWithMeta(e, metadata));
