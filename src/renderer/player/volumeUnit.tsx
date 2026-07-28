@@ -3,7 +3,7 @@
 import { analyzersNodes } from "./store";
 import { useRef, useEffect, RefObject, useState } from "react";
 
-const TARGET_FPS = 60;
+const TARGET_FPS = 20;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
 export default function useVU() {
@@ -26,14 +26,9 @@ export default function useVU() {
     const DBFS = (node: AnalyserNode, buf: Float32Array, smoothed: RefObject<number>) => {
       node.getFloatTimeDomainData(buf as any);
 
-      let sum = 0;
       const attack = 0.9;
       const release = 0.2;
-      for (let i = 0; i < buf.length; i++) sum += buf[i]! * buf[i]!;
-
-      const rms = Math.sqrt(sum / buf.length);
-      const db = 20 * Math.log10(rms);
-
+      const db = 20 * Math.log10(Math.sqrt(buf.reduce((acc, cur) => acc + cur * cur, 0) / buf.length));
       const delta = Math.max(Number.isFinite(db) ? db : -60, -60) - smoothed.current;
       smoothed.current += delta * (delta > 0 ? attack : release);
       return smoothed.current;
