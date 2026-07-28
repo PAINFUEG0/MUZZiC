@@ -48,10 +48,4 @@ export function dbToGain(db: number): number {
   return Math.pow(10, db / 20);
 }
 
-export function logToPercent(gain: number) {
-  return Math.round(Math.sqrt(gain) * 100);
-}
-
-export function percentToLog(percent: number) {
-  return Math.pow(percent / 100, 2);
-}
+export const dbfsToLevel = (dbfs: number) => Math.min(100, Math.max(0, ((60 + dbfs) * 3) / 1.8));
