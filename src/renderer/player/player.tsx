@@ -1,29 +1,43 @@
 /** @format */
 
-import { AudioGraph } from "./audioGraph";
+import { EqNodes } from "./equalizer";
+import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
 import { sleepTimer } from "../utils/stores";
+import { dbToGain, logToPercent, percentToLog, safeAwait } from "../../shared/helpers";
 import { useCallback, useEffect, useRef } from "react";
-import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress } from "./store";
+import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./store";
 
 export default function Player() {
+  const ctx = useRef<AudioContext | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const component = <audio ref={audioRef} crossOrigin="anonymous" />;
+  const source = useRef<MediaElementAudioSourceNode | null>(null);
 
-  const [, setFX] = playerEffects.use();
+  const [fx, setFX] = playerEffects.use();
   const [, setMethods] = playerMethods.use();
   const [queue, setQueue] = playerQueue.use();
   const [index, setIndex] = playerIndex.use();
   const [state, setState] = playerState.use();
+  const [, setAnalyzer] = analyzersNodes.use();
   const [sleepTime, setSleepTime] = sleepTimer.use();
   const [progress, setProgress] = playerProgress.use();
+
+  const initialVolume = useRef(fx.PG);
+  const initialInputGain = useRef(fx.IG);
+
+  const analyserLeft = useRef<AnalyserNode | null>(null);
+  const analyserRight = useRef<AnalyserNode | null>(null);
+  const analyserOverall = useRef<AnalyserNode | null>(null);
+
+  const PG = useRef<GainNode | null>(null); // Post gain
+  const IG = useRef<GainNode | null>(null); // Input gain
+  const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
+  const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
 
   const _state = useRef(state);
   const _queue = useRef(queue);
   const _progress = useRef(progress);
   const _sleepTime = useRef(sleepTime);
-
-  const { initializeAudioGraph } = AudioGraph({ audioRef });
 
   const pause = useCallback(() => audioRef.current!.pause(), []);
   const resume = useCallback(() => audioRef.current!.play(), []);
@@ -31,39 +45,18 @@ export default function Player() {
   const clearQueue = useCallback(() => (setIndex(0), setQueue([])), []);
   const enqueue = useCallback((track: Track[]) => setQueue((q) => [...q, ...track]), []);
 
+  const destroy = useCallback(() => {
+    (setIndex(0), setQueue([]), setProgress(0), audioRef.current!.pause(), (audioRef.current!.src = ""));
+    setState((s) => ({ ...s, isPlaying: false, duration: 0, current: null }));
+  }, []);
+
   const seekForward = useCallback(() => (audioRef.current!.currentTime += 10), []);
   const seekBackward = useCallback(() => (audioRef.current!.currentTime -= 10), []);
   const seekTo = useCallback((time: number) => (audioRef.current!.currentTime = time), []);
 
-  const jumpTo = useCallback((i: number) => {
-    setState((_) => ({ ..._, duration: 0 }));
-    setIndex(i);
-  }, []);
-
-  const skip = useCallback(() => {
-    setIndex((i) => {
-      if (i == _queue.current.length - 1) return i;
-      setState((_) => ({ ..._, duration: 0 }));
-      return i + 1;
-    });
-  }, []);
-
-  const prev = useCallback(() => {
-    setIndex((i) => {
-      if (_progress.current > 10 || i === 0) return ((audioRef.current!.currentTime = 0), i);
-      setState((_) => ({ ..._, duration: 0 }));
-      return Math.max(0, i - 1);
-    });
-  }, []);
-
-  const destroy = useCallback(() => {
-    setIndex(0);
-    setQueue([]);
-    setProgress(0);
-    audioRef.current!.pause();
-    audioRef.current!.src = "";
-    setState((s) => ({ ...s, isPlaying: false, duration: 0, current: null }));
-  }, []);
+  const jumpTo = useCallback((i: number) => (setState((_) => ({ ..._, duration: 0 })), setIndex(i)), []);
+  const skip = useCallback(() => setIndex((i) => (i == _queue.current.length - 1 ? i : (setState((_) => ({ ..._, duration: 0 })), i + 1))), []);
+  const prev = useCallback(() => setIndex((i) => (_progress.current > 10 || i === 0 ? (seekTo(0), i) : (setState((_) => ({ ..._, duration: 0 })), Math.max(0, i - 1)))), []);
 
   useEffect(() => void (_state.current = state), [state]);
   useEffect(() => void (_queue.current = queue), [queue]);
@@ -71,49 +64,79 @@ export default function Player() {
   useEffect(() => void (_sleepTime.current = sleepTime), [sleepTime]);
 
   useEffect(() => {
-    initializeAudioGraph();
+    ctx.current = new AudioContext({ latencyHint: "interactive" });
+    source.current = ctx.current.createMediaElementSource(audioRef.current!);
 
-    const __ = audioRef.current!;
+    EQ.current = EqNodes(ctx.current);
+    CF.current = CrossFeed(ctx.current);
 
+    (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
+    (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
+    (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
+
+    (IG.current = ctx.current.createGain()).gain.value = dbToGain(initialInputGain.current);
+    (PG.current = ctx.current.createGain()).gain.value = dbToGain(initialVolume.current);
+
+    source.current.connect(IG.current);
+    IG.current.connect(EQ.current.initialEQNode);
+
+    EQ.current.finalEQNode.connect(CF.current.splitter);
+    CF.current.merger.connect(PG.current);
+
+    const splitter = ctx.current.createChannelSplitter(2);
+
+    PG.current.connect(splitter);
+    splitter.connect(analyserLeft.current, 0);
+    splitter.connect(analyserRight.current, 1);
+
+    PG.current.connect(analyserOverall.current);
+    analyserOverall.current.connect(ctx.current.destination);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("EQ", JSON.stringify(fx.EQ));
+    localStorage.setItem("EQenabled", fx.EQenabled.toString());
+    EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = fx.EQenabled ? fx.EQ[i] : 0));
+  }, [fx.EQ, fx.EQenabled]);
+
+  useEffect(() => localStorage.setItem("IG", `${(IG.current!.gain.value = fx.IG)}`), [fx.IG]);
+  useEffect(() => localStorage.setItem("PG", `${(PG.current!.gain.value = fx.mute ? 0 : fx.PG)}`), [fx.PG, fx.mute]);
+  useEffect(() => localStorage.setItem("CF", `${(CF.current!.cross.left.gain.value = CF.current!.cross.right.gain.value = fx.CF)}`), [fx.CF]);
+
+  useEffect(() => {
+    safeAwait((async () => CF.current?.merger.disconnect())());
+    safeAwait((async () => EQ.current?.finalEQNode.disconnect())());
+    if (state.current?.channels !== 2) return void EQ.current!.finalEQNode.connect(PG.current!);
+    EQ.current!.finalEQNode.connect(CF.current!.splitter);
+    CF.current!.merger.connect(PG.current!);
+  }, [state.current?.channels]);
+
+  useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-
     navigator.mediaSession.setActionHandler("play", resume);
     navigator.mediaSession.setActionHandler("pause", pause);
     navigator.mediaSession.setActionHandler("nexttrack", skip);
     navigator.mediaSession.setActionHandler("previoustrack", prev);
+  }, []);
 
+  useEffect(() => {
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
       if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
 
-      const key = e.code;
-
       const keybinds: Record<string, () => void> = {
         ArrowLeft: seekBackward,
         ArrowRight: seekForward,
-        KeyM: () => setFX((_) => ({ ..._, muted: !_.muted })),
+        KeyM: () => setFX((_) => ({ ..._, mute: !_.mute })),
         Space: () => (e.preventDefault(), _state.current.isPlaying ? pause() : resume()),
-        ArrowUp: () => (e.preventDefault(), setFX((_) => ({ ..._, volume: Math.min(100, _.volume + 5) }))),
-        ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, volume: Math.max(0, _.volume - 5) }))),
+        ArrowUp: () => (e.preventDefault(), setFX((_) => ({ ..._, PG: percentToLog(Math.min(120, logToPercent(_.PG) + 5)) }))),
+        ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, PG: percentToLog(Math.max(0, logToPercent(_.PG) - 5)) }))),
       };
 
       for (let i = 0; i < 10; i++) keybinds[`Numpad${i}`] = keybinds[`Digit${i}`] = () => seekTo(_state.current.duration * (i / 10));
 
-      key in keybinds && keybinds[key]!();
+      e.code in keybinds && keybinds[e.code]!();
     });
-
-    __.addEventListener("timeupdate", () => {
-      if (!_sleepTime.current) return;
-      if (Date.now() < _sleepTime.current) return;
-      if (Date.now() - _sleepTime.current < 2000) pause();
-      setSleepTime(0);
-    });
-
-    __.addEventListener("play", () => setState((_) => ({ ..._, isPlaying: true })));
-    __.addEventListener("pause", () => setState((_) => ({ ..._, isPlaying: false })));
-    __.addEventListener("timeupdate", () => setProgress(Math.floor(__.currentTime || 0)));
-    __.addEventListener("loadedmetadata", () => setState((_) => ({ ..._, duration: Math.floor(__.duration) })));
-    __.addEventListener("ended", () => (_state.current.loop ? resume() : (setState((_) => ({ ..._, duration: 0 })), skip())));
   }, []);
 
   useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);
@@ -124,7 +147,22 @@ export default function Player() {
     window.api.transcode(state.current?.path).then((res) => void (res && ((audioRef.current!.src = res), audioRef.current!.play())));
   }, [state.current?.path]);
 
+  useEffect(() => {
+    audioRef.current!.addEventListener("timeupdate", () => {
+      if (!_sleepTime.current) return;
+      if (Date.now() < _sleepTime.current) return;
+      (Date.now() - _sleepTime.current < 2000 && pause(), setSleepTime(0));
+    });
+
+    audioRef.current!.addEventListener("ended", () => (_state.current.loop ? resume() : skip()));
+    audioRef.current!.addEventListener("play", () => setState((_) => ({ ..._, isPlaying: true })));
+    audioRef.current!.addEventListener("pause", () => setState((_) => ({ ..._, isPlaying: false })));
+    audioRef.current!.addEventListener("timeupdate", () => setProgress(Math.floor(audioRef.current!.currentTime || 0)));
+    audioRef.current!.addEventListener("loadedmetadata", () => setState((_) => ({ ..._, duration: Math.floor(audioRef.current!.duration) })));
+  }, []);
+
+  useEffect(() => setAnalyzer({ left: analyserLeft.current!, right: analyserRight.current!, overall: analyserOverall.current! }), []);
   useEffect(() => setMethods({ pause, resume, clearQueue, enqueue, seekForward, seekBackward, seekTo, jumpTo, skip, prev, destroy }), []);
 
-  return component;
+  return <audio ref={audioRef} crossOrigin="anonymous" />;
 }

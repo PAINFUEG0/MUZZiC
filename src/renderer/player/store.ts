@@ -6,12 +6,12 @@ import { Track } from "../../shared/types";
 import { createGlobalStore } from "../utils/createGlobalStore";
 
 const __ = {
-  muted: false,
-  volume: Number(localStorage.getItem("volume") || "100"),
-  crossfeed: localStorage.getItem("crossfeed") === "true",
-  equalizer: localStorage.getItem("equalizer") === "true",
-  inputGain: Number(localStorage.getItem("inputGain") || "0"),
-  gains: JSON.parse(localStorage.getItem("gains") || JSON.stringify(frequencies.map(() => 0))),
+  mute: false,
+  CF: Number(localStorage.getItem("CF")),
+  IG: Number(localStorage.getItem("IG") || "1"),
+  PG: Number(localStorage.getItem("PG") || "100"),
+  EQenabled: localStorage.getItem("EQenabled") === "true",
+  EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!),
 };
 
 const _ = { duration: 0, loop: false, shuffle: false, isPlaying: false, current: null as Track | null };

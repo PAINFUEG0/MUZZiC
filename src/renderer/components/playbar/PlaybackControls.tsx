@@ -16,10 +16,10 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index }: P
         { Icon: <LU.LuList />, onclick: () => {} },
         { Icon: <LU.LuFastForward className="rotate-180" />, onclick: methods.seekBackward },
         { Icon: <LU.LuSkipBack />, onclick: methods.prev },
-        isPlaying
-          ? { Icon: <LU.LuPause />, onclick: methods.pause }
-          : loading
-            ? { Icon: <LU.LuLoaderCircle className="animate-spin" /> }
+        loading
+          ? { Icon: <LU.LuLoaderCircle className="animate-spin" /> }
+          : isPlaying
+            ? { Icon: <LU.LuPause />, onclick: methods.pause }
             : { Icon: <LU.LuPlay />, onclick: methods.resume },
         { Icon: <LU.LuSkipForward />, onclick: methods.skip },
         { Icon: <LU.LuFastForward />, onclick: methods.seekForward },
