@@ -4,8 +4,8 @@ import { EqNodes } from "./equalizer";
 import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
 import { sleepTimer } from "../utils/stores";
-import { dbToGain, logToPercent, percentToLog, safeAwait } from "../../shared/helpers";
 import { useCallback, useEffect, useRef } from "react";
+import { dbToGain, safeAwait } from "../../shared/helpers";
 import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./store";
 
 export default function Player() {
@@ -70,9 +70,9 @@ export default function Player() {
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
 
-    (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
-    (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
-    (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
+    (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 1024;
+    (analyserRight.current = ctx.current.createAnalyser()).fftSize = 1024;
+    (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 1024;
 
     (IG.current = ctx.current.createGain()).gain.value = dbToGain(initialInputGain.current);
     (PG.current = ctx.current.createGain()).gain.value = dbToGain(initialVolume.current);
@@ -99,9 +99,9 @@ export default function Player() {
     EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = fx.EQenabled ? fx.EQ[i] : 0));
   }, [fx.EQ, fx.EQenabled]);
 
-  useEffect(() => localStorage.setItem("IG", `${(IG.current!.gain.value = fx.IG)}`), [fx.IG]);
-  useEffect(() => localStorage.setItem("PG", `${(PG.current!.gain.value = fx.mute ? 0 : fx.PG)}`), [fx.PG, fx.mute]);
+  useEffect(() => localStorage.setItem("IG", `${((IG.current!.gain.value = Math.pow(fx.IG / 100, 2)), fx.IG)}`), [fx.IG]);
   useEffect(() => localStorage.setItem("CF", `${(CF.current!.cross.left.gain.value = CF.current!.cross.right.gain.value = fx.CF)}`), [fx.CF]);
+  useEffect(() => localStorage.setItem("PG", `${((PG.current!.gain.value = fx.mute ? 0 : Math.pow(fx.PG / 100, 2)), fx.PG)}`), [fx.PG, fx.mute]);
 
   useEffect(() => {
     safeAwait((async () => CF.current?.merger.disconnect())());
@@ -129,8 +129,6 @@ export default function Player() {
         ArrowRight: seekForward,
         KeyM: () => setFX((_) => ({ ..._, mute: !_.mute })),
         Space: () => (e.preventDefault(), _state.current.isPlaying ? pause() : resume()),
-        ArrowUp: () => (e.preventDefault(), setFX((_) => ({ ..._, PG: percentToLog(Math.min(120, logToPercent(_.PG) + 5)) }))),
-        ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, PG: percentToLog(Math.max(0, logToPercent(_.PG) - 5)) }))),
       };
 
       for (let i = 0; i < 10; i++) keybinds[`Numpad${i}`] = keybinds[`Digit${i}`] = () => seekTo(_state.current.duration * (i / 10));
