@@ -3,15 +3,16 @@
 import fs from "node:fs";
 import eˉ from "electron";
 import path from "node:path";
+import pkg from "../../package.json";
 
 export const WIN32 = process.platform === "win32";
 const wd = eˉ.app.isPackaged ? eˉ.app.getPath("appData") : path.resolve(process.cwd(), "temp");
 
 export const directories = {
-  bin: path.resolve(wd, "bin"),
-  temp: path.resolve(wd, "temp"),
-  database: path.resolve(wd, "database"),
-  thumbnails: path.resolve(wd, "thumbnails"),
+  bin: path.resolve(wd, pkg.appUserModelId, "bin"),
+  temp: path.resolve(wd, pkg.appUserModelId, "temp"),
+  database: path.resolve(wd, pkg.appUserModelId, "database"),
+  thumbnails: path.resolve(wd, pkg.appUserModelId, "thumbnails"),
 };
 
 export const SURROUND_HIRES = [".dts", ".thd", ".mlp", ".dsf", ".dff"];
@@ -27,8 +28,7 @@ export const LOSSLESS = new Set(["flac", "alac", "pcm_s16le", "pcm_s24le", "pcm_
 
 export const AUDIO_EXTENSIONS = new Set([...VIDEO, ...AUDIO_ONLY, ...LOSSY_AUDIO, ...SURROUND_HIRES, ...LOSSLESS_AUDIO]);
 
-fs.existsSync(directories.temp) &&
-  fs.readdirSync(directories.temp).forEach((f) => fs.rmSync(path.resolve(directories.temp, f), { force: true }));
+fs.existsSync(directories.temp) && fs.readdirSync(directories.temp).forEach((f) => fs.rmSync(path.resolve(directories.temp, f), { force: true }));
 for (const directory of Object.values(directories)) if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
 
 export const bin = {
