@@ -6,7 +6,7 @@ import path from "node:path";
 import pkg from "../../package.json";
 
 export const WIN32 = process.platform === "win32";
-const wd = eˉ.app.isPackaged ? eˉ.app.getPath("appData") : path.resolve(process.cwd(), "temp");
+const wd = eˉ.app.isPackaged ? eˉ.app.getPath("appData") : path.resolve(process.cwd(), ".");
 
 export const directories = {
   bin: path.resolve(wd, pkg.appUserModelId, "bin"),
