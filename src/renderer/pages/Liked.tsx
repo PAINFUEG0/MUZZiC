@@ -56,10 +56,7 @@ export function Liked() {
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
-          <button
-            children={<RiHeartLine />}
-            className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
-          />
+          <button children={<RiHeartLine />} className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95" />
           <div className="font-medium">Liked songs</div>
         </div>
 

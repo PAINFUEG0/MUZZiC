@@ -153,16 +153,9 @@ export function Preload() {
   return (
     <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
       <Player />
-      <img
-        src={theme.background}
-        style={{ filter: `blur(${theme.overall.blur})` }}
-        className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover"
-      />
+      <img src={theme.background} style={{ filter: `blur(${theme.overall.blur})` }} className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover" />
 
-      <div
-        className="absolute inset-0 -z-30 h-full w-full"
-        style={{ backgroundColor: hexToRgba(theme.overall.tint.color, theme.overall.tint.opacity) }}
-      />
+      <div className="absolute inset-0 -z-30 h-full w-full" style={{ backgroundColor: hexToRgba(theme.overall.tint.color, theme.overall.tint.opacity) }} />
 
       <div className="absolute inset-0 h-7 w-full cursor-pointer" style={{ WebkitAppRegion: "drag" } as any} />
 

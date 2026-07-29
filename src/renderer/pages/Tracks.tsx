@@ -34,11 +34,7 @@ export function Tracks() {
           end={index === tracks.length - 1}
           isLiked={liked.includes(tracks[index]!.id)}
           onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
-          onLike={() =>
-            setLiked((liked) =>
-              liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id],
-            )
-          }
+          onLike={() => setLiked((liked) => (liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id]))}
         />
       ),
       [tracks, liked],
@@ -49,10 +45,7 @@ export function Tracks() {
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
-          <button
-            children={<LuDisc />}
-            className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
-          />
+          <button children={<LuDisc />} className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95" />
           <div className="font-medium">Playable tracks</div>
         </div>
 

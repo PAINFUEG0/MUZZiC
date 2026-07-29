@@ -35,11 +35,5 @@ export function DoughnutChart({ data, size = 12 }: { data: { V: number; hex: str
     chart.current && chart.current.update("none");
   }, [data]);
 
-  return (
-    <div
-      className="aspect-square"
-      style={{ height: `calc(var(--spacing) * ${size})` }}
-      children={<canvas ref={canvas} className="h-full w-full" />}
-    />
-  );
+  return <div className="aspect-square" style={{ height: `calc(var(--spacing) * ${size})` }} children={<canvas ref={canvas} className="h-full w-full" />} />;
 }

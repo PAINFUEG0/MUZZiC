@@ -17,8 +17,7 @@ export const getTree: API["getTree"] = async (K) => tree.get(K);
 export const setTree: API["setTree"] = async (K, V) => tree.set(K, V);
 export const deleteTree: API["deleteTree"] = async (K) => tree.delete(K);
 
-export const scan: API["scan"] = async (dir) =>
-  (await scanMediaFolder(dir)) || { dirs: [], files: [], name: path.basename(dir), path: dir };
+export const scan: API["scan"] = async (dir) => (await scanMediaFolder(dir)) || { dirs: [], files: [], name: path.basename(dir), path: dir };
 
 export const extractAndSaveMetadata: API["extractAndSaveMetadata"] = async (flat: File[]) => {
   let count = 1;
@@ -43,7 +42,6 @@ export const deleteThumbnails = async (ids: string[]) => {
 };
 
 export const getAllMeta: API["getAllMeta"] = async () => meta.all();
-export const setMeta: API["setMeta"] = async (...args) =>
-  (Array.isArray(args[0]) ? meta.setMany(args[0]) : meta.set(args[0], args[1]!)) as any;
+export const setMeta: API["setMeta"] = async (...args) => (Array.isArray(args[0]) ? meta.setMany(args[0]) : meta.set(args[0], args[1]!)) as any;
 export const getMeta: API["getMeta"] = async (K) => (Array.isArray(K) ? meta.getMany(K) : meta.get(K)) as any;
 export const deleteMeta: API["deleteMeta"] = async (K) => (Array.isArray(K) ? meta.deleteMany(K) : meta.delete(K)) as any;

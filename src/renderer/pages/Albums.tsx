@@ -33,16 +33,12 @@ export function Albums() {
 
   useEffect(() => setQuery(""), [selected]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
-  useEffect(
-    () => setRows(selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) }),
-    [selected],
-  );
+  useEffect(() => setRows(selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) }), [selected]);
   useEffect(
     () =>
       void setRows(() => {
         if (!query) return selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) };
-        if (selected)
-          return { type: "tracks", data: albums[selected]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
+        if (selected) return { type: "tracks", data: albums[selected]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
 
         const keys = Object.keys(albums);
         const matchingAlbums = keys.filter((album) => album.toLowerCase().includes(query.toLowerCase()));
@@ -91,9 +87,7 @@ export function Albums() {
         key={data[index]!.id}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
-        onLike={() =>
-          setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))
-        }
+        onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
     ),
@@ -103,10 +97,7 @@ export function Albums() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: rows.data as any[],
-    Component: useCallback(
-      ({ index }) => (rows.type === "tracks" ? makeTrack(rows.data, index) : makeGrid(rows.data, index)),
-      [makeGrid, makeTrack, rows],
-    ),
+    Component: useCallback(({ index }) => (rows.type === "tracks" ? makeTrack(rows.data, index) : makeGrid(rows.data, index)), [makeGrid, makeTrack, rows]),
     getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),
   });
 

@@ -44,12 +44,7 @@ export function Artists() {
         index={index}
         len={data.length}
         children={data[index]!.map((artist) => (
-          <Card
-            label1={artist}
-            thumb={artists[artist]![0]!.thumb}
-            onClick={() => setSelected(artist)}
-            label2={`${artists[artist]?.length} track/s`}
-          />
+          <Card label1={artist} thumb={artists[artist]![0]!.thumb} onClick={() => setSelected(artist)} label2={`${artists[artist]?.length} track/s`} />
         ))}
       />
     ),
@@ -65,9 +60,7 @@ export function Artists() {
         initial={index === 0}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
-        onLike={() =>
-          setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))
-        }
+        onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
     ),
@@ -77,26 +70,18 @@ export function Artists() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     list: rows.data as any[],
-    Component: useCallback(
-      ({ index }) => (rows.type === "artists" ? makeGrid(rows.data, index) : makeTrack(rows.data, index)),
-      [rows, makeGrid, makeTrack],
-    ),
+    Component: useCallback(({ index }) => (rows.type === "artists" ? makeGrid(rows.data, index) : makeTrack(rows.data, index)), [rows, makeGrid, makeTrack]),
     getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),
   });
 
   useEffect(() => setQuery(""), [selected]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
-  useEffect(
-    () => setRows(selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }),
-    [selected],
-  );
+  useEffect(() => setRows(selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }), [selected]);
   useEffect(
     () =>
       void setRows(() => {
-        if (!query)
-          return selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) };
-        if (selected)
-          return { type: "tracks", data: artists[selected]!.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) };
+        if (!query) return selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) };
+        if (selected) return { type: "tracks", data: artists[selected]!.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) };
         const keys = Object.keys(artists).filter((e) => e.toLowerCase().includes(query.toLowerCase()));
         return { type: "artists", data: chunk(keys, 6) };
       }),

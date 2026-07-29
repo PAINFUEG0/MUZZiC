@@ -39,13 +39,7 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
               el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
             }}
           >
-            <motion.div
-              key={view}
-              animate={{ x: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex h-full w-full flex-col"
-              initial={{ x: direction === 0 ? "0" : direction === 1 ? "70%" : "-70%" }}
-            >
+            <motion.div key={view} animate={{ x: 0 }} transition={{ duration: 0.2 }} className="flex h-full w-full flex-col" initial={{ x: direction === 0 ? "0" : direction === 1 ? "70%" : "-70%" }}>
               <Stats />
             </motion.div>
           </motion.div>

@@ -11,9 +11,7 @@ export function Stats() {
 
   const [data, setData] = useState(() => {
     const last = localStorage.getItem("resource_usage");
-    const usage = last
-      ? JSON.parse(last)
-      : { CPU: 0, RAM: 0, cpu: { gpu: 0, tab: 0, browser: 0, utility: 0 }, mem: { gpu: 0, tab: 0, browser: 0, utility: 0 } };
+    const usage = last ? JSON.parse(last) : { CPU: 0, RAM: 0, cpu: { gpu: 0, tab: 0, browser: 0, utility: 0 }, mem: { gpu: 0, tab: 0, browser: 0, utility: 0 } };
     return Array.from({ length: count }).map(() => usage);
   });
 
@@ -55,10 +53,7 @@ export function Stats() {
             <div className="w-full text-center text-[8px] font-medium opacity-70" children={_.label} />
 
             <div className="flex h-fit w-full flex-row gap-2">
-              <div
-                className="flex items-center justify-center"
-                children={<DoughnutChart data={usages.map(({ K, hex }) => ({ V: data.at(-1)[_.K][K]!, hex }))} />}
-              />
+              <div className="flex items-center justify-center" children={<DoughnutChart data={usages.map(({ K, hex }) => ({ V: data.at(-1)[_.K][K]!, hex }))} />} />
 
               <div className="flex h-full w-full flex-col items-start justify-center text-[8px]">
                 {usages.map((__) => (

@@ -17,11 +17,7 @@ export const Sleep = memo(({ show, setShow, sleepTime, setSleepTime }: Props) =>
   }, []);
 
   return (
-    <Modal
-      open={show}
-      setOpen={setShow}
-      className="z-100 h-fit w-fit border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)"
-    >
+    <Modal open={show} setOpen={setShow} className="z-100 h-fit w-fit border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)">
       <div className="flex flex-col">
         <div className="mb-3 text-lg font-medium">Select sleep mode timeout</div>
 
@@ -30,8 +26,8 @@ export const Sleep = memo(({ show, setShow, sleepTime, setSleepTime }: Props) =>
           {!sleepTime && <div className="opacity-70">You have no ongoing sleep timer. Sleep mode is disabled.</div>}
           {sleepTime ? (
             <div className="opacity-70">
-              You have an ongoing sleep timer with {Math.max(0, Math.floor((sleepTime - current) / (60 * 1000)))} minutes and{" "}
-              {Math.max(0, Math.floor(((sleepTime - current) % (60 * 1000)) / 1000))} seconds remaining.
+              You have an ongoing sleep timer with {Math.max(0, Math.floor((sleepTime - current) / (60 * 1000)))} minutes and {Math.max(0, Math.floor(((sleepTime - current) % (60 * 1000)) / 1000))}{" "}
+              seconds remaining.
             </div>
           ) : null}
         </div>

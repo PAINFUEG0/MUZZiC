@@ -85,12 +85,8 @@ export function Settings() {
                 <PiWaveformBold className="text-base text-(--accent-color)" />
                 PCM output format
               </div>
-              <div className="text-[10px] opacity-70">
-                PCM bit depth used for decoding. Higher bit depths consume more memory and processing time.
-              </div>
-              <div className="-mt-1 text-[10px] opacity-70">
-                This will provide no benefit unless your source audio is already 24-bit / 32-bit.
-              </div>
+              <div className="text-[10px] opacity-70">PCM bit depth used for decoding. Higher bit depths consume more memory and processing time.</div>
+              <div className="-mt-1 text-[10px] opacity-70">This will provide no benefit unless your source audio is already 24-bit / 32-bit.</div>
             </div>
 
             <div className="flex h-fit w-full flex-row gap-2 pt-1">
@@ -105,9 +101,7 @@ export function Settings() {
                   onClick={onClick}
                   className={
                     "flex h-fit w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-sm border-2 px-2 pt-0.5 pb-1 text-xs text-nowrap backdrop-blur-2xl transition-all duration-100 hover:scale-105 active:scale-95 " +
-                    (id === _pcmFormat
-                      ? " border-(--accent-color)/45 bg-(--accent-color)/8"
-                      : "border-(--border-color)/15 bg-(--border-color)/10")
+                    (id === _pcmFormat ? " border-(--accent-color)/45 bg-(--accent-color)/8" : "border-(--border-color)/15 bg-(--border-color)/10")
                   }
                 />
               ))}
@@ -133,9 +127,7 @@ export function Settings() {
                     children={<div>{t.name.toUpperCase()}</div>}
                     className={
                       "flex h-fit w-full cursor-pointer items-center justify-center rounded-md border-2 p-1 text-[10px] font-bold text-nowrap transition-all duration-150 active:scale-95 " +
-                      (JSON.stringify(t) === JSON.stringify(_theme)
-                        ? "border-(--accent-color)/45 bg-(--accent-color)/8"
-                        : "border-(--border-color)/20")
+                      (JSON.stringify(t) === JSON.stringify(_theme) ? "border-(--accent-color)/45 bg-(--accent-color)/8" : "border-(--border-color)/20")
                     }
                   />
                 ))}
@@ -193,11 +185,7 @@ export function Settings() {
         </button>
       </div>
 
-      <Modal
-        open={show}
-        setOpen={setShow}
-        className="z-100 max-h-fit w-fit border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)"
-      >
+      <Modal open={show} setOpen={setShow} className="z-100 max-h-fit w-fit border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)">
         <div className="flex flex-col">
           <div className="mb-3 text-xl">Are you sure about that ?</div>
 
@@ -213,8 +201,7 @@ export function Settings() {
           <div className="w-md pt-3 align-middle text-xs">
             <MdWarning className="mr-1 mb-1 inline text-sm text-red-500" />
             <div className="inline opacity-70">
-              Doing this will take quite a while and is not recommended if you have a large library unless you really know what you're doing
-              or you really need to.
+              Doing this will take quite a while and is not recommended if you have a large library unless you really know what you're doing or you really need to.
             </div>
           </div>
 

@@ -54,5 +54,4 @@ export function registerHandles(win: eˉ.BrowserWindow) {
   }).forEach(([K, V]) => eˉ.ipcMain.handle(K, V));
 }
 
-const onProgress = (e: AxiosProgressEvent) =>
-  api.broadcast({ type: "PROGRESS", data: "BIN", current: e.loaded, total: e.total ?? Number.NaN });
+const onProgress = (e: AxiosProgressEvent) => api.broadcast({ type: "PROGRESS", data: "BIN", current: e.loaded, total: e.total ?? Number.NaN });

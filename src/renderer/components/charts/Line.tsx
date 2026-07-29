@@ -5,19 +5,7 @@ import { useRef, useEffect } from "react";
 
 C.Chart.register(C.ArcElement, C.LineController, C.LineElement, C.PointElement, C.LinearScale, C.CategoryScale, C.PieController);
 
-export function MiniChart({
-  data,
-  height = 7,
-  width = "100%",
-  borderColor,
-  gridColor,
-}: {
-  data: number[];
-  gridColor: string;
-  height?: number | string;
-  width?: number | string;
-  borderColor: string;
-}) {
+export function MiniChart({ data, height = 7, width = "100%", borderColor, gridColor }: { data: number[]; gridColor: string; height?: number | string; width?: number | string; borderColor: string }) {
   const color = gridColor;
   const chart = useRef<C.Chart<"line">>(null);
   const canvas = useRef<HTMLCanvasElement>(null);

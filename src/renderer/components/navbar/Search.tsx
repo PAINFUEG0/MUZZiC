@@ -9,8 +9,7 @@ export const Search = memo(() => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) =>
-      (e.ctrlKey || e.metaKey) && ["k", "f"].includes(e.key.toLowerCase()) && (e.preventDefault(), ref.current?.focus());
+    const onKeyDown = (e: KeyboardEvent) => (e.ctrlKey || e.metaKey) && ["k", "f"].includes(e.key.toLowerCase()) && (e.preventDefault(), ref.current?.focus());
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
@@ -46,10 +45,7 @@ export const Search = memo(() => {
         />
       )}
 
-      <div
-        style={{ opacity: !value ? 0.8 : 0 }}
-        className="pointer-events-none absolute right-0 flex h-full shrink-0 flex-row items-center justify-center gap-1 px-2 text-xs font-bold"
-      >
+      <div style={{ opacity: !value ? 0.8 : 0 }} className="pointer-events-none absolute right-0 flex h-full shrink-0 flex-row items-center justify-center gap-1 px-2 text-xs font-bold">
         <div className="rounded-sm border-2 border-(--border-color)/10 px-1.5 py-px text-(--accent-color)/70" children="Ctrl" />
         <div className="rounded-sm border-2 border-(--border-color)/10 px-1.5 py-px text-(--accent-color)/70" children="K / F" />
       </div>

@@ -49,13 +49,7 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
         >
           <div className="relative flex h-full w-full items-center justify-center bg-(--hover-color)/45 backdrop-blur-[14px]">
             <div className="absolute inset-0 h-full w-full" onClick={close} />
-            <div
-              ref={navRef}
-              className={twMerge(
-                "relative mx-3 flex max-h-[95%] w-md flex-col gap-3 rounded-xl bg-[#151515] px-3 py-4 shadow-lg md:px-5",
-                className,
-              )}
-            >
+            <div ref={navRef} className={twMerge("relative mx-3 flex max-h-[95%] w-md flex-col gap-3 rounded-xl bg-[#151515] px-3 py-4 shadow-lg md:px-5", className)}>
               <div className="flex h-full w-full scrollbar-none overflow-auto">{children}</div>
               <div className="absolute top-5 right-5 z-100 cursor-pointer" children={<RxCross1 onClick={close} />} />
             </div>

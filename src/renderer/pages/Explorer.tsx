@@ -77,23 +77,14 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
-              onClick={() => (
-                methods.destroy(),
-                methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)),
-                methods.enqueue(current.files)
-              )}
-              onLike={() =>
-                setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))
-              }
+              onClick={() => (methods.destroy(), methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)), methods.enqueue(current.files))}
+              onLike={() => setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))}
             />
           );
 
         case "label":
           return (
-            <div
-              key={row.label}
-              className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${index === 0 ? "pb-6" : "py-6"}`}
-            >
+            <div key={row.label} className={`flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20 ${index === 0 ? "pb-6" : "py-6"}`}>
               <div className="font-medium">{row.label}</div>
               <div className="pr-3 text-xs text-(--accent-color) opacity-90">{row.count} items</div>
             </div>
@@ -106,12 +97,7 @@ export function List() {
   const [list, virtualizer] = useVirtualList({
     scrollRef,
     getItemKey: useCallback(
-      (index) =>
-        rows[index]?.type === "label"
-          ? rows[index]!.label
-          : rows[index]?.type === "file"
-            ? rows[index]!.file.title
-            : rows[index]!.dirs.map((e) => e.name).join("/"),
+      (index) => (rows[index]?.type === "label" ? rows[index]!.label : rows[index]?.type === "file" ? rows[index]!.file.title : rows[index]!.dirs.map((e) => e.name).join("/")),
       [rows],
     ),
     list: useMemo(() => rows.map((_, i) => i), [rows]),
@@ -171,9 +157,7 @@ export function List() {
                   <RiErrorWarningLine className="mt-0.5" />
                   <div>Media folder has no items to display</div>
                 </div>
-                <div className="pt-2 text-xs opacity-60">
-                  Please add some tracks to your media folder. Or to change your media folder using the button below.
-                </div>
+                <div className="pt-2 text-xs opacity-60">Please add some tracks to your media folder. Or to change your media folder using the button below.</div>
                 <div className="pb-2 text-[11px] opacity-60">You need to restart the app for the changes to take effect.</div>
                 <div className="flex flex-row items-center gap-2">
                   <button

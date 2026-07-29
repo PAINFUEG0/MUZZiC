@@ -3,9 +3,7 @@
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 type UsageComponents = { gpu: number; tab: number; browser: number; utility: number };
 
-export type MessagePayload = Prettify<
-  { type: "MESSAGE"; data: string } | { type: "PROGRESS"; current: number; total: number; data: string }
->;
+export type MessagePayload = Prettify<{ type: "MESSAGE"; data: string } | { type: "PROGRESS"; current: number; total: number; data: string }>;
 
 export type Track = BaseTrack & DirNode["files"][number];
 export type File = { path: string; name: string; id: string };
@@ -54,9 +52,7 @@ export type API = {
   setMediaFolder: (dir: string) => Promise<void>;
   setTree: (K: string, V: DirNode) => Promise<DirNode>;
   setPcmFormat: (format: "pcm_s16le" | "pcm_s24le" | "pcm_s32le") => Promise<void>;
-  setMeta: <T extends [string, BaseTrack] | [{ key: string; value: BaseTrack }[]], R extends BaseTrack>(
-    ...args: T
-  ) => Promise<T extends [string, BaseTrack] ? R : R[]>;
+  setMeta: <T extends [string, BaseTrack] | [{ key: string; value: BaseTrack }[]], R extends BaseTrack>(...args: T) => Promise<T extends [string, BaseTrack] ? R : R[]>;
 
   deleteTree: (K: string) => Promise<boolean>;
   deleteMeta: <T extends string | string[], R extends boolean>(K: T) => Promise<T extends string ? R : R[]>;

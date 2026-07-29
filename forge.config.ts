@@ -16,8 +16,7 @@ const description = pkg.description;
 const manufacturer = pkg.author.name;
 const appUserModelId = pkg.appUserModelId;
 
-const beforeCreate = (creator: any) =>
-  (creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"'));
+const beforeCreate = (creator: any) => (creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"'));
 
 export default {
   packagerConfig: { asar: true, executableName: name, icon },
@@ -41,8 +40,5 @@ export default {
     }),
   ],
 
-  makers: [
-    new MakerZIP({}, ["linux", "darwin"]),
-    new MakerWix({ name, icon, exe: name, description, manufacturer, programFilesFolderName: name, ui, appUserModelId, beforeCreate }),
-  ],
+  makers: [new MakerZIP({}, ["linux", "darwin"]), new MakerWix({ name, icon, exe: name, description, manufacturer, programFilesFolderName: name, ui, appUserModelId, beforeCreate })],
 } satisfies ForgeConfig;
