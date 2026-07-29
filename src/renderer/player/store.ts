@@ -8,7 +8,7 @@ import { createGlobalStore } from "../utils/createGlobalStore";
 const __ = {
   mute: false,
   CF: Number(localStorage.getItem("CF")),
-  IG: Number(localStorage.getItem("IG") || "1"),
+  IG: Number(localStorage.getItem("IG") || "85"),
   PG: Number(localStorage.getItem("PG") || "100"),
   EQenabled: localStorage.getItem("EQenabled") === "true",
   EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!),
