@@ -20,7 +20,7 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
   const virtualizer = useVirtualizer({
     getItemKey,
     count: list.length,
-    overscan: overscan || 5,
+    overscan: overscan || 15,
     estimateSize: estimateSize || (() => 50),
     getScrollElement: () => scrollRef.current,
   });
