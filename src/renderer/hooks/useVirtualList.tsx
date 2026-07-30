@@ -1,9 +1,10 @@
 /** @format */
 
 import { useMask } from "./useMask";
-import { ComponentType, ReactNode, RefObject, useEffect } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
+import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { ComponentType, ReactNode, RefObject, useEffect } from "react";
 
 type Props = {
   list: any[];
@@ -29,24 +30,29 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
 
   const component = (
     <div style={{ height: list.length ? virtualizer.getTotalSize() : "100%", position: "relative" }}>
-      {virtualizer.getVirtualItems().length === 0
-        ? emptyComponent || (
-            <div className="flex h-full w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
-              <RiErrorWarningLine className="mt-0.5" />
-              <div>No items to display</div>
-            </div>
-          )
-        : virtualizer
-            .getVirtualItems()
-            .map((vItem) => (
-              <div
-                key={vItem.key}
-                data-index={vItem.index}
-                ref={virtualizer.measureElement}
-                children={<Component index={vItem.index} />}
-                style={{ top: 0, left: 0, width: "100%", position: "absolute", transform: `translateY(${vItem.start}px)` }}
-              />
-            ))}
+      {virtualizer.getVirtualItems().length === 0 ? (
+        emptyComponent || (
+          <div className="flex h-full w-full flex-row items-center justify-center gap-2 rounded-md border-2 border-(--border-color)/20 py-5 text-xl font-medium">
+            <RiErrorWarningLine className="mt-0.5" />
+            <div>No items to display</div>
+          </div>
+        )
+      ) : (
+        <AnimatePresence initial={false}>
+          {virtualizer.getVirtualItems().map((vItem) => (
+            <motion.div
+              key={vItem.key}
+              data-index={vItem.index}
+              ref={virtualizer.measureElement}
+              children={<Component index={vItem.index} />}
+              initial={{ opacity: 0, y: vItem.start }}
+              animate={{ opacity: 1, y: vItem.start }}
+              style={{ top: 0, left: 0, width: "100%", position: "absolute" }}
+              exit={{ opacity: 0, transition: { duration: 0.3, ease: "easeInOut" } }}
+            />
+          ))}
+        </AnimatePresence>
+      )}
     </div>
   );
 
