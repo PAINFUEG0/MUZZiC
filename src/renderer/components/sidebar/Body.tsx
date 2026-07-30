@@ -2,13 +2,13 @@
 
 import { Item } from "./Item";
 import { useRef } from "react";
-import { view } from "../../utils/stores";
 import { useMask } from "../../hooks/useMask";
 import { ExpandableItem } from "./ExpandableItem";
+import { sceneStore } from "../../utils/stores";
 import { mainItems, sections } from "./constants";
 
 export function Body() {
-  const [scene, setScene] = view.use();
+  const [scene, setScene] = sceneStore.use();
   const ref = useRef<HTMLDivElement>(null);
 
   useMask(ref);
