@@ -6,6 +6,7 @@ temp
 .vite
 tracks
 database
+thumbnails
 node_modules
 .tsbuildinfo
 .thumbnails
