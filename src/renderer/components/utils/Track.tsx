@@ -1,8 +1,8 @@
 /** @format */
 
-import { memo } from "react";
+import { memo, ReactNode } from "react";
 import { Tree } from "../../../shared/types";
-import { TbFileMusicFilled } from "react-icons/tb";
+import { LuDisc, LuDisc3 } from "react-icons/lu";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
@@ -13,10 +13,12 @@ type Props = {
   isLiked: boolean;
   onLike: () => void;
   onClick: () => void;
+  buttons?: ReactNode;
   file: Tree["files"][number];
+  isCurrentlyPlaying?: boolean;
 };
 
-export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike }: Props) => (
+export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike, buttons, isCurrentlyPlaying }: Props) => (
   <div
     className={
       `flex h-fit w-full flex-col border-(--border-color)/20 bg-(--hover-color)/5 px-5 ` +
@@ -34,7 +36,7 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
     <div className="grid w-full shrink-0 cursor-pointer grid-cols-15 rounded-md px-2 py-1 transition-transform duration-50 hover:bg-(--hover-color)/20">
       <div className="flex h-full w-full flex-row items-center justify-between px-0.5">
         <div className="flex w-2.5 shrink-0 justify-end text-xs opacity-50">{index + 1}</div>
-        <TbFileMusicFilled className="aspect-square h-8 w-8 shrink-0 text-(--accent-color)" />
+        {isCurrentlyPlaying ? <LuDisc3 className="aspect-square h-8 w-8 shrink-0 animate-spin text-(--accent-color)" /> : <LuDisc className="aspect-square h-8 w-8 shrink-0 text-(--accent-color)" />}
       </div>
 
       <div className="group col-span-8 flex w-full flex-col px-3" onClick={onClick}>
@@ -67,10 +69,14 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
         {`${Math.floor(file.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(file.duration % 60)}`.padStart(2, "0")}
       </div>
 
-      <div className="col-span-2 flex flex-row items-center justify-between px-3 opacity-90">
-        <BiAddToQueue className="shrink-0" />
-        <BiTrash className="shrink-0" />
-        <BiDotsVertical className="shrink-0" />
+      <div className="col-span-2 flex pr-1 pl-5">
+        {buttons || (
+          <div className="flex h-full w-full flex-row items-center justify-between opacity-90">
+            <BiAddToQueue className="shrink-0" />
+            <BiTrash className="shrink-0" />
+            <BiDotsVertical className="shrink-0" />
+          </div>
+        )}
       </div>
     </div>
   </div>
