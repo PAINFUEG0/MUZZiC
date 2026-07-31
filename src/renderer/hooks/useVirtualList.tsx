@@ -44,9 +44,9 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
               key={vItem.key}
               data-index={vItem.index}
               ref={virtualizer.measureElement}
-              children={<Component index={vItem.index} />}
-              initial={{ opacity: 0, y: vItem.start }}
+              initial={{ opacity: 1, y: vItem.start }}
               animate={{ opacity: 1, y: vItem.start }}
+              children={<Component index={vItem.index} />}
               style={{ top: 0, left: 0, width: "100%", position: "absolute" }}
               exit={{ opacity: 0, transition: { duration: 0.3, ease: "easeInOut" } }}
             />
