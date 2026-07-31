@@ -1,7 +1,7 @@
 /** @format */
 
+import { searchBox } from "../../stores";
 import { TbSearch, TbX } from "react-icons/tb";
-import { searchBox } from "../../utils/stores";
 import { memo, useEffect, useRef } from "react";
 
 export const Search = memo(() => {

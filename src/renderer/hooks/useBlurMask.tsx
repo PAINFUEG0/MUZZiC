@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export function useMask(ref: React.RefObject<HTMLDivElement | null>, display = true) {
+export function useBlurMask(ref: React.RefObject<HTMLDivElement | null>, display = true) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;

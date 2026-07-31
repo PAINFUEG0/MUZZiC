@@ -1,8 +1,8 @@
 /** @format */
 
-import { PlayerMethods } from "./types";
-import { frequencies } from "./equalizer";
 import { Track } from "../../shared/types";
+import { PlayerMethods } from "../player/types";
+import { frequencies } from "../player/equalizer";
 import { createGlobalStore } from "../utils/createGlobalStore";
 
 const __ = {

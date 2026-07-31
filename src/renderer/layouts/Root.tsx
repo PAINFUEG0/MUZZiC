@@ -1,12 +1,12 @@
 /** @format */
 
-import { memo, useState } from "react";
 import { Viewport } from "./Viewport";
-import { Settings } from "../pages/Settings";
+import { memo, useState } from "react";
 import { Navbar } from "../components/navbar";
 import { Sidebar } from "../components/sidebar";
 import { Playbar } from "../components/playbar";
 import { Modal } from "../components/utils/Modal";
+import { Settings } from "../components/utils/Settings";
 
 export const Root = memo(() => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

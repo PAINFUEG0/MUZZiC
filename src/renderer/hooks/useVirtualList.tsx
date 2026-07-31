@@ -1,6 +1,6 @@
 /** @format */
 
-import { useMask } from "./useMask";
+import { useBlurMask } from "./useBlurMask";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -25,7 +25,7 @@ export function useVirtualList({ list, scrollRef, getItemKey, Component, oversca
     getScrollElement: () => scrollRef.current,
   });
 
-  useMask(scrollRef, list.length > 0);
+  useBlurMask(scrollRef, list.length > 0);
   useEffect(() => void (scrollRef.current && (scrollRef.current.style.willChange = "scroll-position")), [scrollRef]);
 
   const component = (

@@ -1,15 +1,15 @@
 /** @format */
 
-import { useMask } from "../hooks/useMask";
+import { Modal } from "./Modal";
 import { MdWarning } from "react-icons/md";
 import { PiWaveformBold } from "react-icons/pi";
 import { useMemo, useRef, useState } from "react";
-import { Modal } from "../components/utils/Modal";
 import { LuInfo, LuLibrary } from "react-icons/lu";
-import { themes, themeStore } from "../utils/themes";
-import { chunk, flatten } from "../../shared/helpers";
+import { useBlurMask } from "../../hooks/useBlurMask";
+import { themes, themeStore } from "../../utils/themes";
+import { chunk, flatten } from "../../../shared/helpers";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { needsRestart, pcmFormatStore, treeStore } from "../utils/stores";
+import { needsRestart, pcmFormatStore, treeStore } from "../../stores";
 
 export function Settings() {
   const ref = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ export function Settings() {
   const [index, setIndex] = useState(0);
   const themeChunks = useMemo(() => chunk(themes, 5 * 3), [themes]);
 
-  useMask(ref);
+  useBlurMask(ref);
 
   return (
     <div className="relative flex h-[85dvh] w-[85dvw] flex-col gap-1">

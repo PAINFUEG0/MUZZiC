@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import * as LU from "react-icons/lu";
-import { sceneStore } from "../../utils/stores";
+import { sceneStore } from "../../stores";
 import { playerMethods, playerQueue } from "../../player";
 
 type T = ReturnType<(typeof playerQueue)["use"]>;

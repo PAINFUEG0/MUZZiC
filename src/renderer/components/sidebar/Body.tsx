@@ -2,16 +2,16 @@
 
 import { Item } from "./Item";
 import { useRef } from "react";
-import { useMask } from "../../hooks/useMask";
+import { sceneStore } from "../../stores";
 import { ExpandableItem } from "./ExpandableItem";
-import { sceneStore } from "../../utils/stores";
 import { mainItems, sections } from "./constants";
+import { useBlurMask } from "../../hooks/useBlurMask";
 
 export function Body() {
   const [scene, setScene] = sceneStore.use();
   const ref = useRef<HTMLDivElement>(null);
 
-  useMask(ref);
+  useBlurMask(ref);
   return (
     <div ref={ref} className="relative flex h-full w-67 scrollbar-none flex-col overflow-x-hidden overflow-y-auto p-2">
       {mainItems.map(({ icon, label, toSet }) => (

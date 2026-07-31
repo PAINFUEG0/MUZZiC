@@ -7,7 +7,7 @@ import { generateIndex } from "../utils/helpers";
 import { Track } from "../components/utils/Track";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { useRef, useEffect, useMemo, useCallback } from "react";
-import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
+import { likedSongsStore, searchBox, treeStore } from "../stores";
 
 export function Liked() {
   const [data] = treeStore.use();

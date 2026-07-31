@@ -1,8 +1,9 @@
 /** @format */
 
 import { Tree } from "../../shared/types";
-import { createGlobalStore } from "./createGlobalStore";
+import { createGlobalStore } from "./create";
 
+export * from "./player";
 export const searchBox = createGlobalStore<string>("");
 export const sleepTimer = createGlobalStore<number>(0);
 export const treeStore = createGlobalStore<Tree>({} as Tree);

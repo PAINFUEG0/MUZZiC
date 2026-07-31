@@ -2,7 +2,7 @@
 
 import { Modal } from "../utils/Modal";
 import { LuInfo } from "react-icons/lu";
-import { sleepTimer } from "../../utils/stores";
+import { sleepTimer } from "../../stores";
 import { Dispatch, memo, SetStateAction, useEffect, useState } from "react";
 
 type T = ReturnType<(typeof sleepTimer)["use"]>;

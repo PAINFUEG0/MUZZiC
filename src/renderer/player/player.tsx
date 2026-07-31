@@ -1,12 +1,12 @@
 /** @format */
 
 import { EqNodes } from "./equalizer";
+import { sleepTimer } from "../stores";
 import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
-import { sleepTimer } from "../utils/stores";
 import { useCallback, useEffect, useRef } from "react";
 import { dbToGain, safeAwait } from "../../shared/helpers";
-import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./store";
+import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./index";
 
 export default function Player() {
   const ctx = useRef<AudioContext | null>(null);

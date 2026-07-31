@@ -12,7 +12,7 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { treeStore, searchBox, likedSongsStore, needsRestart } from "../utils/stores";
+import { treeStore, searchBox, likedSongsStore, needsRestart } from "../stores";
 
 export function List() {
   const [tree] = treeStore.use();

@@ -4,12 +4,12 @@ import { memo } from "react";
 import { Liked } from "../pages/Liked";
 import { motion } from "framer-motion";
 import { Queue } from "../pages/Queue";
+import { sceneStore } from "../stores";
 import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { themeStore } from "../utils/themes";
-import { sceneStore } from "../utils/stores";
 import { hexToRgba } from "../../shared/helpers";
 
 export const Viewport = memo(() => {

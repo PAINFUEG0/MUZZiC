@@ -1,15 +1,15 @@
 /** @format */
 
 import { memo, useRef } from "react";
-import { Track } from "../../shared/types";
-import { useMask } from "../hooks/useMask";
-import { formatDuration } from "../../shared/helpers";
+import { Track } from "../../../shared/types";
+import { useBlurMask } from "../../hooks/useBlurMask";
+import { formatDuration } from "../../../shared/helpers";
 
 export const TrackInfo = memo(({ track }: { track: Track }) => {
   const res = track.resolution;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useMask(scrollRef);
+  useBlurMask(scrollRef);
 
   return (
     <div className="flex h-full w-full flex-col gap-3">

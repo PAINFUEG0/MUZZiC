@@ -1,12 +1,12 @@
 /** @format */
 
-import { TrackInfo } from "./TrackInfo";
+import { likedSongsStore } from "../stores";
 import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
-import { likedSongsStore } from "../utils/stores";
 import { LuInfo, LuListMusic } from "react-icons/lu";
 import { BiTrash, BiAddToQueue } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
+import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useCallback, useMemo, useState } from "react";
 import { playerIndex, playerMethods, playerQueue } from "../player";
 

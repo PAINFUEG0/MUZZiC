@@ -4,8 +4,8 @@ import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
 import { playerEffects, playerState } from "../../player";
+import { likedSongsStore, sleepTimer } from "../../stores";
 import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
-import { likedSongsStore, sleepTimer } from "../../utils/stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
 type T = ReturnType<(typeof playerState)["use"]>;

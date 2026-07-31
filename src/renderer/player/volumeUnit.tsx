@@ -1,6 +1,6 @@
 /** @format */
 
-import { analyzersNodes } from "./store";
+import { analyzersNodes } from "./index";
 import { useRef, useEffect, RefObject, useState } from "react";
 
 const TARGET_FPS = 30;

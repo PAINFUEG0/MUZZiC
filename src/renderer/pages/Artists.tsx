@@ -9,8 +9,8 @@ import { chunk, flatten } from "../../shared/helpers";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
+import { likedSongsStore, searchBox, treeStore } from "../stores";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { likedSongsStore, searchBox, treeStore } from "../utils/stores";
 
 export function Artists() {
   type Row = ArtistRow | TrackRow;
