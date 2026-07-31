@@ -4,7 +4,7 @@ import { memo } from "react";
 import { FXControls } from "./FXcontrols";
 import { NowPlaying } from "./NowPlaying";
 import { Progressbar } from "./Progressbar";
-import { themeStore } from "../../utils/themes";
+import { themeStore } from "../../stores/theme";
 import { hexToRgba } from "../../../shared/helpers";
 import { PlaybackControls } from "./PlaybackControls";
 import { playerState, playerIndex, playerQueue } from "../../player";

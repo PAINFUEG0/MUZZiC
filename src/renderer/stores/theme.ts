@@ -1,6 +1,6 @@
 /** @format */
 
-import { createGlobalStore } from "./createGlobalStore";
+import { createGlobalStore } from "./create";
 
 type Theme = {
   name: string;

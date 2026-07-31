@@ -9,7 +9,7 @@ import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
-import { themeStore } from "../utils/themes";
+import { themeStore } from "../stores/theme";
 import { hexToRgba } from "../../shared/helpers";
 
 export const Viewport = memo(() => {

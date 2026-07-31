@@ -5,7 +5,7 @@ import { Search } from "./Search";
 import { memo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { needsRestart } from "../../stores";
-import { themeStore } from "../../utils/themes";
+import { themeStore } from "../../stores/theme";
 import { hexToRgba } from "../../../shared/helpers";
 import { MdFullscreen, MdFullscreenExit, MdRestartAlt } from "react-icons/md";
 import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus } from "react-icons/tb";

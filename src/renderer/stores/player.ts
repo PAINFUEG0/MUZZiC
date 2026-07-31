@@ -1,9 +1,9 @@
 /** @format */
 
 import { Track } from "../../shared/types";
+import { createGlobalStore } from "./create";
 import { PlayerMethods } from "../player/types";
 import { frequencies } from "../player/equalizer";
-import { createGlobalStore } from "../utils/createGlobalStore";
 
 const __ = {
   mute: false,

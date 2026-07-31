@@ -6,7 +6,7 @@ import { PiWaveformBold } from "react-icons/pi";
 import { useMemo, useRef, useState } from "react";
 import { LuInfo, LuLibrary } from "react-icons/lu";
 import { useBlurMask } from "../../hooks/useBlurMask";
-import { themes, themeStore } from "../../utils/themes";
+import { themes, themeStore } from "../../stores/theme";
 import { chunk, flatten } from "../../../shared/helpers";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import { needsRestart, pcmFormatStore, treeStore } from "../../stores";

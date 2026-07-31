@@ -3,9 +3,9 @@
 import Player from "../player/player.js";
 import { Root } from "../layouts/Root.js";
 import { useState, useEffect } from "react";
-import { themeStore } from "../utils/themes.js";
+import { themeStore } from "../stores/theme.js";
 import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
-import { likedSongsStore, pcmFormatStore, treeStore } from "../utils/stores.js";
+import { likedSongsStore, pcmFormatStore, treeStore } from "../stores";
 import { API, DirNode, MessagePayload, BaseTrack, Tree } from "../../shared/types";
 
 export function Preload() {
