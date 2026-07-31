@@ -68,7 +68,7 @@ export function Queue() {
         open={!!info}
         setOpen={() => setInfo(null)}
         children={<TrackInfo track={info!} />}
-        className="h-fit w-fit max-w-3xl border-2 border-(--border-color)/20 bg-(--hover-color)/25 text-(--text-color)"
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
       />
     </div>
   );
