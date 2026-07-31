@@ -1,30 +1,36 @@
 /** @format */
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
-export function useBlurMask(ref: React.RefObject<HTMLDivElement | null>, display = true) {
-  useEffect(() => {
+type Orientation = "vertical" | "horizontal";
+
+export function useBlurMask(ref: React.RefObject<HTMLDivElement | null>, display = true, orientation: Orientation = "vertical") {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
     const mask = () => {
-      const top = el.scrollTop <= 0;
-      const bottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 1;
+      const isVertical = orientation === "vertical";
+      const direction = isVertical ? "to bottom" : "to right";
+      const start = isVertical ? el.scrollTop <= 0 : el.scrollLeft <= 0;
+      const end = isVertical ? el.scrollHeight - el.scrollTop <= el.clientHeight + 1 : el.scrollWidth - el.scrollLeft <= el.clientWidth + 1;
 
-      el.style.maskImage = display
-        ? top && bottom
+      if (!display) return (el.style.maskImage = "none");
+
+      el.style.maskImage =
+        start && end
           ? "none"
-          : top
-            ? "linear-gradient(to bottom, black 95%, transparent 100%)"
-            : bottom
-              ? "linear-gradient(to bottom, transparent 0%, black 5%)"
-              : "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)"
-        : "none";
+          : start
+            ? `linear-gradient(${direction}, black 95%, transparent 100%)`
+            : end
+              ? `linear-gradient(${direction}, transparent 0%, black 5%)`
+              : `linear-gradient(${direction}, transparent 0%, black 5%, black 95%, transparent 100%)`;
     };
 
-    mask();
-
+    const mutation = new MutationObserver(() => requestAnimationFrame(mask));
+    mutation.observe(el, { childList: true, subtree: true });
     el.addEventListener("scroll", mask, { passive: true });
-    return () => el.removeEventListener("scroll", mask);
-  }, [ref, display]);
+
+    return () => (mutation.disconnect(), el.removeEventListener("scroll", mask));
+  }, [ref, display, orientation]);
 }
