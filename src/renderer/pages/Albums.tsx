@@ -1,14 +1,18 @@
 /** @format */
 
+import { LuInfo } from "react-icons/lu";
 import { playerMethods } from "../player";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
+import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
 import { RiFolderMusicLine } from "react-icons/ri";
 import { chunk, flatten } from "../../shared/helpers";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
+import { TrackInfo } from "../components/utils/TrackInfo";
 import { likedSongsStore, searchBox, treeStore } from "../stores";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
@@ -20,6 +24,7 @@ export function Albums() {
   const [tree] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
+  const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const albums = useMemo(() => {
@@ -82,13 +87,16 @@ export function Albums() {
     (data: TrackRow["data"], index: number) => (
       <Track
         index={index}
-        initial={index === 0}
         file={data[index]!}
         key={data[index]!.id}
+        initial={index === 0}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
-        onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
+        button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([data[index]!])} />}
+        button2={<BiTrash className="shrink-0 opacity-40" />}
+        button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(data[index]!)} />}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
+        onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
       />
     ),
     [liked],
@@ -132,6 +140,13 @@ export function Albums() {
           />
         </AnimatePresence>
       </div>
+
+      <Modal
+        open={!!info}
+        setOpen={() => setInfo(null)}
+        children={<TrackInfo track={info!} />}
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
+      />
     </div>
   );
 }

@@ -1,18 +1,22 @@
 /** @format */
 
-import { LuDisc } from "react-icons/lu";
 import { playerMethods } from "../player";
 import { flatten } from "../../shared/helpers";
+import { LuDisc, LuInfo } from "react-icons/lu";
 import { generateIndex } from "../utils/helpers";
+import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
-import { useRef, useMemo, useCallback } from "react";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
+import { TrackInfo } from "../components/utils/TrackInfo";
+import { useRef, useMemo, useCallback, useState } from "react";
 import { likedSongsStore, searchBox, treeStore } from "../stores";
 
 export function Tracks() {
   const [data] = treeStore.use();
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
+  const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -33,6 +37,9 @@ export function Tracks() {
           key={tracks[index]!.id}
           end={index === tracks.length - 1}
           isLiked={liked.includes(tracks[index]!.id)}
+          button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([tracks[index]!])} />}
+          button2={<BiTrash className="shrink-0 opacity-40" />}
+          button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(tracks[index]!)} />}
           onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
           onLike={() => setLiked((liked) => (liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id]))}
         />
@@ -66,6 +73,12 @@ export function Tracks() {
           ))}
         </div>
       </div>
+      <Modal
+        open={!!info}
+        setOpen={() => setInfo(null)}
+        children={<TrackInfo track={info!} />}
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
+      />
     </div>
   );
 }

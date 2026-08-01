@@ -4,7 +4,6 @@ import { memo, ReactNode } from "react";
 import { Tree } from "../../../shared/types";
 import { LuDisc, LuDisc3 } from "react-icons/lu";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
-import { BiAddToQueue, BiDotsVertical, BiTrash } from "react-icons/bi";
 
 type Props = {
   end: boolean;
@@ -13,12 +12,14 @@ type Props = {
   isLiked: boolean;
   onLike: () => void;
   onClick: () => void;
-  buttons?: ReactNode;
   file: Tree["files"][number];
   isCurrentlyPlaying?: boolean;
+  button1: ReactNode;
+  button2: ReactNode;
+  button3: ReactNode;
 };
 
-export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike, buttons, isCurrentlyPlaying }: Props) => (
+export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike, button1, button2, button3, isCurrentlyPlaying }: Props) => (
   <div
     className={
       `flex h-fit w-full flex-col border-(--border-color)/20 bg-(--hover-color)/5 px-5 ` +
@@ -70,13 +71,11 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
       </div>
 
       <div className="col-span-2 flex pr-1 pl-5">
-        {buttons || (
-          <div className="flex h-full w-full flex-row items-center justify-between opacity-90">
-            <BiAddToQueue className="shrink-0" />
-            <BiTrash className="shrink-0" />
-            <BiDotsVertical className="shrink-0" />
-          </div>
-        )}
+        <div className="flex h-full w-full flex-row items-center justify-between opacity-90">
+          {button1}
+          {button2}
+          {button3}
+        </div>
       </div>
     </div>
   </div>

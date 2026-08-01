@@ -32,16 +32,14 @@ export function Queue() {
         isCurrentlyPlaying={index === currentIndex}
         onClick={() => methods.jumpTo(queue.findIndex((t) => t.id === queue[index]!.id))}
         onLike={() => setLiked((liked) => (liked.includes(queue[index]!.id) ? liked.filter((e) => e !== queue[index]!.id) : [...liked, queue[index]!.id]))}
-        buttons={
-          <div className="flex h-full w-full flex-row items-center justify-between opacity-90">
-            <BiAddToQueue className="shrink-0 opacity-40" />
-            <BiTrash
-              onClick={() => index > currentIndex && setQueue((_) => _.filter((__) => __.id !== _[index]!.id))}
-              className={"shrink-0 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
-            />
-            <LuInfo className="shrink-0" onClick={() => setInfo(queue[index]!)} />
-          </div>
+        button1={<BiAddToQueue className="shrink-0 opacity-40" />}
+        button2={
+          <BiTrash
+            onClick={() => index > currentIndex && setQueue((_) => _.filter((__) => __.id !== _[index]!.id))}
+            className={"shrink-0 active:scale-95 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
+          />
         }
+        button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(queue[index]!)} />}
       />
     ),
     [queue, liked, currentIndex],

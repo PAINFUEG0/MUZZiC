@@ -1,18 +1,23 @@
 /** @format */
 
+import { LuInfo } from "react-icons/lu";
 import { playerMethods } from "../player";
 import { RiHeartLine } from "react-icons/ri";
 import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
+import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
-import { useRef, useEffect, useMemo, useCallback } from "react";
+import { TrackInfo } from "../components/utils/TrackInfo";
 import { likedSongsStore, searchBox, treeStore } from "../stores";
+import { useRef, useEffect, useMemo, useCallback, useState } from "react";
 
 export function Liked() {
   const [data] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
+  const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -40,6 +45,9 @@ export function Liked() {
             key={track.id}
             isLiked={true}
             initial={index === 0}
+            button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([tracks[index]!])} />}
+            button2={<BiTrash className="shrink-0 opacity-40" />}
+            button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(tracks[index]!)} />}
             end={index === tracks.length - 1}
             onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
             onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
@@ -77,6 +85,13 @@ export function Liked() {
           ))}
         </div>
       </div>
+
+      <Modal
+        open={!!info}
+        setOpen={() => setInfo(null)}
+        children={<TrackInfo track={info!} />}
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
+      />
     </div>
   );
 }

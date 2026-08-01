@@ -4,11 +4,14 @@ import { playerMethods } from "../player";
 import { chunk } from "../../shared/helpers";
 import { MdRestartAlt } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
-import { LuFolderSearch } from "react-icons/lu";
+import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
 import { RiErrorWarningLine } from "react-icons/ri";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { AnimatePresence, motion } from "framer-motion";
+import { LuFolderSearch, LuInfo } from "react-icons/lu";
 import { useVirtualList } from "../hooks/useVirtualList";
+import { TrackInfo } from "../components/utils/TrackInfo";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -20,6 +23,7 @@ export function List() {
   const [rs, setRs] = needsRestart.use();
   const [path, setPath] = useState([tree]);
   const [query, setQuery] = searchBox.use();
+  const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -77,6 +81,9 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
+              button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([row.file])} />}
+              button2={<BiTrash className="shrink-0 opacity-40" />}
+              button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(row.file)} />}
               onClick={() => (methods.destroy(), methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)), methods.enqueue(current.files))}
               onLike={() => setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))}
             />
@@ -190,6 +197,13 @@ export function List() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <Modal
+        open={!!info}
+        setOpen={() => setInfo(null)}
+        children={<TrackInfo track={info!} />}
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
+      />
     </div>
   );
 }

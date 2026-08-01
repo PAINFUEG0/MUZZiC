@@ -1,13 +1,17 @@
 /** @format */
 
+import { LuInfo } from "react-icons/lu";
 import { playerMethods } from "../player";
 import { TbMicrophone2 } from "react-icons/tb";
 import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
+import { Modal } from "../components/utils/Modal";
 import { chunk, flatten } from "../../shared/helpers";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
+import { TrackInfo } from "../components/utils/TrackInfo";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { likedSongsStore, searchBox, treeStore } from "../stores";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
@@ -20,6 +24,7 @@ export function Artists() {
   const [data] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
+  const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -60,6 +65,9 @@ export function Artists() {
         initial={index === 0}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
+        button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([data[index]!])} />}
+        button2={<BiTrash className="shrink-0 opacity-40" />}
+        button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(data[index]!)} />}
         onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
@@ -119,6 +127,13 @@ export function Artists() {
           />
         </AnimatePresence>
       </div>
+
+      <Modal
+        open={!!info}
+        setOpen={() => setInfo(null)}
+        children={<TrackInfo track={info!} />}
+        className="flex h-fit w-[50dvw] shrink-0 overflow-hidden border-2 border-(--border-color)/20 bg-(--hover-color)/25 p-5 text-(--text-color)"
+      />
     </div>
   );
 }
