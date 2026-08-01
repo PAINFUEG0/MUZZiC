@@ -11,6 +11,7 @@ import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { themeStore } from "../stores/theme";
 import { hexToRgba } from "../../shared/helpers";
+import Equalizer from "../pages/Equalizer";
 
 export const Viewport = memo(() => {
   let page;
@@ -35,6 +36,9 @@ export const Viewport = memo(() => {
       break;
     case "queue":
       page = <Queue />;
+      break;
+    case "equalizer":
+      page = <Equalizer />;
       break;
   }
 

@@ -11,7 +11,7 @@ const __ = {
   IG: Number(localStorage.getItem("IG") || "85"),
   PG: Number(localStorage.getItem("PG") || "100"),
   EQenabled: localStorage.getItem("EQenabled") === "true",
-  EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!),
+  EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!) as number[],
 };
 
 const _ = { duration: 0, loop: false, shuffle: false, isPlaying: false, current: null as Track | null };

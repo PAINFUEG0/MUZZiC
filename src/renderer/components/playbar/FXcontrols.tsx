@@ -4,13 +4,14 @@ import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useEffect, useRef, useState } from "react";
 import { playerEffects, playerState } from "../../player";
-import { likedSongsStore, sleepTimer } from "../../stores";
+import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
 type T = ReturnType<(typeof playerState)["use"]>;
 
 export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: string | null; repeatMode?: boolean; canCF: boolean; setState: T[1] }) => {
+  const [, setScene] = sceneStore.use();
   const [open, setOpen] = useState(false);
   const [fx, setFx] = playerEffects.use();
   const [liked, setLiked] = likedSongsStore.use();
@@ -54,7 +55,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
 
         <RiMoonFill onClick={() => setOpen(true)} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
 
-        <LuSlidersVertical className="cursor-pointer hover:text-(--accent-color) active:scale-85" onClick={() => {}} />
+        <LuSlidersVertical className="cursor-pointer hover:text-(--accent-color) active:scale-85" onClick={() => setScene({ scene: "equalizer" })} />
       </div>
 
       <Volume FX={fx} setFX={setFx} />
