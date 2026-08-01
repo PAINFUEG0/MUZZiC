@@ -11,8 +11,10 @@ process.env.UV_THREADPOOL_SIZE = "64";
 
   await api.startServer();
 
-  app.setName(appUserModelId);
-  app.setAppUserModelId(appUserModelId);
+  const _ = `${(!app.isPackaged && "test.") || ""}${appUserModelId}`;
+
+  app.setName(_);
+  app.setAppUserModelId(_);
   const preload = path.resolve(__dirname, "./preload.js");
   const webPreferences = { webSecurity: false, backgroundThrottling: false, devTools: !app.isPackaged, preload } as Electron.WebPreferences;
 
