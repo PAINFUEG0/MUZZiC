@@ -70,9 +70,9 @@ export default function Player() {
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
 
-    (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 1024;
-    (analyserRight.current = ctx.current.createAnalyser()).fftSize = 1024;
-    (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 1024;
+    (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
+    (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
+    (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
 
     (IG.current = ctx.current.createGain()).gain.value = dbToGain(initialInputGain.current);
     (PG.current = ctx.current.createGain()).gain.value = dbToGain(initialVolume.current);

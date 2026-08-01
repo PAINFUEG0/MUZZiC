@@ -3,7 +3,7 @@
 import { analyzersNodes } from "./index";
 import { useRef, useEffect, RefObject, useState } from "react";
 
-const TARGET_FPS = 30;
+const TARGET_FPS = 60;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
 
 export default function useVU() {
