@@ -45,7 +45,7 @@ export function Queue() {
     [queue, liked, currentIndex],
   );
 
-  const [list] = useVirtualList({ scrollRef, list: queue, getItemKey: useCallback((index) => queue[index]!.id, [queue]), Component });
+  const [list] = useVirtualList({ scrollRef, list: queue, getItemKey: (index) => index.toString(), Component });
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
@@ -55,7 +55,17 @@ export function Queue() {
           <div className="font-medium">Playaback queue</div>
         </div>
 
-        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{queue.length} items</div>
+        <div
+          children="Dedupe Queue"
+          onClick={() => setQueue((_) => [..._.slice(0, currentIndex + 1), ...Array.from(new Set(_.slice(currentIndex + 1)))])}
+          className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
+        />
+
+        <div
+          children="Clear Queue"
+          onClick={methods.destroy}
+          className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
+        />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">
