@@ -49,7 +49,7 @@ export function Stats() {
           { K: "cpu", label: "CPU Distribution ( % )" },
           { K: "mem", label: "Memory Distribution ( MB )" },
         ].map((_) => (
-          <div className="flex h-fit w-full flex-col gap-2">
+          <div key={_.label} className="flex h-fit w-full flex-col gap-2">
             <div className="w-full text-center text-[8px] font-medium opacity-70" children={_.label} />
 
             <div className="flex h-fit w-full flex-row gap-2">
@@ -57,7 +57,7 @@ export function Stats() {
 
               <div className="flex h-full w-full flex-col items-start justify-center text-[8px]">
                 {usages.map((__) => (
-                  <div className="flex flex-row items-center gap-1">
+                  <div key={_.K + __.label} className="flex flex-row items-center gap-1">
                     <div className="flex aspect-square h-1 w-1 shrink-0" style={{ backgroundColor: __.hex }} />
                     <div children={`${__.label} - ${data.at(-1)[_.K][__.K]!.toFixed(2)}`} />
                   </div>
@@ -71,7 +71,7 @@ export function Stats() {
           { K: "CPU", label: "%", hex: `${theme.accent.substring(0, 7)}` },
           { K: "RAM", label: "MB", hex: `${theme.accent.substring(0, 7)}` },
         ].map((_) => (
-          <div className="mb-px flex h-fit w-full flex-col items-center gap-1.5">
+          <div key={_.label} className="mb-px flex h-fit w-full flex-col items-center gap-1.5">
             <MiniChart data={data.map((d) => d[_.K])} borderColor={_.hex} gridColor={gridColor} />
             <div className="flex w-full flex-row justify-center gap-1 text-[8px] text-nowrap">
               <span children={_.K} />
