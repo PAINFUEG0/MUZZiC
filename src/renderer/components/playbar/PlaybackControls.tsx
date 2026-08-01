@@ -1,6 +1,6 @@
 /** @format */
 
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import * as LU from "react-icons/lu";
 import { sceneStore } from "../../stores";
 import { playerMethods, playerQueue } from "../../player";
@@ -11,6 +11,17 @@ type Props = { setQueue: T[1]; loading: boolean; isPlaying: boolean; index: numb
 export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index }: Props) => {
   const [, setScene] = sceneStore.use();
   const [methods] = playerMethods.use();
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
+      e.code === "KeyQ" && setScene({ scene: "queue" });
+    };
+
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, []);
 
   return (
     <div className="mt-2 flex w-full flex-row items-center justify-center gap-5">
