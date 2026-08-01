@@ -36,10 +36,10 @@ export function Queue() {
         button2={
           <BiTrash
             onClick={() => index > currentIndex && setQueue((_) => _.filter((__) => __.id !== _[index]!.id))}
-            className={"shrink-0 active:scale-95 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
+            className={"shrink-0 transition-all duration-100 active:scale-90 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
           />
         }
-        button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(queue[index]!)} />}
+        button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(queue[index]!)} />}
       />
     ),
     [queue, liked, currentIndex],

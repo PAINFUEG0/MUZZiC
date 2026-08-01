@@ -45,9 +45,9 @@ export function Liked() {
             key={track.id}
             isLiked={true}
             initial={index === 0}
-            button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([tracks[index]!])} />}
+            button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
             button2={<BiTrash className="shrink-0 opacity-40" />}
-            button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(tracks[index]!)} />}
+            button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
             end={index === tracks.length - 1}
             onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
             onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}

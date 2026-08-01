@@ -81,9 +81,9 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
-              button1={<BiAddToQueue className="shrink-0 active:scale-95" onClick={() => methods.enqueue([row.file])} />}
+              button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([row.file])} />}
               button2={<BiTrash className="shrink-0 opacity-40" />}
-              button3={<LuInfo className="shrink-0 active:scale-95" onClick={() => setInfo(row.file)} />}
+              button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(row.file)} />}
               onClick={() => (methods.destroy(), methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)), methods.enqueue(current.files))}
               onLike={() => setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))}
             />
