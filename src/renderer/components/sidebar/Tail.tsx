@@ -6,39 +6,20 @@ import { useRef, useState } from "react";
 import { BsGearWide } from "react-icons/bs";
 import { RiDonutChartFill } from "react-icons/ri";
 import { AnimatePresence, motion } from "framer-motion";
+import { useBlurMask } from "../../hooks/useBlurMask";
 
 export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) {
   const [direction, setDirection] = useState(1);
   const [view, setView] = useState<"x" | "stats" | null>(null);
 
-  const [atTop, setAtTop] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [atBottom, setAtBottom] = useState(false);
-
-  const maskImage =
-    atTop && atBottom
-      ? "none"
-      : atTop
-        ? "linear-gradient(to bottom, black 85%, transparent 100%)"
-        : atBottom
-          ? "linear-gradient(to bottom, transparent 0%, black 15%)"
-          : "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)";
+  useBlurMask(scrollRef);
 
   return (
     <div className="flex h-fit w-67 shrink-0 scrollbar-none flex-col p-1">
       <div className="flex h-fit w-full flex-col gap-2 rounded-md border-2 border-(--border-color)/20 p-1 py-1.5">
         <AnimatePresence mode="wait">
-          <motion.div
-            ref={scrollRef}
-            style={{ maskImage, WebkitMaskImage: maskImage }}
-            animate={{ height: view ? "calc(var(--spacing) * 30)" : "0px" }}
-            className="flex w-full shrink-0 scrollbar-none flex-col overflow-y-auto"
-            onScroll={() => {
-              const el = scrollRef.current;
-              el && setAtTop(el.scrollTop <= 0);
-              el && setAtBottom(el.scrollHeight - el.scrollTop <= el.clientHeight + 1);
-            }}
-          >
+          <motion.div ref={scrollRef} animate={{ height: view ? "calc(var(--spacing) * 30)" : "0px" }} className="flex w-full shrink-0 scrollbar-none flex-col overflow-y-auto">
             <motion.div key={view} animate={{ x: 0 }} transition={{ duration: 0.2 }} className="flex h-full w-full flex-col" initial={{ x: direction === 0 ? "0" : direction === 1 ? "70%" : "-70%" }}>
               <Stats />
             </motion.div>
