@@ -15,6 +15,7 @@ const name = pkg.name.toUpperCase();
 const description = pkg.description;
 const manufacturer = pkg.author.name;
 const appUserModelId = pkg.appUserModelId;
+const upgradeCode = "89581fa5-b7e5-480b-bac5-5fdfb8d18944";
 
 const beforeCreate = (creator: any) => (creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"'));
 
@@ -40,5 +41,5 @@ export default {
     }),
   ],
 
-  makers: [new MakerZIP({}, ["linux", "darwin"]), new MakerWix({ name, icon, exe: name, description, manufacturer, programFilesFolderName: name, ui, appUserModelId, beforeCreate })],
+  makers: [new MakerZIP({}, ["linux", "darwin"]), new MakerWix({ ui, name, icon, exe: name, description, beforeCreate, manufacturer, appUserModelId, upgradeCode, programFilesFolderName: name })],
 } satisfies ForgeConfig;
