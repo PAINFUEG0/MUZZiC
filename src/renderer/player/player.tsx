@@ -162,5 +162,5 @@ export default function Player() {
   useEffect(() => setAnalyzer({ left: analyserLeft.current!, right: analyserRight.current!, overall: analyserOverall.current! }), []);
   useEffect(() => setMethods({ pause, resume, clearQueue, enqueue, seekForward, seekBackward, seekTo, jumpTo, skip, prev, destroy }), []);
 
-  return <audio ref={audioRef} crossOrigin="anonymous" />;
+  return <audio ref={audioRef} crossOrigin="anonymous" id="audio" />;
 }
