@@ -44,15 +44,15 @@ const component = forwardRef<HTMLInputElement, Props>(({ disabled, min, max, ste
       className={twMerge(
         (vertical ? "h-full w-(--track-h) [direction:rtl] [writing-mode:vertical-lr] " : "h-(--track-h) w-full ") +
           "cursor-pointer appearance-none rounded-full " +
-          "[&::-moz-range-thumb]:opacity-0 [&::-webkit-slider-thumb]:opacity-0 " +
-          "[&::-moz-range-thumb]:border-0 [&::-webkit-slider-thumb]:appearance-none " +
-          "[&::-moz-range-thumb]:rounded-full [&::-webkit-slider-thumb]:rounded-full " +
-          "[&::-moz-range-thumb]:h-(--thumb-h) [&::-webkit-slider-thumb]:h-(--thumb-h) " +
-          "[&::-moz-range-thumb]:w-(--thumb-w) [&::-webkit-slider-thumb]:w-(--thumb-w) " +
-          "[&::-moz-range-thumb]:cursor-pointer [&::-webkit-slider-thumb]:cursor-pointer " +
-          "[&:hover::-moz-range-thumb]:opacity-100 [&:hover::-webkit-slider-thumb]:opacity-100 " +
-          "[&::-moz-range-thumb]:transition-opacity [&::-webkit-slider-thumb]:transition-opacity " +
-          "[&::-moz-range-thumb]:bg-(--thumb-color) [&::-webkit-slider-thumb]:bg-(--thumb-color) " +
+          "[&::-webkit-slider-thumb]:opacity-0 " +
+          "[&::-webkit-slider-thumb]:appearance-none " +
+          "[&::-webkit-slider-thumb]:rounded-full " +
+          "[&::-webkit-slider-thumb]:h-(--thumb-h) " +
+          "[&::-webkit-slider-thumb]:w-(--thumb-w) " +
+          "[&::-webkit-slider-thumb]:cursor-pointer " +
+          "[&:hover::-webkit-slider-thumb]:opacity-100 " +
+          "[&::-webkit-slider-thumb]:transition-opacity " +
+          "[&::-webkit-slider-thumb]:bg-(--thumb-color) " +
           (vertical
             ? "bg-[linear-gradient(to_top,var(--thumb-color)_var(--progress),var(--track-color)_var(--progress))]"
             : "bg-[linear-gradient(to_right,var(--thumb-color)_var(--progress),var(--track-color)_var(--progress))]"),
