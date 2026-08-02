@@ -1,0 +1,12 @@
+bin
+out
+dist
+temp
+.env
+.vite
+tracks
+database
+thumbnails
+node_modules
+.tsbuildinfo
+.thumbnails
