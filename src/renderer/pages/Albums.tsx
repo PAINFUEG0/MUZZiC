@@ -104,6 +104,7 @@ export function Albums() {
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
+    overscan: 2,
     list: rows.data as any[],
     Component: useCallback(({ index }) => (rows.type === "tracks" ? makeTrack(rows.data, index) : makeGrid(rows.data, index)), [makeGrid, makeTrack, rows]),
     getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),

@@ -96,7 +96,7 @@ export default function Player() {
   useEffect(() => {
     localStorage.setItem("EQ", JSON.stringify(fx.EQ));
     localStorage.setItem("EQenabled", fx.EQenabled.toString());
-    EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = fx.EQenabled ? fx.EQ[i] : 0));
+    EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = fx.EQenabled ? fx.EQ[i]! : 0));
   }, [fx.EQ, fx.EQenabled]);
 
   useEffect(() => localStorage.setItem("IG", `${((IG.current!.gain.value = Math.pow(fx.IG / 100, 2)), fx.IG)}`), [fx.IG]);
