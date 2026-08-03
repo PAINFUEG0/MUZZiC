@@ -8,6 +8,7 @@ import { Sidebar } from "../components/sidebar";
 import { Playbar } from "../components/playbar";
 import { Modal } from "../components/utils/Modal";
 import { Settings } from "../components/utils/Settings";
+import { Keybinds } from "../components/playbar/Keybinds";
 
 export const Root = memo(() => {
   const [fullscreen, setFullscreen] = useState(false);
@@ -16,6 +17,7 @@ export const Root = memo(() => {
 
   return (
     <div className="relative flex h-full w-full shrink-0 flex-col overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
+      <Keybinds fullscreen={fullscreen} setFullscreen={setFullscreen} />
       {fullscreen && (
         <div className="absolute inset-0 z-10 h-full w-full overflow-hidden bg-black">
           <Fullscreen setShow={setFullscreen} />
