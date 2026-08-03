@@ -3,14 +3,22 @@
 import { memo } from "react";
 import { LuExpand } from "react-icons/lu";
 import { Track } from "../../../shared/types";
+import { themeStore } from "../../stores/theme";
 
 const _ = { DD: "Spatial ( DD / DTS )", CD: "CD Lossless", HR: "Hi-Res Lossless", SR: "Standard (Lossy)" };
 
 export const NowPlaying = memo(({ index, queueLength, track, setFullscreen }: { index: number; queueLength: number; track: Track | null; setFullscreen: (arg: boolean) => void }) => {
+  const [theme] = themeStore.use();
   return (
     <div className="flex h-20 w-full min-w-0 flex-row gap-3 p-2">
       <button className="relative aspect-square h-full shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-100 active:scale-95">
-        <img src={track?.thumb || "./logo.png"} className="-z-1 h-full w-full object-contain" onError={(e) => (e.currentTarget.src = "./logo.png")} />
+        <img
+          key={track?.id + theme.type}
+          src={track?.thumb || "./logo.png"}
+          className="-z-1 h-full w-full object-contain"
+          onError={(e) => (e.currentTarget.src = "./logo.png")}
+          onLoad={(e) => (e.currentTarget.style.filter = theme.type === "dark" && e.currentTarget.src.includes("logo.png") ? "invert(100%)" : "invert(0%)")}
+        />
         <div
           onClick={() => track && setFullscreen(true)}
           children={<LuExpand className="opacity-70" />}
