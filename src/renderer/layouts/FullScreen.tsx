@@ -1,6 +1,6 @@
 /** @format */
 
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import { BsPerson } from "react-icons/bs";
 import { themeStore } from "../stores/theme";
 import { FaAngleDown } from "react-icons/fa6";
@@ -14,20 +14,15 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
   const [state] = playerState.use();
   const [, setQueue] = playerQueue.use();
 
-  useEffect(() => {
-    document.documentElement.style.setProperty("--accent-color", "#FFFFFF");
-    return () => document.documentElement.style.setProperty("--accent-color", theme.accent);
-  }, []);
-
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden text-white">
       <div onClick={() => setShow(false)} className="absolute top-0 right-0 z-100 shrink-0 cursor-pointer p-5 text-xl opacity-10 hover:opacity-70" children={<FaAngleDown />} />
 
       <img
         key={state.current?.id}
+        onError={(e) => (e.currentTarget.src = theme.background)}
         src={state.current?.thumb.replace("thumbnail.", "artwork.")}
-        className="absolute inset-0 z-20 h-full w-full object-cover"
-        onError={(e) => ((e.currentTarget.src = "./logo.png"), (e.currentTarget.style.filter = "invert(100%)"))}
+        className="absolute inset-0 z-20 h-full w-full scale-115 object-cover"
       />
 
       <div className="absolute inset-0 z-30 h-full w-full bg-black/10 backdrop-blur-none" />
