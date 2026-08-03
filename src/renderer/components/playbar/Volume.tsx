@@ -2,30 +2,13 @@
 
 import Slider from "../utils/Slider";
 import { playerEffects } from "../../player";
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import { LuVolumeOff, LuVolume, LuVolume1, LuVolume2 } from "react-icons/lu";
 
 type _ = ReturnType<(typeof playerEffects)["use"]>;
 
 export const Volume = memo(({ FX, setFX }: { FX: _[0]; setFX: _[1] }) => {
   const [T, setT] = useState<"IG" | "PG">("PG");
-
-  useEffect(() => {
-    const fn = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
-
-      const keybinds: Record<string, () => void> = {
-        ArrowUp: () => (e.preventDefault(), setFX((_) => ({ ..._, [T]: Math.min(100, _[T] + 5) }))),
-        ArrowDown: () => (e.preventDefault(), setFX((_) => ({ ..._, [T]: Math.max(0, _[T] - 5) }))),
-      };
-
-      e.code in keybinds && keybinds[e.code]!();
-    };
-
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, [T]);
 
   return (
     <div className="flex h-fit flex-col">

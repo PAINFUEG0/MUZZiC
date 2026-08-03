@@ -13,7 +13,7 @@ export default function Player() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const source = useRef<MediaElementAudioSourceNode | null>(null);
 
-  const [fx, setFX] = playerEffects.use();
+  const [fx] = playerEffects.use();
   const [, setMethods] = playerMethods.use();
   const [queue, setQueue] = playerQueue.use();
   const [index, setIndex] = playerIndex.use();
@@ -117,24 +117,6 @@ export default function Player() {
     navigator.mediaSession.setActionHandler("pause", pause);
     navigator.mediaSession.setActionHandler("nexttrack", skip);
     navigator.mediaSession.setActionHandler("previoustrack", prev);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("keydown", (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
-
-      const keybinds: Record<string, () => void> = {
-        ArrowLeft: seekBackward,
-        ArrowRight: seekForward,
-        KeyM: () => setFX((_) => ({ ..._, mute: !_.mute })),
-        Space: () => (e.preventDefault(), _state.current.isPlaying ? pause() : resume()),
-      };
-
-      for (let i = 0; i < 10; i++) keybinds[`Numpad${i}`] = keybinds[`Digit${i}`] = () => seekTo(_state.current.duration * (i / 10));
-
-      e.code in keybinds && keybinds[e.code]!();
-    });
   }, []);
 
   useEffect(() => setState((s) => ({ ...s, current: queue[index] || null })), [queue, index]);

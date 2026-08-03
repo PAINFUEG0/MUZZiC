@@ -2,17 +2,11 @@
 
 import { searchBox } from "../../stores";
 import { TbSearch, TbX } from "react-icons/tb";
-import { memo, useEffect, useRef } from "react";
+import { memo, useRef } from "react";
 
 export const Search = memo(() => {
   const [value, setValue] = searchBox.use();
   const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => (e.ctrlKey || e.metaKey) && ["k", "f"].includes(e.key.toLowerCase()) && (e.preventDefault(), ref.current?.focus());
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
 
   return (
     <div className="relative flex w-[65%]">
@@ -20,6 +14,7 @@ export const Search = memo(() => {
         ref={ref}
         type="text"
         value={value}
+        id="search-bar"
         spellCheck={false}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search for music / albums / artists . . ."

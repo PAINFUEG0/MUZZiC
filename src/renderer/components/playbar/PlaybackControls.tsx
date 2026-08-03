@@ -1,7 +1,7 @@
 /** @format */
 
-import { memo, useEffect } from "react";
 import * as LU from "react-icons/lu";
+import { memo } from "react";
 import { sceneStore } from "../../stores";
 import { playerMethods, playerQueue } from "../../player";
 
@@ -12,28 +12,21 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index }: P
   const [, setScene] = sceneStore.use();
   const [methods] = playerMethods.use();
 
-  useEffect(() => {
-    const fn = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
-      e.code === "KeyQ" && setScene({ scene: "queue" });
-    };
-
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, []);
-
   return (
     <div className="mt-2 flex w-full flex-row items-center justify-center gap-5">
       {[
-        { Icon: <LU.LuList />, onclick: () => setScene({ scene: "queue" }) },
-        { Icon: <LU.LuFastForward className="rotate-180" />, onclick: methods.seekBackward },
-        { Icon: <LU.LuSkipBack />, onclick: methods.prev },
-        loading ? { Icon: <LU.LuLoaderCircle className="animate-spin" /> } : isPlaying ? { Icon: <LU.LuPause />, onclick: methods.pause } : { Icon: <LU.LuPlay />, onclick: methods.resume },
-        { Icon: <LU.LuSkipForward />, onclick: methods.skip },
-        { Icon: <LU.LuFastForward />, onclick: methods.seekForward },
+        { Icon: <LU.LuList className="opacity-70 hover:opacity-100" />, onclick: () => setScene({ scene: "queue" }) },
+        { Icon: <LU.LuFastForward className="rotate-180 opacity-70 hover:opacity-100" />, onclick: methods.seekBackward },
+        { Icon: <LU.LuSkipBack className="opacity-70 hover:opacity-100" />, onclick: methods.prev },
+        loading
+          ? { Icon: <LU.LuLoaderCircle className="animate-spin" /> }
+          : isPlaying
+            ? { Icon: <LU.LuPause className="opacity-70 hover:opacity-100" />, onclick: methods.pause }
+            : { Icon: <LU.LuPlay className="opacity-70 hover:opacity-100" />, onclick: methods.resume },
+        { Icon: <LU.LuSkipForward className="opacity-70 hover:opacity-100" />, onclick: methods.skip },
+        { Icon: <LU.LuFastForward className="opacity-70 hover:opacity-100" />, onclick: methods.seekForward },
         {
-          Icon: <LU.LuShuffle className="text-[15px]" />,
+          Icon: <LU.LuShuffle className="text-[15px] opacity-70 hover:opacity-100" />,
           onclick: () => setQueue((q) => [...q.slice(0, index + 1), ...q.slice(index + 1).sort(() => Math.random() - 0.5)]),
         },
       ].map(({ Icon, onclick }, i) => (

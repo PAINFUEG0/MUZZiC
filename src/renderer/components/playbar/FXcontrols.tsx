@@ -2,7 +2,7 @@
 
 import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useState } from "react";
 import { playerEffects, playerState } from "../../player";
 import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
@@ -17,19 +17,6 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
   const [liked, setLiked] = likedSongsStore.use();
   const [sleepTime, setSleepTime] = sleepTimer.use();
 
-  const likeButton = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fn = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
-      e.code === "KeyL" && likeButton.current!.click();
-    };
-
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, []);
-
   return (
     <div className="flex h-full w-full flex-row items-center justify-end gap-10 px-7">
       <div className="flex h-full w-fit flex-row items-center gap-5 pl-5">
@@ -41,7 +28,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
         />
 
         <div
-          ref={likeButton}
+          id="like-button"
           children={id && liked.includes(id) ? <RiHeartFill /> : <RiHeartLine />}
           onClick={() => id && setLiked((liked) => (liked.includes(id) ? liked.filter((e) => e !== id) : [...liked, id]))}
           className={"cursor-pointer active:scale-85 " + (liked.includes(id!) ? " text-(--accent-color)" : "")}
