@@ -34,7 +34,7 @@ export const Root = memo(() => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
             children={<Fullscreen setShow={setFullscreen} />}
-            className="absolute inset-0 z-10 h-full w-full overflow-hidden bg-black"
+            className="absolute inset-0 z-500 h-full w-full overflow-hidden bg-black"
           />
         )}
       </AnimatePresence>
