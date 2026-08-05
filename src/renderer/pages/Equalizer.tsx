@@ -1,17 +1,14 @@
 /** @format */
 
-import { useEffect, useRef, useState } from "react";
-import { BsCassetteFill, BsMusicPlayerFill } from "react-icons/bs";
-import { FaCaretDown, FaGuitar } from "react-icons/fa6";
-import { GiGClef } from "react-icons/gi";
-import { IoHeadsetSharp } from "react-icons/io5";
-import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
-import { PiMicrophoneStageBold, PiMusicNoteFill, PiWaveformBold } from "react-icons/pi";
-import { TbVinyl } from "react-icons/tb";
-import { VscPiano } from "react-icons/vsc";
+import { playerEffects } from "../stores";
+import { presets } from "../utils/presets";
+import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
-import { playerEffects } from "../stores";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
+
+// I don't like the way this is done, but I'm too fcuked to change it
 
 export default function Equalizer() {
   const lim = 12;
@@ -54,21 +51,12 @@ export default function Equalizer() {
     return () => observer.disconnect();
   }, [fx.EQ]);
 
-  const presets = [
-    { name: "Flat", EQ: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], icon: <PiMusicNoteFill className="text-sm" /> },
-    { name: "Rock", EQ: [0, +5, +4, +3, +1, 0, -1, -1, 0, +1, 0, +3, 0, +4, +5], icon: <BsMusicPlayerFill className="text-sm" /> },
-    { name: "Pop", EQ: [0, -1, +2, +4, +5, 0, +5, +4, 0, +2, 0, +1, 0, +2, +2], icon: <TbVinyl className="text-sm" /> },
-    { name: "Hip Hop", EQ: [0, +5, +5, +4, +1, 0, -1, -1, 0, +1, 0, +1, 0, +3, +4], icon: <BsCassetteFill className="text-sm" /> },
-    { name: "Jazz", EQ: [0, +3, +2, +1, +2, 0, -1, -1, 0, 0, 0, +2, 0, +3, +4], icon: <FaGuitar className="text-sm" /> },
-    { name: "Classical", EQ: [0, +4, +3, +2, +1, 0, -1, -1, 0, 0, 0, +2, 0, +4, +4], icon: <VscPiano className="text-sm" /> },
-    { name: "Electronic", EQ: [0, +5, +5, +2, 0, 0, -1, +1, 0, 0, 0, +2, 0, +5, +5], icon: <IoHeadsetSharp className="text-sm" /> },
-    { name: "Bass Boost", EQ: [0, +5, +5, +5, +3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], icon: <PiWaveformBold className="text-sm" /> },
-    { name: "Treble Boost", EQ: [0, 0, 0, 0, 0, 0, 0, +1, 0, +3, 0, +5, 0, +5, +5], icon: <GiGClef className="text-sm" /> },
-    { name: "Vocal", EQ: [0, -3, -2, -1, +2, 0, +5, +5, 0, +5, 0, +3, 0, +1, 0], icon: <PiMicrophoneStageBold className="text-sm" /> },
-  ];
+  const flat = useMemo(() => presets.find((p) => p.name === "Flat")!, [presets]);
 
   const [show, setShow] = useState(false);
-  const [preset, setPreset] = useState(presets[0]);
+  const [preset, setPreset] = useState(presets.find((p) => p.name === localStorage.getItem("EQN")) ?? flat);
+
+  useEffect(() => setFX((_) => ({ ..._, EQ: [...preset!.EQ] })), []);
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
@@ -93,7 +81,7 @@ export default function Equalizer() {
               {presets.map((preset, i, arr) => (
                 <div
                   key={preset.name}
-                  onClick={() => (setFX((_) => ({ ..._, EQ: preset.EQ })), setPreset(preset), setShow(false))}
+                  onClick={() => (setFX((_) => ({ ..._, EQ: preset.EQ })), setPreset(preset), setShow(false), localStorage.setItem("EQN", preset.name))}
                   className={
                     "flex w-full cursor-pointer items-center gap-1.5 border-(--border-color)/20 bg-(--hover-color)/5 px-2 py-0.5 text-sm hover:bg-(--hover-color)/20 " +
                     (i === arr.length - 1 ? "" : "border-b")
@@ -115,7 +103,11 @@ export default function Equalizer() {
 
           <button
             children={<LuRotateCw />}
-            onClick={() => setFX((_) => ({ ..._, EQ: fx.EQ.map(() => 0) }))}
+            onClick={() => {
+              if (preset?.name === "Custom") localStorage.setItem("CEQ", JSON.stringify(flat.EQ));
+              else (localStorage.setItem("EQN", "Flat"), setPreset(flat));
+              setFX((_) => ({ ..._, EQ: flat.EQ }));
+            }}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
         </div>
@@ -167,7 +159,17 @@ export default function Equalizer() {
                   disabled={!fx.EQenabled}
                   ref={(el) => void (sliderRefs.current[i] = el)}
                   className="h-[42dvh] [&::-webkit-slider-thumb]:opacity-100"
-                  onChange={(e) => setFX((_) => ({ ..._, EQ: [...((fx.EQ[i] = Number(e.target.value) - lim), fx.EQ)] }))}
+                  onChange={(e) => {
+                    setFX((_) => {
+                      _.EQ[i] = Number(e.target.value) - lim;
+                      localStorage.setItem("CEQ", JSON.stringify(_.EQ));
+                      if (preset?.name !== "Custom") {
+                        localStorage.setItem("EQN", "Custom");
+                        setPreset(presets.find((p) => p.name === "Custom")!);
+                      }
+                      return { ..._, EQ: [..._.EQ] };
+                    });
+                  }}
                 />
               </div>
             ))}
