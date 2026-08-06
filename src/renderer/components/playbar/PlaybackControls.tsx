@@ -6,9 +6,9 @@ import { sceneStore } from "../../stores";
 import { playerMethods, playerQueue } from "../../player";
 
 type T = ReturnType<(typeof playerQueue)["use"]>;
-type Props = { setQueue: T[1]; loading: boolean; isPlaying: boolean; index: number };
+type Props = { setQueue: T[1]; loading: boolean; isPlaying: boolean; index: number; isFullscreen?: boolean };
 
-export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index }: Props) => {
+export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index, isFullscreen }: Props) => {
   const [, setScene] = sceneStore.use();
   const [methods] = playerMethods.use();
 
@@ -30,7 +30,7 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index }: P
           onclick: () => setQueue((q) => [...q.slice(0, index + 1), ...q.slice(index + 1).sort(() => Math.random() - 0.5)]),
         },
       ].map(({ Icon, onclick }, i) => (
-        <button key={i} children={Icon} onClick={onclick} className="cursor-pointer p-px hover:text-(--accent-color) active:scale-85" />
+        <button key={i} children={Icon} onClick={onclick} className={`cursor-pointer p-px active:scale-85 ` + (isFullscreen ? "hover:text-white" : "hover:text-(--accent-color)")} />
       ))}
     </div>
   );
