@@ -43,9 +43,9 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
           exit={{ opacity: 0 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.1 }}
           className="fixed inset-0 z-50"
           onClick={(e) => e.stopPropagation()}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
         >
           <div className="relative flex h-full w-full items-center justify-center bg-(--hover-color)/45 backdrop-blur-[14px]">
             <div className="absolute inset-0 h-full w-full" onClick={close} />
