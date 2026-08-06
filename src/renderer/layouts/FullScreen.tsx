@@ -1,6 +1,7 @@
 /** @format */
 
-import { memo } from "react";
+import { memo, useState } from "react";
+import DynamicBackground from "./DynamicBackground";
 import { BsPerson } from "react-icons/bs";
 import { themeStore } from "../stores/theme";
 import { FaAngleDown } from "react-icons/fa6";
@@ -14,28 +15,39 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
   const [state] = playerState.use();
   const [, setQueue] = playerQueue.use();
 
+  const [gradient, setGradient] = useState(false);
+
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden text-white">
       <div onClick={() => setShow(false)} className="absolute top-0 right-0 z-100 shrink-0 cursor-pointer p-5 text-xl opacity-10 hover:opacity-70" children={<FaAngleDown />} />
 
-      <img
-        key={state.current?.id}
-        onError={(e) => (e.currentTarget.src = theme.background)}
-        src={state.current?.thumb.replace("thumbnail.", "artwork.")}
-        className="absolute inset-0 z-20 h-full w-full scale-115 object-cover"
-      />
-
-      <div className="absolute inset-0 z-30 h-full w-full bg-black/10 backdrop-blur-none" />
-
-      <div
-        className="absolute bottom-0 z-50 h-[50%] w-full backdrop-blur-3xl"
-        style={{
-          maskImage: "linear-gradient(to top, black 0%, black 40%, rgba(0,0,0,0.5) 75%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to top, black 0%, black 40%, rgba(0,0,0,0.5) 75%, transparent 100%)",
-        }}
-      />
-
-      <div className="absolute bottom-0 z-50 h-[50%] w-full" style={{ backgroundImage: "linear-gradient(to top, black 0%, black 5%, rgba(0,0,0,0.6) 50%, transparent 100%)" }} />
+      {gradient ? (
+        <div className="absolute inset-0 z-20 h-full w-full object-cover blur-[100px]">
+          <DynamicBackground artworkUrl={state.current!.thumb.replace("thumbnail.", "artwork.")} alt={theme.background} />
+        </div>
+      ) : (
+        [
+          <img
+            key="thumb"
+            onError={(e) => (e.currentTarget.src = theme.background)}
+            src={state.current?.thumb.replace("thumbnail.", "artwork.")}
+            className="absolute inset-0 z-20 h-full w-full scale-115 object-cover brightness-85"
+          />,
+          <div
+            key="gradient"
+            className="absolute bottom-0 z-30 h-[90%] w-full invert-5"
+            style={{ backgroundImage: "linear-gradient(to top, black 0%, black 5%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 70%, transparent 90%, transparent 100%)" }}
+          />,
+          <div
+            key="blur"
+            className="absolute bottom-0 z-50 h-[63%] w-full backdrop-blur-3xl"
+            style={{
+              maskImage: "linear-gradient(to top, black 0%, black 40%, rgba(0,0,0,0.5) 75%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to top, black 0%, black 40%, rgba(0,0,0,0.5) 75%, transparent 100%)",
+            }}
+          />,
+        ]
+      )}
 
       <div className="z-50 flex h-[15dvh] w-full shrink-0 flex-row items-center justify-center gap-2 text-lg font-medium">
         <img src="./logo.png" className="h-5 shrink-0 invert" />
@@ -64,8 +76,8 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
         </div>
 
         <div className="flex h-fit w-xl flex-col items-center justify-center gap-6">
-          <PlaybackControls index={index} setQueue={setQueue} isPlaying={state.isPlaying} loading={!!(state.current && !state.duration)} />
-          <Progressbar />
+          <PlaybackControls isFullscreen setGradient={setGradient} index={index} setQueue={setQueue} isPlaying={state.isPlaying} loading={!!(state.current && !state.duration)} />
+          <Progressbar isFullscreen />
         </div>
       </div>
     </div>
