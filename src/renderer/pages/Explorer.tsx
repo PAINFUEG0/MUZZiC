@@ -147,7 +147,7 @@ export function List() {
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={current.name}
             animate={{ x: 0, opacity: 1 }}
