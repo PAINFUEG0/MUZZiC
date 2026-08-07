@@ -130,7 +130,7 @@ export function Preload() {
           (node.files[i] as any) = {
             ...node.files[i],
             ...metadata[node.files[i]!.id]!,
-            thumb: `${thumbPath}/thumbnail.${node.files[i]!.id}.jpg`,
+            thumb: `${thumbPath}/thumbnail.${node.files[i]!.id}.jpg`.replaceAll(/\\/g, "/").replaceAll(/%2F/g, "/"),
           } satisfies BaseTrack;
 
         node.dirs.forEach((e) => populateTreeWithMeta(e, metadata));
