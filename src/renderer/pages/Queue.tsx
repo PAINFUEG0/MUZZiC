@@ -45,7 +45,7 @@ export function Queue() {
     [queue, liked, currentIndex],
   );
 
-  const [list] = useVirtualList({ scrollRef, list: queue, getItemKey: (index) => index.toString(), Component });
+  const [list, virtualizer] = useVirtualList({ scrollRef, list: queue, getItemKey: (index) => index.toString(), Component });
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
@@ -53,6 +53,18 @@ export function Queue() {
         <div className="flex h-fit w-full flex-row gap-3">
           <button children={<LuListMusic />} className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95" />
           <div className="font-medium">Playaback queue</div>
+        </div>
+
+        <div
+          onClick={() => virtualizer.scrollToIndex(currentIndex - 1, { align: "start" })}
+          className="mx-1 flex h-fit w-fit cursor-pointer items-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
+        >
+          <div>Jump to current</div>
+          <div className="text-center text-[10px]" children="(" />
+          <div className="mt-px text-center text-[10px]" children={currentIndex + 1} />
+          <div className="mt-px text-center text-[10px]" children="/" />
+          <div className="mt-px text-center text-[10px]" children={queue.length} />
+          <div className="text-center text-[10px]" children=")" />
         </div>
 
         <div
