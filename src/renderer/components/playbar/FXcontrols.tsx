@@ -4,8 +4,8 @@ import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
 import { playerEffects, playerState } from "../../player";
-import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
+import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
 type T = ReturnType<(typeof playerState)["use"]>;
@@ -21,6 +21,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
     <div className="flex h-full w-full flex-row items-center justify-end gap-10 px-7">
       <div className="flex h-full w-fit flex-row items-center gap-5 pl-5">
         <div
+          id="crossfeed-button"
           children={<LuRotate3D />}
           style={{ opacity: canCF ? 1 : 0 }}
           onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 0.5 }))}
@@ -30,8 +31,8 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
         <div
           id="like-button"
           children={id && liked.includes(id) ? <RiHeartFill /> : <RiHeartLine />}
-          onClick={() => id && setLiked((liked) => (liked.includes(id) ? liked.filter((e) => e !== id) : [...liked, id]))}
           className={"cursor-pointer active:scale-85 " + (liked.includes(id!) ? " text-(--accent-color)" : "")}
+          onClick={() => id && setLiked((liked) => (liked.includes(id) ? liked.filter((e) => e !== id) : [...liked, id]))}
         />
 
         <div
@@ -40,9 +41,9 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
           className={"cursor-pointer active:scale-85 " + (repeatMode ? " text-(--accent-color)" : "")}
         />
 
-        <RiMoonFill onClick={() => setOpen(true)} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
+        <div id="sleep-button" onClick={() => setOpen(true)} children={<RiMoonFill />} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
 
-        <LuSlidersVertical className="cursor-pointer hover:text-(--accent-color) active:scale-85" onClick={() => setScene({ scene: "equalizer" })} />
+        <div id="eq-button" onClick={() => setScene({ scene: "equalizer" })} children={<LuSlidersVertical />} className="cursor-pointer hover:text-(--accent-color) active:scale-85" />
       </div>
 
       <Volume FX={fx} setFX={setFx} />

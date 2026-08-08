@@ -19,15 +19,9 @@ export const Volume = memo(({ FX, setFX }: { FX: _[0]; setFX: _[1] }) => {
       </div>
 
       <div className="flex h-fit w-fit flex-row items-center gap-1.5">
-        {FX.mute || FX[T] === 0 ? (
-          <button children={<LuVolumeOff className="w-5 cursor-pointer" onClick={() => setFX((s: any) => ({ ...s, mute: false }))} />} />
-        ) : FX[T] > 0 && FX[T] <= 30 ? (
-          <button children={<LuVolume className="w-5 cursor-pointer" onClick={() => setFX((s: any) => ({ ...s, mute: true }))} />} />
-        ) : FX[T] > 30 && FX[T] <= 60 ? (
-          <button children={<LuVolume1 className="w-5 cursor-pointer" onClick={() => setFX((s: any) => ({ ...s, mute: true }))} />} />
-        ) : (
-          <button children={<LuVolume2 className="w-5 cursor-pointer" onClick={() => setFX((s: any) => ({ ...s, mute: true }))} />} />
-        )}
+        <div id="mute-unmute-button" onClick={() => setFX((_) => ({ ..._, mute: !_.mute }))} className="w-5 cursor-pointer">
+          {FX.mute || FX[T] === 0 ? <LuVolumeOff /> : FX[T] > 0 && FX[T] <= 30 ? <LuVolume /> : FX[T] > 30 && FX[T] <= 60 ? <LuVolume1 /> : <LuVolume2 />}
+        </div>
 
         <Slider
           min={0}

@@ -17,22 +17,23 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index, isF
       {[
         isFullscreen
           ? { Icon: <LU.LuSwitchCamera className="opacity-70 hover:opacity-100" />, onclick: () => setGradient!((_) => !_) }
-          : { Icon: <LU.LuList className="opacity-70 hover:opacity-100" />, onclick: () => setScene({ scene: "queue" }) },
-        { Icon: <LU.LuFastForward className="rotate-180 opacity-70 hover:opacity-100" />, onclick: methods.seekBackward },
-        { Icon: <LU.LuSkipBack className="opacity-70 hover:opacity-100" />, onclick: methods.prev },
+          : { id: "queue-button", Icon: <LU.LuList className="opacity-70 hover:opacity-100" />, onclick: () => setScene({ scene: "queue" }) },
+        { id: "seekBackward-button", Icon: <LU.LuFastForward className="rotate-180 opacity-70 hover:opacity-100" />, onclick: methods.seekBackward },
+        { id: "prev-button", Icon: <LU.LuSkipBack className="opacity-70 hover:opacity-100" />, onclick: methods.prev },
         loading
-          ? { Icon: <LU.LuLoaderCircle className="animate-spin" /> }
+          ? { id: "play-pause-button", Icon: <LU.LuLoaderCircle className="animate-spin" /> }
           : isPlaying
-            ? { Icon: <LU.LuPause className="opacity-70 hover:opacity-100" />, onclick: methods.pause }
-            : { Icon: <LU.LuPlay className="opacity-70 hover:opacity-100" />, onclick: methods.resume },
-        { Icon: <LU.LuSkipForward className="opacity-70 hover:opacity-100" />, onclick: methods.skip },
-        { Icon: <LU.LuFastForward className="opacity-70 hover:opacity-100" />, onclick: methods.seekForward },
+            ? { id: "play-pause-button", Icon: <LU.LuPause className="opacity-70 hover:opacity-100" />, onclick: methods.pause }
+            : { id: "play-pause-button", Icon: <LU.LuPlay className="opacity-70 hover:opacity-100" />, onclick: methods.resume },
+        { id: "skip-button", Icon: <LU.LuSkipForward className="opacity-70 hover:opacity-100" />, onclick: methods.skip },
+        { id: "seekForward-button", Icon: <LU.LuFastForward className="opacity-70 hover:opacity-100" />, onclick: methods.seekForward },
         {
+          id: "shuffle-button",
           Icon: <LU.LuShuffle className="text-[15px] opacity-70 hover:opacity-100" />,
           onclick: () => setQueue((q) => [...q.slice(0, index + 1), ...q.slice(index + 1).sort(() => Math.random() - 0.5)]),
         },
-      ].map(({ Icon, onclick }, i) => (
-        <button key={i} children={Icon} onClick={onclick} className={`cursor-pointer p-px active:scale-85 ` + (isFullscreen ? "hover:text-white" : "hover:text-(--accent-color)")} />
+      ].map(({ id, Icon, onclick }, i) => (
+        <button id={id} key={i} children={Icon} onClick={onclick} className={`cursor-pointer p-px active:scale-85 ` + (isFullscreen ? "hover:text-white" : "hover:text-(--accent-color)")} />
       ))}
     </div>
   );
