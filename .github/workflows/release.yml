@@ -1,0 +1,118 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+
+jobs:
+  state:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changed: ${{ steps.changed.outputs.changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get current version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Compare old version
+        id: changed
+        run: |
+          PREV=$(git show HEAD~1:package.json 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version" 2>/dev/null || echo "")
+          CURR="${{ steps.version.outputs.version }}"
+          if [ "$PREV" != "$CURR" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: state
+    if: needs.state.outputs.changed == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+          - os: ubuntu-latest
+            platform: linux
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install WiX v3
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $wixUrl  = "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip"
+          $zipPath = "$env:TEMP\wix3-binaries.zip"
+          $wixDir  = "$env:USERPROFILE\wix3"
+
+          Invoke-WebRequest -Uri $wixUrl -OutFile $zipPath
+          Expand-Archive -Path $zipPath -DestinationPath $wixDir -Force
+
+          echo "$wixDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "WIX=$wixDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build for ${{ matrix.platform }}
+        run: npx electron-forge make --arch=x64
+
+      - name: Collect artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/upload"
+          find out/make -maxdepth 3 \( -name "*.msi" -o -name "*.zip" -o -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.rpm" \) \
+            -exec cp {} "$RUNNER_TEMP/upload/" \;
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          ls "$RUNNER_TEMP/upload" >> "$GITHUB_OUTPUT"
+          echo "EOF"                >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.platform }}
+          path: ${{ runner.temp }}/upload/*
+          if-no-files-found: warn
+
+  release:
+    needs: [state, build]
+    if: needs.state.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: artifacts-*
+
+      - name: Merge artifacts
+        run: |
+          mkdir -p release
+          find artifacts -type f -exec cp {} release/ \;
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.state.outputs.version }}
+          name: v${{ needs.state.outputs.version }}
+          generate_release_notes: true
+          files: release/*
