@@ -65,6 +65,7 @@ export type API = {
   close: () => Promise<void>;
   minimize: () => Promise<void>;
   fullscreen: () => Promise<void>;
+  openExternal: (url: string) => Promise<void>;
   openFolderDialog: () => Promise<string | null>;
   usage: () => Promise<{ CPU: number; RAM: number; cpu: UsageComponents; mem: UsageComponents }>;
 };

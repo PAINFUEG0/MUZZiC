@@ -1,12 +1,14 @@
 /** @format */
 
+import axios from "axios";
+import pkg from "../../../package.json";
 import Player from "../player/player.js";
 import { Root } from "../layouts/Root.js";
 import { useState, useEffect } from "react";
 import { themeStore } from "../stores/theme.js";
-import { flatten, hexToRgba, sleep } from "../../shared/helpers.js";
-import { likedSongsStore, pcmFormatStore, treeStore } from "../stores";
-import { API, DirNode, MessagePayload, BaseTrack, Tree } from "../../shared/types";
+import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
+import { DirNode, MessagePayload, BaseTrack, Tree, API } from "../../shared/types";
+import { likedSongsStore, notificationsStore, pcmFormatStore, treeStore } from "../stores";
 
 export function Preload() {
   const [theme] = themeStore.use();
@@ -15,8 +17,15 @@ export function Preload() {
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [, setPcmFormat] = pcmFormatStore.use();
+  const [, setNotifications] = notificationsStore.use();
   const [task, setTask] = useState<string>("Initializing");
   const [footer, setFooter] = useState<string | null>(null);
+
+  window.api = new Proxy({} as API, {
+    get(_, K) {
+      return (...args: any[]) => window.invoke(String(K), ...args);
+    },
+  });
 
   useEffect(() => {
     document.documentElement.style.setProperty("--accent-color", theme.accent);
@@ -29,12 +38,6 @@ export function Preload() {
 
   useEffect(() => {
     const run = async () => {
-      window.api = new Proxy({} as API, {
-        get(_, K) {
-          return (...args: any[]) => window.invoke(String(K), ...args);
-        },
-      });
-
       setTask("Initializing conns, deps and peers");
 
       const port = await window.api.getPort();
@@ -145,6 +148,30 @@ export function Preload() {
       await sleep(200);
       setReady(true);
       ws.close();
+
+      const [res, err] = await safeAwait(axios.head("https://github.com/PAINFUEG0/MUZZiC/releases/latest"));
+      if (err) return;
+
+      const latestVersion = res.request.responseURL.split("/").at(-1);
+
+      if (latestVersion !== `v${pkg.version}`)
+        setNotifications((_) => [
+          ..._,
+          {
+            id: "update",
+            title: "A new version is available",
+            body: (
+              <div className="flex h-fit w-full flex-col gap-0.5 text-[10px] opacity-70">
+                <div onClick={() => window.api.openExternal("https://github.com/PAINFUEG0/MUZZiC/releases/latest")} className="cursor-pointer hover:text-(--accent-color) hover:underline">
+                  Click to visit the download page ( <span className="text-red-400">v{pkg.version}</span> → <span className="text-(--accent-color)">{latestVersion}</span> )
+                </div>
+                <div className="flex w-full flex-row items-center justify-end gap-1">
+                  <div>~ com.painfuego.muzzic</div>
+                </div>
+              </div>
+            ),
+          },
+        ]);
     };
 
     run();
