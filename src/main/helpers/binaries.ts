@@ -32,5 +32,5 @@ export async function downloadBinary(_: (typeof bin)[keyof typeof bin], onProgre
   await axios
     .get(_.remoteResourceURI, { responseType: "stream", onDownloadProgress: onProgress })
     .then(({ data }) => stream.promises.pipeline(data, fs.createWriteStream(_.path)))
-    .then(async () => void (!WIN32 && (await execute(`chmod +x ${_.path}`))));
+    .then(async () => void (!WIN32 && (await execute(`chmod +x "${_.path}"`))));
 }
