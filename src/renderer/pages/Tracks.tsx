@@ -10,12 +10,14 @@ import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useMemo, useCallback, useState } from "react";
-import { likedSongsStore, searchBox, treeStore } from "../stores";
+import { SelectActions } from "../components/utils/SelectActions";
+import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
 
 export function Tracks() {
   const [data] = treeStore.use();
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
+  const [inSelectionMode] = selectMode.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
@@ -37,9 +39,9 @@ export function Tracks() {
           key={tracks[index]!.id}
           end={index === tracks.length - 1}
           isLiked={liked.includes(tracks[index]!.id)}
-          button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
-          button2={<BiTrash className="shrink-0 opacity-40" />}
-          button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
+          button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
+          button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
+          button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
           onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
           onLike={() => setLiked((liked) => (liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id]))}
         />
@@ -56,7 +58,9 @@ export function Tracks() {
           <div className="font-medium">Playable tracks</div>
         </div>
 
-        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
+        {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>}
+
+        <SelectActions />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

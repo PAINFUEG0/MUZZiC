@@ -10,14 +10,16 @@ import { Track } from "../components/utils/Track";
 import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
-import { likedSongsStore, searchBox, treeStore } from "../stores";
-import { useRef, useEffect, useMemo, useCallback, useState } from "react";
+import { useRef, useMemo, useCallback, useState } from "react";
+import { SelectActions } from "../components/utils/SelectActions";
+import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
 
 export function Liked() {
   const [data] = treeStore.use();
+  const [query] = searchBox.use();
   const [methods] = playerMethods.use();
-  const [query, setQuery] = searchBox.use();
   const [info, setInfo] = useState<any>(null);
+  const [inSelectionMode] = selectMode.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
@@ -45,9 +47,9 @@ export function Liked() {
             key={track.id}
             isLiked={true}
             initial={index === 0}
-            button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
-            button2={<BiTrash className="shrink-0 opacity-40" />}
-            button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
+            button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
+            button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
+            button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
             end={index === tracks.length - 1}
             onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
             onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
@@ -58,8 +60,6 @@ export function Liked() {
     ),
   });
 
-  useEffect(() => setQuery(""), []);
-
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
@@ -68,7 +68,8 @@ export function Liked() {
           <div className="font-medium">Liked songs</div>
         </div>
 
-        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>
+        {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>}
+        <SelectActions />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

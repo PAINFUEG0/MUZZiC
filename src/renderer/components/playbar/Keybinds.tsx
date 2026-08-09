@@ -1,18 +1,22 @@
 /** @format */
 
 import { memo, useEffect, useRef } from "react";
-import { sceneStore, playerMethods, playerState, playerEffects } from "../../stores";
+import { sceneStore, playerMethods, playerState, playerEffects, selected, selectMode } from "../../stores";
 
 export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boolean; setFullscreen: (arg: boolean) => void }) => {
   const [state] = playerState.use();
   const [, setFX] = playerEffects.use();
   const [, setScene] = sceneStore.use();
+  const [, setSelctions] = selected.use();
   const [{ seekTo }] = playerMethods.use();
+  const [inSelectionMode, setInSelectionMode] = selectMode.use();
 
   const _state = useRef(state);
   const _fullscreen = useRef(fullscreen);
+  const _inSelectionMode = useRef(inSelectionMode);
   useEffect(() => void (_state.current = state), [state]);
   useEffect(() => void (_fullscreen.current = fullscreen), [fullscreen]);
+  useEffect(() => void (_inSelectionMode.current = inSelectionMode), [inSelectionMode]);
 
   useEffect(() => {
     const keybinds: Record<string, () => void> = {
@@ -32,8 +36,8 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
       _KeyD: () => setScene({ scene: "downloads" }),
 
       // fullscreen
-      Escape: () => _fullscreen && setFullscreen(false),
       KeyF: () => _state.current.current && setFullscreen(true),
+      Escape: () => (_fullscreen.current ? setFullscreen(false) : _inSelectionMode.current ? (setInSelectionMode(false), setSelctions([])) : null),
 
       // volume
       ArrowUp: () => setFX((_) => ({ ..._, PG: Math.min(100, _.PG + 5) })),

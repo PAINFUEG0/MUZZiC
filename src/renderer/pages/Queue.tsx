@@ -8,6 +8,7 @@ import { BiTrash, BiAddToQueue } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useCallback, useMemo, useState } from "react";
+import { SelectActions } from "../components/utils/SelectActions";
 import { playerIndex, playerMethods, playerQueue } from "../player";
 
 export function Queue() {
@@ -32,14 +33,14 @@ export function Queue() {
         isCurrentlyPlaying={index === currentIndex}
         onClick={() => methods.jumpTo(queue.findIndex((t) => t.id === queue[index]!.id))}
         onLike={() => setLiked((liked) => (liked.includes(queue[index]!.id) ? liked.filter((e) => e !== queue[index]!.id) : [...liked, queue[index]!.id]))}
-        button1={<BiAddToQueue className="shrink-0 opacity-40" />}
+        button1={<BiAddToQueue className="shrink-0 cursor-pointer opacity-40" />}
         button2={
           <BiTrash
             onClick={() => index > currentIndex && setQueue((_) => _.filter((__) => __.id !== _[index]!.id))}
             className={"shrink-0 transition-all duration-100 active:scale-90 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
           />
         }
-        button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(queue[index]!)} />}
+        button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(queue[index]!)} />}
       />
     ),
     [queue, liked, currentIndex],
@@ -78,6 +79,8 @@ export function Queue() {
           onClick={methods.destroy}
           className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
         />
+
+        <SelectActions />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

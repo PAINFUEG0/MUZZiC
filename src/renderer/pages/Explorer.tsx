@@ -14,15 +14,16 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { Directory } from "../components/utils/Directory";
 import { DirectoryGrid } from "../components/utils/DirectoryGrid";
+import { SelectActions } from "../components/utils/SelectActions";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { treeStore, searchBox, likedSongsStore, needsRestart } from "../stores";
 
 export function List() {
   const [tree] = treeStore.use();
+  const [query] = searchBox.use();
   const [methods] = playerMethods.use();
   const [rs, setRs] = needsRestart.use();
   const [path, setPath] = useState([tree]);
-  const [query, setQuery] = searchBox.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
@@ -44,8 +45,6 @@ export function List() {
     ],
     [dirs, files],
   );
-
-  useEffect(() => setQuery(""), []);
 
   useEffect(() => {
     setDirs(current.dirs);
@@ -81,9 +80,9 @@ export function List() {
               initial={row.index === 0}
               end={row.index === row.len - 1}
               isLiked={liked.includes(row.file.id)}
-              button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([row.file])} />}
-              button2={<BiTrash className="shrink-0 opacity-40" />}
-              button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(row.file)} />}
+              button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([row.file])} />}
+              button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
+              button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(row.file)} />}
               onClick={() => (methods.destroy(), methods.jumpTo(current.files.findIndex((t) => t.id === row.file.id)), methods.enqueue(current.files))}
               onLike={() => setLiked((liked) => (liked.includes(row.file.id) ? liked.filter((e) => e !== row.file.id) : [...liked, row.file.id]))}
             />
@@ -144,6 +143,8 @@ export function List() {
                 </span>
               ))}
         </div>
+
+        <SelectActions />
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">

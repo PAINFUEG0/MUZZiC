@@ -1,22 +1,27 @@
 /** @format */
 
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Liked } from "../pages/Liked";
 import { motion } from "framer-motion";
 import { Queue } from "../pages/Queue";
-import { sceneStore } from "../stores";
 import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { themeStore } from "../stores/theme";
+import { Equalizer } from "../pages/Equalizer";
 import { hexToRgba } from "../../shared/helpers";
-import Equalizer from "../pages/Equalizer";
+import { sceneStore, searchBox, selected, selectMode } from "../stores";
 
 export const Viewport = memo(() => {
   let page;
   const [scene] = sceneStore.use();
   const [theme] = themeStore.use();
+  const [, setQuery] = searchBox.use();
+  const [, setSelections] = selected.use();
+  const [, setSelectionMode] = selectMode.use();
+
+  useEffect(() => (setQuery(""), setSelections([]), setSelectionMode(false)), [scene.scene]);
 
   switch (scene.scene) {
     case "explorer":

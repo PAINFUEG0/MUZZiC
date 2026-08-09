@@ -13,8 +13,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
-import { likedSongsStore, searchBox, treeStore } from "../stores";
+import { SelectActions } from "../components/utils/SelectActions";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
 
 export function Artists() {
   type Row = ArtistRow | TrackRow;
@@ -24,6 +25,7 @@ export function Artists() {
   const [data] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
+  const [inSelectionMode] = selectMode.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
@@ -65,9 +67,9 @@ export function Artists() {
         initial={index === 0}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
-        button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
-        button2={<BiTrash className="shrink-0 opacity-40" />}
-        button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
+        button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
+        button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
+        button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
         onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
@@ -112,8 +114,8 @@ export function Artists() {
             {selected && <div className="min-w-0 truncate" children={selected} />}
           </div>
         </div>
-
-        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>
+        {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>}
+        <SelectActions />{" "}
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">

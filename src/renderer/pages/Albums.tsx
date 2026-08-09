@@ -13,8 +13,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { TrackInfo } from "../components/utils/TrackInfo";
-import { likedSongsStore, searchBox, treeStore } from "../stores";
+import { SelectActions } from "../components/utils/SelectActions";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
 
 export function Albums() {
   type Row = AlbumRow | TrackRow;
@@ -24,6 +25,7 @@ export function Albums() {
   const [tree] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
+  const [inSelectionMode] = selectMode.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -92,9 +94,9 @@ export function Albums() {
         initial={index === 0}
         end={index === data.length - 1}
         isLiked={liked.includes(data[index]!.id)}
-        button1={<BiAddToQueue className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
-        button2={<BiTrash className="shrink-0 opacity-40" />}
-        button3={<LuInfo className="shrink-0 transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
+        button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
+        button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
+        button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
         onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
       />
@@ -126,7 +128,8 @@ export function Albums() {
           </div>
         </div>
 
-        <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>
+        {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>}
+        <SelectActions />
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
