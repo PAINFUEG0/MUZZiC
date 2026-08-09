@@ -3,6 +3,7 @@
 import pkg from "./package.json";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";
+import { MakerDMG } from "@electron-forge/maker-dmg";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
@@ -41,5 +42,9 @@ export default {
     }),
   ],
 
-  makers: [new MakerZIP({}, ["linux", "darwin"]), new MakerWix({ ui, name, icon, exe: name, description, beforeCreate, manufacturer, appUserModelId, upgradeCode, programFilesFolderName: name })],
+  makers: [
+    new MakerZIP({}, ["linux"]),
+    new MakerDMG({}, ["darwin"]),
+    new MakerWix({ ui, name, icon, exe: name, description, beforeCreate, manufacturer, appUserModelId, upgradeCode, programFilesFolderName: name }),
+  ],
 } satisfies ForgeConfig;

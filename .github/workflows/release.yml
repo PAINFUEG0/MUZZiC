@@ -43,6 +43,8 @@ jobs:
             platform: win32
           - os: ubuntu-latest
             platform: linux
+          - os: macos-15-intel
+            platform: darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -78,7 +80,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/upload"
-          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.exe" \) \
+          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.exe" -o -name "*.dmg" \) \
             -exec cp {} "$RUNNER_TEMP/upload/" \; || true
 
       - name: Upload artifacts
