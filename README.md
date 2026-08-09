@@ -1,5 +1,7 @@
 <!-- @format -->
 
+Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
 ## Keyboard Shortcuts
 
 Shortcuts are disabled while typing in the search box.
