@@ -5,12 +5,12 @@ import { presets } from "../utils/presets";
 import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
 
 // I don't like the way this is done, but I'm too fcuked to change it
 
-export default function Equalizer() {
+export const Equalizer = memo(() => {
   const lim = 12;
   const [lastX, setLastX] = useState(0);
   const [firstX, setFirstX] = useState(0);
@@ -184,4 +184,4 @@ export default function Equalizer() {
       </div>
     </div>
   );
-}
+});
