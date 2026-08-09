@@ -9,8 +9,9 @@ import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
 type T = ReturnType<(typeof playerState)["use"]>;
+type Props = { id: string | null; repeatMode?: boolean; canCF: boolean; setState: T[1] };
 
-export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: string | null; repeatMode?: boolean; canCF: boolean; setState: T[1] }) => {
+export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
   const [, setScene] = sceneStore.use();
   const [open, setOpen] = useState(false);
   const [fx, setFx] = playerEffects.use();
@@ -19,7 +20,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: { id: strin
 
   return (
     <div className="flex h-full w-full flex-row items-center justify-end gap-10 px-7">
-      <div className="flex h-full w-fit flex-row items-center gap-5 pl-5">
+      <div className="grid grid-cols-5 gap-5 xl:pr-3">
         <div
           id="crossfeed-button"
           children={<LuRotate3D />}
