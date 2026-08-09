@@ -40,7 +40,7 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
       Escape: () => (_fullscreen.current ? setFullscreen(false) : _inSelectionMode.current ? (setInSelectionMode(false), setSelctions([])) : null),
 
       // volume
-      ArrowUp: () => setFX((_) => ({ ..._, PG: Math.min(100, _.PG + 5) })),
+      ArrowUp: () => setFX((_) => ({ ..._, PG: Math.min(150, _.PG + 5) })),
       ArrowDown: () => setFX((_) => ({ ..._, PG: Math.max(0, _.PG - 5) })),
       _ArrowUp: () => setFX((_) => ({ ..._, IG: Math.min(100, _.IG + 5) })),
       _ArrowDown: () => setFX((_) => ({ ..._, IG: Math.max(0, _.IG - 5) })),
@@ -57,9 +57,9 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
       const el = e.target as HTMLElement;
       if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT") return;
 
-      (e.ctrlKey || e.metaKey) && ["k", "f"].includes(e.key.toLowerCase()) && (e.preventDefault(), document.getElementById("search-bar")!.focus());
-      e.code in keybinds && (e.preventDefault(), keybinds[e.code]!());
-      `_${e.code}` in keybinds && e.shiftKey && (e.preventDefault(), keybinds[`_${e.code}`]!());
+      if ((e.ctrlKey || e.metaKey) && ["k", "f"].includes(e.key.toLowerCase())) return (e.preventDefault(), document.getElementById("search-bar")!.focus());
+      if (`_${e.code}` in keybinds && e.shiftKey) return (e.preventDefault(), keybinds[`_${e.code}`]!());
+      if (e.code in keybinds) return (e.preventDefault(), keybinds[e.code]!());
     };
 
     window.addEventListener("keydown", listener);

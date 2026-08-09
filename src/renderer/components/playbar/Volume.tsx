@@ -26,9 +26,9 @@ export const Volume = memo(({ FX, setFX }: { FX: _[0]; setFX: _[1] }) => {
         <Slider
           min={0}
           step={1}
-          max={100}
           value={FX[T]}
           className="h-1 w-25"
+          max={T === "PG" ? 150 : 100}
           thumb={{ height: "0.70rem", width: "0.70rem" }}
           onChange={(e) => setFX((s: any) => ({ ...s, [T]: Number(e.target.value) }))}
         />
