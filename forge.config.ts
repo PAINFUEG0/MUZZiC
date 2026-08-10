@@ -3,25 +3,17 @@
 import pkg from "./package.json";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";
-import { MakerDMG } from "@electron-forge/maker-dmg";
+import { MakerDeb } from "@electron-forge/maker-deb";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 
-const ui = { chooseDirectory: true };
-
 const icon = pkg.icon;
 const name = pkg.name.toUpperCase();
-const description = pkg.description;
-const manufacturer = pkg.author.name;
-const appUserModelId = pkg.appUserModelId;
-const upgradeCode = "89581fa5-b7e5-480b-bac5-5fdfb8d18944";
-
-const beforeCreate = (creator: any) => (creator.wixTemplate = creator.wixTemplate.replace(/Value="{{ApplicationName}} \(Machine\)"/g, 'Value="{{ApplicationName}}"'));
 
 export default {
-  packagerConfig: { asar: true, executableName: name, icon },
+  packagerConfig: { icon, name, asar: true, overwrite: true, osxSign: {} },
 
   plugins: [
     new FusesPlugin({
@@ -43,8 +35,27 @@ export default {
   ],
 
   makers: [
-    new MakerZIP({}, ["linux"]),
-    new MakerDMG({}, ["darwin"]),
-    new MakerWix({ ui, name, icon, exe: name, description, beforeCreate, manufacturer, appUserModelId, upgradeCode, programFilesFolderName: name }),
+    new MakerZIP({}, ["linux", "darwin"]),
+    new MakerWix({
+      icon,
+      name,
+      programFilesFolderName: name,
+      appUserModelId: pkg.appUserModelId,
+      upgradeCode: "89581fa5-b7e5-480b-bac5-5fdfb8d18944",
+      ui: { chooseDirectory: true },
+      beforeCreate(creator) {
+        creator.wixTemplate = creator.wixTemplate.replace(/(?<={{ApplicationName}})(\s+\((Machine|User).*\))/gi, "");
+      },
+    }),
+    new MakerDeb({
+      options: {
+        icon: icon.replace(".ico", ".png"),
+        productName: name,
+        version: pkg.version,
+        maintainer: pkg.author.name,
+        description: pkg.description,
+        categories: ["Audio"],
+      },
+    }),
   ],
 } satisfies ForgeConfig;
