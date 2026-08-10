@@ -41,10 +41,13 @@ jobs:
         include:
           - os: windows-latest
             platform: win32
+            arch: x64
           - os: ubuntu-latest
             platform: linux
-          - os: macos-15-intel
+            arch: x64
+          - os: macos-latest
             platform: darwin
+            arch: universal
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,14 +76,14 @@ jobs:
           echo "WIX=$wixDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Build for ${{ matrix.platform }}
-        run: npx electron-forge make --arch=x64
+        run: npx electron-forge make --arch=${{ matrix.arch }}
 
       - name: Collect artifacts
         id: artifacts
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/upload"
-          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.exe" -o -name "*.dmg" \) \
+          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.deb" \) \
             -exec cp {} "$RUNNER_TEMP/upload/" \; || true
 
       - name: Upload artifacts
@@ -102,6 +105,7 @@ jobs:
         with:
           path: artifacts
           pattern: artifacts-*
+          merge-multiple: true
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -109,4 +113,4 @@ jobs:
           tag_name: v${{ needs.check.outputs.version }}
           name: v${{ needs.check.outputs.version }}
           generate_release_notes: true
-          files: artifacts/**/*
+          files: artifacts/*
