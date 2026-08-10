@@ -13,7 +13,7 @@ const icon = pkg.icon;
 const name = pkg.name.toUpperCase();
 
 export default {
-  packagerConfig: { icon, name, asar: true, overwrite: true, osxSign: {} },
+  packagerConfig: { icon, name, asar: true, overwrite: true, executableName: pkg.name, osxSign: {} },
 
   plugins: [
     new FusesPlugin({
