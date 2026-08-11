@@ -69,7 +69,7 @@ export function Liked() {
         </div>
 
         {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>}
-        <SelectActions />
+        <SelectActions competeList={flat.map((_) => _.id)} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

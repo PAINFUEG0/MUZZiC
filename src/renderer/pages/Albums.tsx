@@ -129,7 +129,7 @@ export function Albums() {
         </div>
 
         {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>}
-        <SelectActions />
+        <SelectActions competeList={rows.type === "tracks" ? rows.data.flat().map((_) => _.id) : undefined} />
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">

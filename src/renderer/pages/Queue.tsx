@@ -80,7 +80,7 @@ export function Queue() {
           className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
         />
 
-        <SelectActions />
+        <SelectActions competeList={queue.map((_) => _.id)} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">
