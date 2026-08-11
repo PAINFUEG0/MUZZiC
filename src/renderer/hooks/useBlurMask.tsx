@@ -21,10 +21,10 @@ export function useBlurMask(ref: React.RefObject<HTMLDivElement | null>, display
         start && end
           ? "none"
           : start
-            ? `linear-gradient(${direction}, black 95%, transparent 100%)`
+            ? `linear-gradient(${direction}, black 80%, transparent 100%)`
             : end
-              ? `linear-gradient(${direction}, transparent 0%, black 5%)`
-              : `linear-gradient(${direction}, transparent 0%, black 5%, black 95%, transparent 100%)`;
+              ? `linear-gradient(${direction}, transparent 0%, black 20%)`
+              : `linear-gradient(${direction}, transparent 0%, black 20%, black 80%, transparent 100%)`;
     };
 
     const mutation = new MutationObserver(() => requestAnimationFrame(mask));
