@@ -8,12 +8,14 @@ import { useState, useEffect } from "react";
 import { themeStore } from "../stores/theme.js";
 import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
 import { DirNode, MessagePayload, BaseTrack, Tree, API } from "../../shared/types";
-import { likedSongsStore, notificationsStore, pcmFormatStore, treeStore } from "../stores";
+import { likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistStore, treeStore } from "../stores";
 
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
   const [liked] = likedSongsStore.use();
+  const [data] = playlistDataStore.use();
+  const [playlists] = playlistStore.use();
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [, setPcmFormat] = pcmFormatStore.use();
@@ -34,7 +36,11 @@ export function Preload() {
     document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
   }, [theme]);
 
+  useEffect(() => {
+    for (const K in data) localStorage.setItem(K, JSON.stringify(data[K]));
+  }, [data]);
   useEffect(() => localStorage.setItem("liked", JSON.stringify(liked)), [liked]);
+  useEffect(() => localStorage.setItem("playlists", JSON.stringify(playlists)), [playlists]);
 
   useEffect(() => {
     const run = async () => {

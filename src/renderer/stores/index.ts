@@ -15,3 +15,9 @@ export const notificationsStore = createGlobalStore<{ id: string; title: string;
 
 export const selected = createGlobalStore<string[]>([]);
 export const selectMode = createGlobalStore<boolean>(false);
+
+const playlists = JSON.parse(localStorage.getItem("playlists") ?? "[]") as { name: string; K: string }[];
+const data = Object.fromEntries(playlists.map((_) => [_.K, JSON.parse(localStorage.getItem(_.K) ?? "[]") as string[]]));
+
+export const playlistDataStore = createGlobalStore(data);
+export const playlistStore = createGlobalStore(playlists);
