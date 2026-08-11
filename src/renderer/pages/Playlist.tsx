@@ -20,10 +20,10 @@ export const Playlist = memo(({ K }: { K: string }) => {
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
   const [, setScene] = sceneStore.use();
-  const [, setLiked] = likedSongsStore.use();
   const [info, setInfo] = useState<any>(null);
   const [inSelectionMode] = selectMode.use();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [liked, setLiked] = likedSongsStore.use();
   const [data, setData] = playlistDataStore.use();
   const [playLists, setPlaylists] = playlistStore.use();
 
@@ -32,7 +32,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
       flatten(tree)
         .filter((e) => data[K]!.includes(e.id))
         .sort((a, b) => a.title.localeCompare(b.title)),
-    [tree, data, K],
+    [tree, data, K, liked],
   );
   const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
@@ -49,8 +49,8 @@ export const Playlist = memo(({ K }: { K: string }) => {
             file={track}
             index={index}
             key={track.id}
-            isLiked={true}
             initial={index === 0}
+            isLiked={liked.includes(track.id)}
             button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
             button2={
               <BiTrash className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setData((data) => ({ ...data, [K]: data[K]!.filter((t) => t !== track.id) }))} />
