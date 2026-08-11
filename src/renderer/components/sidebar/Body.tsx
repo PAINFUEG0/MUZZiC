@@ -23,38 +23,26 @@ export function Body() {
         <Item key={label} icon={icon} label={label} onClick={() => setScene(toSet)} highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} />
       ))}
 
-      {[{ label: "Library", defaultOpen: true, icon: <LuLibrary />, items: libraryItems }].map(({ icon, label, items, defaultOpen }) => (
-        <ExpandableItem
-          key={label}
-          icon={icon}
-          label={label}
-          defaultOpen={defaultOpen}
-          collapsable={!items.some(({ toSet }) => JSON.stringify(scene) === JSON.stringify(toSet))}
-          items={items.map(({ icon, label, toSet }) => (
-            <Item key={label} icon={icon} label={label} onClick={() => setScene(toSet)} highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} />
-          ))}
-        />
-      ))}
+      <ExpandableItem
+        defaultOpen
+        key="Library"
+        label="Library"
+        icon={<LuLibrary />}
+        collapsable={!libraryItems.some(({ toSet }) => JSON.stringify(scene) === JSON.stringify(toSet))}
+        items={libraryItems.map(({ icon, label, toSet }) => (
+          <Item key={label} icon={icon} label={label} onClick={() => setScene(toSet)} highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} />
+        ))}
+      />
 
-      {[
-        {
-          label: "Playlists",
-          defaultOpen: false,
-          icon: <RiPlayListFill />,
-          items: playlists.map(({ name, K }) => ({ icon: <PiMusicNoteBold className="ml-8" />, label: name, toSet: { scene: "playlist", K } })),
-        },
-      ].map(({ icon, label, items, defaultOpen }) => (
-        <ExpandableItem
-          key={label}
-          icon={icon}
-          label={label}
-          defaultOpen={defaultOpen}
-          collapsable={!items.some(({ toSet }) => JSON.stringify(scene) === JSON.stringify(toSet))}
-          items={items.map(({ icon, label, toSet }) => (
-            <Item key={label} icon={icon} label={label} onClick={() => setScene(toSet)} highlighted={JSON.stringify(scene) === JSON.stringify(toSet)} />
-          ))}
-        />
-      ))}
+      <ExpandableItem
+        key="Playlists"
+        label="Playlists"
+        icon={<RiPlayListFill />}
+        collapsable={scene.scene !== "playlist"}
+        items={playlists.map(({ name, K }) => (
+          <Item label={name} highlighted={scene.K === K} icon={<PiMusicNoteBold className="ml-8" />} onClick={() => setScene({ scene: "playlist", K })} />
+        ))}
+      />
     </div>
   );
 }

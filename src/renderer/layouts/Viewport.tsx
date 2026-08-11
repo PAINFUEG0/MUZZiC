@@ -12,6 +12,7 @@ import { themeStore } from "../stores/theme";
 import { Equalizer } from "../pages/Equalizer";
 import { hexToRgba } from "../../shared/helpers";
 import { sceneStore, searchBox, selected, selectMode } from "../stores";
+import { Playlist } from "../pages/Playlist";
 
 export const Viewport = memo(() => {
   let page;
@@ -44,6 +45,9 @@ export const Viewport = memo(() => {
       break;
     case "equalizer":
       page = <Equalizer />;
+      break;
+    case "playlist":
+      page = <Playlist K={scene.K!} />;
       break;
   }
 

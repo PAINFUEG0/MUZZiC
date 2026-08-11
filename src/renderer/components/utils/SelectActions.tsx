@@ -77,7 +77,7 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
             <div className="opacity-70">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, itaque!</div>
           </div>
 
-          <div className="grid max-h-[35dvh] scrollbar-none grid-cols-3 gap-1 overflow-auto">
+          <div className="grid max-h-[35dvh] scrollbar-none grid-cols-2 gap-1 overflow-auto">
             {[{ name: "Liked Songs", K: "liked" }, ...playlists].map(({ name, K }) => {
               return (
                 <button
