@@ -23,7 +23,7 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
 
   useEffect(() => {
     if (!open) return;
-    const handleKeyDown = (event: KeyboardEvent) => event.key === "Escape" && openModalStack[openModalStack.length - 1] === id && close();
+    const handleKeyDown = (event: KeyboardEvent) => event.key === "Escape" && openModalStack[openModalStack.length - 1] === id && (event.stopPropagation(), close());
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
