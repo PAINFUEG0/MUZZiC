@@ -15,7 +15,7 @@ export const Item = ({ icon, label, onClick, highlighted = false }: ItemProps) =
       {highlighted && <div className="absolute inset-0 h-full w-full bg-(--accent-color) opacity-10 backdrop-blur-md" />}
       <div className={"z-1 h-full w-1 rounded-sm " + (highlighted ? "bg-(--accent-color)" : "group-hover:bg-(--accent-color)")} />
       <div className={"z-1 text-base " + (highlighted ? "" : "group-hover:text-(--accent-color)")} children={icon} />
-      <div className="z-1 p-1 text-[13px]" children={label} />
+      <div className="z-1 min-w-0 truncate p-1 pr-2 text-[13px]" children={label} />
     </div>
   );
 };
