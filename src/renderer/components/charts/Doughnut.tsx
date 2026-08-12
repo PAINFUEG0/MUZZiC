@@ -1,11 +1,11 @@
 /** @format */
 
 import * as C from "chart.js";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 
 C.Chart.register(C.ArcElement, C.LineController, C.LineElement, C.PointElement, C.LinearScale, C.CategoryScale, C.PieController);
 
-export function DoughnutChart({ data, size = 12 }: { data: { V: number; hex: string }[]; size?: number }) {
+export const DoughnutChart = memo(({ data, size = 12 }: { data: { V: number; hex: string }[]; size?: number }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const chart = useRef<C.Chart<"doughnut">>(null);
 
@@ -36,4 +36,4 @@ export function DoughnutChart({ data, size = 12 }: { data: { V: number; hex: str
   }, [data]);
 
   return <div className="aspect-square" style={{ height: `calc(var(--spacing) * ${size})` }} children={<canvas ref={canvas} className="h-full w-full" />} />;
-}
+});

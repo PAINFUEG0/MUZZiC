@@ -1,7 +1,7 @@
 /** @format */
 
 import { memo, useEffect, useRef } from "react";
-import { sceneStore, playerMethods, playerState, playerEffects, selected, selectMode } from "../../stores";
+import { sceneStore, playerMethods, playerState, playerEffects, selected, selectMode } from "../stores";
 
 export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boolean; setFullscreen: (arg: boolean) => void }) => {
   const [state] = playerState.use();
@@ -20,13 +20,6 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
 
   useEffect(() => {
     const keybinds: Record<string, () => void> = {
-      // playbar buttons
-      KeyE: () => document.getElementById("eq-button")!.click(),
-      KeyL: () => document.getElementById("like-button")!.click(),
-      KeyS: () => document.getElementById("sleep-button")!.click(),
-      KeyC: () => document.getElementById("crossfeed-button")!.click(),
-      KeyM: () => document.getElementById("mute-unmute-button")!.click(),
-
       // scenes
       _KeyL: () => setScene({ scene: "liked" }),
       _KeyQ: () => setScene({ scene: "queue" }),
@@ -34,6 +27,13 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
       _KeyT: () => setScene({ scene: "tracks" }),
       _KeyE: () => setScene({ scene: "explorer" }),
       _KeyD: () => setScene({ scene: "downloads" }),
+
+      // playbar buttons
+      KeyE: () => document.getElementById("eq-button")!.click(),
+      KeyL: () => document.getElementById("like-button")!.click(),
+      KeyS: () => document.getElementById("sleep-button")!.click(),
+      KeyC: () => document.getElementById("crossfeed-button")!.click(),
+      KeyM: () => document.getElementById("mute-unmute-button")!.click(),
 
       // fullscreen
       KeyF: () => _state.current.current && setFullscreen(true),

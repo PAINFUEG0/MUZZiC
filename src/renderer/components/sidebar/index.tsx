@@ -1,5 +1,6 @@
 /** @format */
 
+import { memo } from "react";
 import { Head } from "./Head";
 import { Body } from "./Body";
 import { Tail } from "./Tail";
@@ -7,7 +8,9 @@ import { motion } from "framer-motion";
 import { themeStore } from "../../stores/theme";
 import { hexToRgba } from "../../../shared/helpers";
 
-export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean; setSettingsOpen: (arg: boolean) => void }) {
+type Props = { sidebarOpen: boolean; setSettingsOpen: React.Dispatch<React.SetStateAction<boolean>> };
+
+export const Sidebar = memo(({ sidebarOpen, setSettingsOpen }: Props) => {
   const [theme] = themeStore.use();
 
   return (
@@ -25,4 +28,4 @@ export function Sidebar({ sidebarOpen, setSettingsOpen }: { sidebarOpen: boolean
       <Tail setisSettingsOpen={setSettingsOpen} />
     </motion.div>
   );
-}
+});

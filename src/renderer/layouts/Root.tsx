@@ -7,9 +7,9 @@ import { Sidebar } from "../components/sidebar";
 import { Playbar } from "../components/playbar";
 import { Modal } from "../components/utils/Modal";
 import { memo, useState } from "react";
+import { Keybinds } from "../utils/Keybinds";
 import { Settings } from "../components/utils/Settings";
 import { AnimatePresence, motion } from "framer-motion";
-import { Keybinds } from "../components/playbar/Keybinds";
 
 export const Root = memo(() => {
   const [fullscreen, setFullscreen] = useState(false);

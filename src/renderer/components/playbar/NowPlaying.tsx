@@ -9,6 +9,7 @@ const _ = { DD: "Spatial ( DD / DTS )", CD: "CD Lossless", HR: "Hi-Res Lossless"
 
 export const NowPlaying = memo(({ index, queueLength, track, setFullscreen }: { index: number; queueLength: number; track: Track | null; setFullscreen: (arg: boolean) => void }) => {
   const [theme] = themeStore.use();
+
   return (
     <div className="flex h-20 w-full min-w-0 flex-row gap-3 p-2">
       <button className="relative aspect-square h-full shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-100 active:scale-95">

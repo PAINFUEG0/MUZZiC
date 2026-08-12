@@ -1,11 +1,11 @@
 /** @format */
 
 import { FaChevronUp } from "react-icons/fa6";
-import { ReactNode, useState, JSX } from "react";
+import { ReactNode, useState, JSX, memo } from "react";
 
 export type ExpandableItemProps = { label: string; collapsable: boolean; icon: ReactNode; defaultOpen?: boolean; items: JSX.Element[] };
 
-export const ExpandableItem = ({ icon, label, items, collapsable, defaultOpen }: ExpandableItemProps) => {
+export const ExpandableItem = memo(({ icon, label, items, collapsable, defaultOpen }: ExpandableItemProps) => {
   const [show, setShow] = useState(defaultOpen);
 
   const item = (
@@ -22,4 +22,4 @@ export const ExpandableItem = ({ icon, label, items, collapsable, defaultOpen }:
   );
 
   return show || !collapsable ? [item, items] : item;
-};
+});

@@ -1,8 +1,10 @@
 /** @format */
 
+import { memo } from "react";
+
 export type ItemProps = { icon: React.ReactNode; label: string; onClick: () => void; highlighted?: boolean };
 
-export const Item = ({ icon, label, onClick, highlighted = false }: ItemProps) => {
+export const Item = memo(({ icon, label, onClick, highlighted = false }: ItemProps) => {
   return (
     <div
       key={label}
@@ -18,4 +20,4 @@ export const Item = ({ icon, label, onClick, highlighted = false }: ItemProps) =
       <div className="z-1 min-w-0 truncate p-1 pr-2 text-[13px]" children={label} />
     </div>
   );
-};
+});

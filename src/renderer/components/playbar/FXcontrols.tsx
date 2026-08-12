@@ -13,10 +13,10 @@ type Props = { id: string | null; repeatMode?: boolean; canCF: boolean; setState
 
 export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
   const [, setScene] = sceneStore.use();
-  const [open, setOpen] = useState(false);
   const [fx, setFx] = playerEffects.use();
   const [liked, setLiked] = likedSongsStore.use();
   const [sleepTime, setSleepTime] = sleepTimer.use();
+  const [showSleepTimerModal, setShowSleepTimerModal] = useState(false);
 
   return (
     <div className="flex h-full w-full flex-row items-center justify-end gap-10 px-7">
@@ -42,14 +42,14 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           className={"cursor-pointer active:scale-85 " + (repeatMode ? " text-(--accent-color)" : "")}
         />
 
-        <div id="sleep-button" onClick={() => setOpen(true)} children={<RiMoonFill />} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
+        <div id="sleep-button" onClick={() => setShowSleepTimerModal(true)} children={<RiMoonFill />} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
 
         <div id="eq-button" onClick={() => setScene({ scene: "equalizer" })} children={<LuSlidersVertical />} className="cursor-pointer hover:text-(--accent-color) active:scale-85" />
       </div>
 
       <Volume FX={fx} setFX={setFx} />
 
-      <Sleep show={open} setShow={setOpen} sleepTime={sleepTime} setSleepTime={setSleepTime} />
+      <Sleep show={showSleepTimerModal} setShow={setShowSleepTimerModal} sleepTime={sleepTime} setSleepTime={setSleepTime} />
     </div>
   );
 });

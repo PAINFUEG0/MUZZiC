@@ -3,8 +3,8 @@
 import { memo, ReactNode } from "react";
 import { Tree } from "../../../shared/types";
 import { LuDisc, LuDisc3 } from "react-icons/lu";
-import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 import { selected, selectMode } from "../../stores";
+import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 
 type Props = {
   end: boolean;

@@ -7,11 +7,11 @@ import pkg from "../../../../package.json";
 import { BsGearWide } from "react-icons/bs";
 import { RiDonutChartFill } from "react-icons/ri";
 import { notificationsStore } from "../../stores";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useBlurMask } from "../../hooks/useBlurMask";
 import { AnimatePresence, motion } from "framer-motion";
 
-export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) {
+export const Tail = memo(({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) => void }) => {
   const [direction, setDirection] = useState(1);
   const [notifications, setNotifications] = notificationsStore.use();
   const [view, setView] = useState<"Notifications" | "Resource Usage Stats" | null>(null);
@@ -99,4 +99,4 @@ export function Tail({ setisSettingsOpen }: { setisSettingsOpen: (arg: boolean) 
       </div>
     </div>
   );
-}
+});

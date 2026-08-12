@@ -18,7 +18,7 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index, isF
         isFullscreen
           ? { Icon: <LU.LuSwitchCamera className="opacity-70 hover:opacity-100" />, onclick: () => setGradient!((_) => !_) }
           : { id: "queue-button", Icon: <LU.LuList className="opacity-70 hover:opacity-100" />, onclick: () => setScene({ scene: "queue" }) },
-        { id: "seekBackward-button", Icon: <LU.LuFastForward className="rotate-180 opacity-70 hover:opacity-100" />, onclick: methods.seekBackward },
+        { id: "seekBackward-button", Icon: <LU.LuFastForward className="rotate-180 opacity-70 hover:opacity-100" />, onclick: () => !loading && methods.seekBackward() },
         { id: "prev-button", Icon: <LU.LuSkipBack className="opacity-70 hover:opacity-100" />, onclick: methods.prev },
         loading
           ? { id: "play-pause-button", Icon: <LU.LuLoaderCircle className="animate-spin" /> }
@@ -26,7 +26,7 @@ export const PlaybackControls = memo(({ setQueue, loading, isPlaying, index, isF
             ? { id: "play-pause-button", Icon: <LU.LuPause className="opacity-70 hover:opacity-100" />, onclick: methods.pause }
             : { id: "play-pause-button", Icon: <LU.LuPlay className="opacity-70 hover:opacity-100" />, onclick: methods.resume },
         { id: "skip-button", Icon: <LU.LuSkipForward className="opacity-70 hover:opacity-100" />, onclick: methods.skip },
-        { id: "seekForward-button", Icon: <LU.LuFastForward className="opacity-70 hover:opacity-100" />, onclick: methods.seekForward },
+        { id: "seekForward-button", Icon: <LU.LuFastForward className="opacity-70 hover:opacity-100" />, onclick: () => !loading && methods.seekForward() },
         {
           id: "shuffle-button",
           Icon: <LU.LuShuffle className="text-[15px] opacity-70 hover:opacity-100" />,

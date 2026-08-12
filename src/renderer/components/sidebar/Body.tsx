@@ -1,19 +1,19 @@
 /** @format */
 
 import { Item } from "./Item";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { LuLibrary } from "react-icons/lu";
 import { RiPlayListFill } from "react-icons/ri";
 import { PiMusicNoteBold } from "react-icons/pi";
 import { ExpandableItem } from "./ExpandableItem";
 import { useBlurMask } from "../../hooks/useBlurMask";
 import { libraryItems, mainItems } from "./constants";
-import { playlistStore, sceneStore } from "../../stores";
+import { playlistIndexStore, sceneStore } from "../../stores";
 
-export function Body() {
-  const [playlists] = playlistStore.use();
+export const Body = memo(() => {
   const ref = useRef<HTMLDivElement>(null);
   const [scene, setScene] = sceneStore.use();
+  const [playlistIndex] = playlistIndexStore.use();
 
   useBlurMask(ref);
 
@@ -39,10 +39,10 @@ export function Body() {
         label="Playlists"
         icon={<RiPlayListFill />}
         collapsable={scene.scene !== "playlist"}
-        items={playlists.map(({ name, K }) => (
+        items={playlistIndex.map(({ name, K }) => (
           <Item label={name} highlighted={scene.K === K} icon={<PiMusicNoteBold className="ml-8" />} onClick={() => setScene({ scene: "playlist", K })} />
         ))}
       />
     </div>
   );
-}
+});

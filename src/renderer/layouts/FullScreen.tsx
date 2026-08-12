@@ -1,10 +1,10 @@
 /** @format */
 
 import { memo, useState } from "react";
-import DynamicBackground from "./DynamicBackground";
 import { BsPerson } from "react-icons/bs";
 import { themeStore } from "../stores/theme";
 import { FaAngleDown } from "react-icons/fa6";
+import DynamicBackground from "./DynamicBackground";
 import { Progressbar } from "../components/playbar/Progressbar";
 import { playerState, playerIndex, playerQueue } from "../stores";
 import { PlaybackControls } from "../components/playbar/PlaybackControls";

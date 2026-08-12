@@ -5,7 +5,7 @@ import { LuInfo } from "react-icons/lu";
 import { RiHeartLine } from "react-icons/ri";
 import { memo, useRef, useState } from "react";
 import { PiMusicNoteBold } from "react-icons/pi";
-import { likedSongsStore, playlistDataStore, playlistStore, selected, selectMode } from "../../stores";
+import { likedSongsStore, playlistDataStore, playlistIndexStore, selected, selectMode } from "../../stores";
 
 export const SelectActions = memo(({ competeList }: { competeList?: string[] }) => {
   const [value, setValue] = useState("");
@@ -14,7 +14,7 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
   const [, setLiked] = likedSongsStore.use();
   const [data, setData] = playlistDataStore.use();
   const [selections, setSelections] = selected.use();
-  const [playlists, setPlaylists] = playlistStore.use();
+  const [playlists, setPlaylists] = playlistIndexStore.use();
   const [inSelectionMode, setInSelectionMode] = selectMode.use();
 
   if (!inSelectionMode) return null;

@@ -11,7 +11,7 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useMemo, useCallback, useState, memo } from "react";
 import { SelectActions } from "../components/utils/SelectActions";
-import { likedSongsStore, playlistDataStore, playlistStore, sceneStore, searchBox, selectMode, treeStore } from "../stores";
+import { likedSongsStore, playlistDataStore, playlistIndexStore, sceneStore, searchBox, selectMode, treeStore } from "../stores";
 import { PiMusicNoteBold } from "react-icons/pi";
 import { MdWarning } from "react-icons/md";
 
@@ -25,7 +25,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
   const [data, setData] = playlistDataStore.use();
-  const [playLists, setPlaylists] = playlistStore.use();
+  const [playLists, setPlaylists] = playlistIndexStore.use();
 
   const flat = useMemo(
     () =>

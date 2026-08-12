@@ -1,7 +1,7 @@
 /** @format */
 
 import { LuX } from "react-icons/lu";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 import { notificationsStore } from "../../stores";
 
 type N = ReturnType<(typeof notificationsStore)["use"]>;
@@ -13,7 +13,7 @@ type Props = {
   containerRef: React.RefObject<HTMLDivElement | null>;
 };
 
-export function Noti({ n, containerRef, onSeen, onDismiss }: Props) {
+export const Noti = memo(({ n, containerRef, onSeen, onDismiss }: Props) => {
   const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,4 +43,4 @@ export function Noti({ n, containerRef, onSeen, onDismiss }: Props) {
       {n.body}
     </div>
   );
-}
+});
