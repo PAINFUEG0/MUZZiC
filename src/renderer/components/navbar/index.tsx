@@ -13,7 +13,7 @@ import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbMinus } from 
 export const Navbar = memo(({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (arg: boolean) => void }) => {
   const [rs] = needsRestart.use();
   const [theme] = themeStore.use();
-  const [fs, setFs] = useState(true);
+  const [fs, setFs] = useState(false);
 
   return (
     <div className="relative flex h-15 w-full shrink-0 flex-row items-center justify-between px-5 py-3">
@@ -50,7 +50,7 @@ export const Navbar = memo(({ sidebarOpen, setSidebarOpen }: { sidebarOpen: bool
 
             {[
               { Icon: <TbMinus />, onclick: () => window.api.minimize() },
-              { Icon: !fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.fullscreen().then(() => setFs(!fs)) },
+              { Icon: fs ? <MdFullscreenExit /> : <MdFullscreen />, onclick: () => window.api.setFullscreenMode(!fs).then(() => setFs(!fs)) },
               { Icon: <IoMdClose />, onclick: () => window.api.close() },
             ].map((b, i) => (
               <button

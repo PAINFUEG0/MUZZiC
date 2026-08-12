@@ -47,8 +47,8 @@ export function registerHandles(win: eˉ.BrowserWindow) {
     close: () => Promise.resolve(eˉ.app.quit()),
     minimize: () => Promise.resolve(win.minimize()),
     usage: (_: eˉ.IpcMainInvokeEvent, ...args) => getResourceUsages(...args),
-    fullscreen: () => Promise.resolve(win.setFullScreen(!win.isFullScreen())),
     openExternal: (_: eˉ.IpcMainInvokeEvent, ...args) => eˉ.shell.openExternal(...args),
+    setFullscreenMode: (_: eˉ.IpcMainInvokeEvent, ...args) => Promise.resolve(win.setFullScreen(...args)),
     openFolderDialog: async () => (await eˉ.dialog.showOpenDialog({ properties: ["openDirectory"] })).filePaths?.[0] || null,
   } satisfies {
     [K in keyof API]: (event: eˉ.IpcMainInvokeEvent, ...args: Parameters<API[K]>) => ReturnType<API[K]>;
