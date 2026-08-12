@@ -83,7 +83,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/upload"
-          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.deb" \) \
+          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.deb" -o -name "*.dmg" \) \
             -exec cp {} "$RUNNER_TEMP/upload/" \; || true
 
       - name: Upload artifacts

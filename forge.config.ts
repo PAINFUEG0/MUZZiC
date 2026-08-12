@@ -4,6 +4,7 @@ import pkg from "./package.json";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";
 import { MakerDeb } from "@electron-forge/maker-deb";
+import { MakerDMG } from "@electron-forge/maker-dmg";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
@@ -57,5 +58,6 @@ export default {
         categories: ["Audio"],
       },
     }),
+    new MakerDMG({ name, title: name }),
   ],
 } satisfies ForgeConfig;
