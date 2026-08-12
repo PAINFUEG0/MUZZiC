@@ -79,12 +79,20 @@ jobs:
         run: npx electron-forge make --arch=${{ matrix.arch }}
 
       - name: Collect artifacts
-        id: artifacts
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/upload"
-          find out/make -type f \( -name "*.msi" -o -name "*.zip" -o -name "*.deb" -o -name "*.dmg" \) \
-            -exec cp {} "$RUNNER_TEMP/upload/" \; || true
+
+          find out/make -type f \( \
+            -name "*.msi" -o \
+            -name "*.deb" -o \
+            -name "*.dmg" \
+          \) -exec sh -c '
+            for file do
+              ext="${file##*.}"
+              cp "$file" "$RUNNER_TEMP/upload/muzzic-${{ matrix.platform }}-${{ matrix.arch }}-${{ needs.check.outputs.version }}.$ext"
+            done
+          ' sh {} +
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

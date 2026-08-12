@@ -1,7 +1,6 @@
 /** @format */
 
 import pkg from "./package.json";
-import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerWix } from "@electron-forge/maker-wix";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerDMG } from "@electron-forge/maker-dmg";
@@ -11,7 +10,7 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 
 const icon = pkg.icon;
-const name = pkg.name.toUpperCase();
+const name = pkg.productName;
 
 export default {
   packagerConfig: { icon, name, asar: true, overwrite: true, executableName: pkg.name, osxSign: {} },
@@ -36,7 +35,6 @@ export default {
   ],
 
   makers: [
-    new MakerZIP({}, ["linux", "darwin"]),
     new MakerWix({
       icon,
       name,
@@ -58,6 +56,6 @@ export default {
         categories: ["Audio"],
       },
     }),
-    new MakerDMG({ name, title: name }),
+    new MakerDMG({ name, title: name, icon: icon.replace(".ico", ".icns") }),
   ],
 } satisfies ForgeConfig;
