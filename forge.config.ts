@@ -13,7 +13,7 @@ const icon = pkg.icon;
 const name = pkg.productName;
 
 export default {
-  packagerConfig: { icon, name, asar: true, overwrite: true, executableName: pkg.name, osxSign: {} },
+  packagerConfig: { icon, name, asar: true, overwrite: true, osxSign: {} },
 
   plugins: [
     new FusesPlugin({
