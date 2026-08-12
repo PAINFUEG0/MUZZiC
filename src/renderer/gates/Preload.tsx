@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import pkg from "../../../package.json";
-import Player from "../player/player.js";
+import Player from "../player/index.js";
 import { Root } from "../layouts/Root.js";
 import { useState, useEffect } from "react";
 import { themeStore } from "../stores/theme.js";
