@@ -4,10 +4,8 @@ export function EqNodes(ctx: AudioContext) {
   const nodes = frequencies.map((freq, i) => {
     const filter = ctx.createBiquadFilter();
 
-    if (i === 0) filter.type = "lowshelf";
-    else if (i === frequencies.length - 1) filter.type = "highshelf";
-    else ((filter.type = "peaking"), (filter.Q.value = 2.1));
-
+    filter.type = i === 0 ? "lowshelf" : i === frequencies.length - 1 ? "highshelf" : "peaking";
+    filter.type === "peaking" && (filter.Q.value = 2.1);
     filter.frequency.value = freq;
     filter.gain.value = 0;
     return filter;

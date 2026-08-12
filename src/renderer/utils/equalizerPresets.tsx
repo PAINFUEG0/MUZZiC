@@ -2,8 +2,8 @@
 
 import { GiGClef } from "react-icons/gi";
 import { TbVinyl } from "react-icons/tb";
+import { FaGuitar } from "react-icons/fa";
 import { VscPiano } from "react-icons/vsc";
-import { FaGuitar } from "react-icons/fa6";
 import { IoHeadsetSharp } from "react-icons/io5";
 import { BsCassetteFill, BsMusicPlayerFill } from "react-icons/bs";
 import { PiMicrophoneStageBold, PiMusicNoteFill, PiWaveformBold, PiWrench } from "react-icons/pi";

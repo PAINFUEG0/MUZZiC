@@ -1,10 +1,10 @@
 /** @format */
 
 import { playerEffects } from "../stores";
-import { presets } from "../utils/presets";
 import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
+import { presets } from "../utils/equalizerPresets";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
 
