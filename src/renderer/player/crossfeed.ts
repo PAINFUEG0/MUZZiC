@@ -10,7 +10,9 @@ export function CrossFeed(ctx: AudioContext) {
 
   cross.left.gain.value = 0.3;
   cross.right.gain.value = 0.3;
+  lowpass.left.Q.value = 0.707;
   lowpass.left.type = "lowpass";
+  lowpass.right.Q.value = 0.707;
   lowpass.right.type = "lowpass";
   lowpass.left.frequency.value = 650;
   lowpass.right.frequency.value = 650;
