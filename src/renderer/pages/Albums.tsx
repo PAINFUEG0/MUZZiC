@@ -7,7 +7,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
 import { RiFolderMusicLine } from "react-icons/ri";
-import { chunk, flatten } from "../../shared/helpers";
+import { chunk } from "../../shared/helpers";
 import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
@@ -15,25 +15,20 @@ import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { SelectActions } from "../components/utils/SelectActions";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
+import { albumsStore, likedSongsStore, searchBox, selectMode } from "../stores";
 
 export function Albums() {
   type Row = AlbumRow | TrackRow;
   type AlbumRow = { type: "albums"; data: string[][] };
   type TrackRow = { type: "tracks"; data: NonNullable<(typeof albums)[keyof typeof albums]> };
 
-  const [tree] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
   const [inSelectionMode] = selectMode.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const albums = useMemo(() => {
-    const flat = flatten(tree).sort((a, b) => a.album.localeCompare(b.album));
-    return Object.groupBy(flat, (e) => e.album);
-  }, [tree]);
-
+  const [albums] = albumsStore.use();
   const [liked, setLiked] = likedSongsStore.use();
   const [isTrackView, setIsTrackView] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });

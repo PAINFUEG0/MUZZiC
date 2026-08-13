@@ -2,7 +2,6 @@
 
 import { LuInfo } from "react-icons/lu";
 import { playerMethods } from "../player";
-import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
@@ -11,32 +10,26 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useMemo, useCallback, useState, memo } from "react";
 import { SelectActions } from "../components/utils/SelectActions";
-import { likedSongsStore, playlistDataStore, playlistIndexStore, sceneStore, searchBox, selectMode, treeStore } from "../stores";
+import { flattenedTreeStore, likedSongsStore, playlistDataStore, playlistIndexStore, sceneStore, searchBox, selectMode } from "../stores";
 import { PiMusicNoteBold } from "react-icons/pi";
 import { MdWarning } from "react-icons/md";
 
 export const Playlist = memo(({ K }: { K: string }) => {
-  const [tree] = treeStore.use();
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
   const [, setScene] = sceneStore.use();
+  const [flat] = flattenedTreeStore.use();
   const [info, setInfo] = useState<any>(null);
   const [inSelectionMode] = selectMode.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
-  const [data, setData] = playlistDataStore.use();
-  const [playLists, setPlaylists] = playlistIndexStore.use();
+  const [playlistData, setPlaylistData] = playlistDataStore.use();
+  const [playListIndex, setPlaylistIndex] = playlistIndexStore.use();
 
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
 
-  const flat = useMemo(
-    () =>
-      flatten(tree)
-        .filter((e) => data[K]!.includes(e.id))
-        .sort((a, b) => a.title.localeCompare(b.title)),
-    [tree, data, K],
-  );
-  const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
+  const _ = useMemo(() => flat.filter((e) => playlistData[K]!.includes(e.id)), [playlistData, K]);
+  const tracks = useMemo(() => (query ? _.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : _), [_, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
 
   const [list, virtualizer] = useVirtualList({
@@ -55,12 +48,15 @@ export const Playlist = memo(({ K }: { K: string }) => {
             isLiked={!!likedMap[track.id]}
             button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
             button2={
-              <BiTrash className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setData((data) => ({ ...data, [K]: data[K]!.filter((t) => t !== track.id) }))} />
+              <BiTrash
+                className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90"
+                onClick={() => setPlaylistData((data) => ({ ...data, [K]: data[K]!.filter((t) => t !== track.id) }))}
+              />
             }
             button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
             end={index === tracks.length - 1}
             onLike={() => setLiked((liked) => (liked.includes(track.id) ? liked.filter((e) => e !== track.id) : [...liked, track.id]))}
-            onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
+            onClick={() => (methods.destroy(), methods.jumpTo(_.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(_))}
           />
         );
       },
@@ -75,14 +71,14 @@ export const Playlist = memo(({ K }: { K: string }) => {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button children={<PiMusicNoteBold />} className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95" />
-          <div className="font-medium">{playLists.find((p) => p.K == K)!.name}</div>
+          <div className="font-medium">{playListIndex.find((p) => p.K == K)!.name}</div>
         </div>
 
         {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>}
         {!inSelectionMode && (
           <div children="Delete Playlist" onClick={() => setShow(true)} className="shrink-0 cursor-pointer pr-3 text-xs text-(--accent-color) opacity-90 hover:text-red-500 active:scale-95" />
         )}
-        <SelectActions competeList={flat.map((_) => _.id)} />
+        <SelectActions competeList={_.map((_) => _.id)} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">
@@ -130,7 +126,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
               children="Delete playlist"
               onClick={async () => {
                 setScene({ scene: "explorer" });
-                setTimeout(() => setPlaylists((_) => _.filter((p) => p.K !== K)), 50);
+                setTimeout(() => setPlaylistIndex((_) => _.filter((p) => p.K !== K)), 50);
               }}
               className="w-full cursor-pointer rounded-md border-2 border-[#ff1116] bg-[#ff111622] pt-1 pb-1.5 text-[#ff3333] transition-all duration-150 active:scale-98"
             />

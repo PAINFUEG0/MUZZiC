@@ -2,14 +2,14 @@
 
 import { Modal } from "./Modal";
 import { MdWarning } from "react-icons/md";
+import { chunk } from "../../../shared/helpers";
 import { PiWaveformBold } from "react-icons/pi";
 import { useMemo, useRef, useState } from "react";
 import { LuInfo, LuLibrary } from "react-icons/lu";
 import { useBlurMask } from "../../hooks/useBlurMask";
 import { themes, themeStore } from "../../stores/theme";
-import { chunk, flatten } from "../../../shared/helpers";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { needsRestart, pcmFormatStore, treeStore } from "../../stores";
+import { flattenedTreeStore, needsRestart, pcmFormatStore, treeStore } from "../../stores";
 
 export function Settings() {
   const ref = useRef<HTMLDivElement>(null);
@@ -17,6 +17,7 @@ export function Settings() {
   const [show, setShow] = useState(false);
 
   const [tree] = treeStore.use();
+  const [flat] = flattenedTreeStore.use();
   const [theme, setTheme] = themeStore.use();
   const [, setRestartRequired] = needsRestart.use();
   const [pcmFormat, setPcmFormat] = pcmFormatStore.use();
@@ -208,7 +209,7 @@ export function Settings() {
           <div className="mt-5 flex flex-row gap-4 text-xs font-semibold">
             <button
               onClick={async () => {
-                await window.api.deleteMeta(flatten(tree).map(({ id }) => id));
+                await window.api.deleteMeta(flat.map(({ id }) => id));
                 await window.api.deleteTree("mediaFolder");
                 window.navigation.reload();
               }}

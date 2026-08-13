@@ -7,15 +7,18 @@ import { Root } from "../layouts/Root.js";
 import { useState, useEffect } from "react";
 import { themeStore } from "../stores/theme.js";
 import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
-import { DirNode, MessagePayload, BaseTrack, Tree, API } from "../../shared/types";
-import { likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
+import { DirNode, MessagePayload, BaseTrack, Tree, API, Track } from "../../shared/types";
+import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
 
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
   const [liked] = likedSongsStore.use();
+  const [, setAlbums] = albumsStore.use();
+  const [, setArtists] = artistsStore.use();
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [, setFlat] = flattenedTreeStore.use();
   const [, setPcmFormat] = pcmFormatStore.use();
   const [playlistData] = playlistDataStore.use();
   const [playlistIndex] = playlistIndexStore.use();
@@ -146,6 +149,22 @@ export function Preload() {
       };
 
       setTree(populateTreeWithMeta(tree, await window.api.getAllMeta()));
+
+      let _ = flatten(tree as Tree).sort((a, b) => a.name.localeCompare(b.name));
+      setFlat(_);
+
+      _ = _.sort((a, b) => a.album.localeCompare(b.album));
+      setAlbums(Object.groupBy(_, (e) => e.album));
+
+      const __: Record<string, Set<Track>> = {};
+      _.forEach((track) => (track.artists.forEach((artist) => (__[artist.trim()] ??= new Set()).add(track)), (__[track.artists.join(", ")] ??= new Set()).add(track)));
+
+      const artists = Object.entries(__)
+        .map(([K, V]): [string, Track[]] => [K, [...V]])
+        .sort((a, b) => a[0].localeCompare(b[0]));
+
+      setArtists(Object.fromEntries(artists));
+
       setFooter("Hope you enjoy your music");
       setTask("All done!");
       setProgress(100);

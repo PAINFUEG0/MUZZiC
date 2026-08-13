@@ -7,7 +7,7 @@ import { Card } from "../components/utils/Card";
 import { IoIosArrowBack } from "react-icons/io";
 import { Track } from "../components/utils/Track";
 import { Modal } from "../components/utils/Modal";
-import { chunk, flatten } from "../../shared/helpers";
+import { chunk } from "../../shared/helpers";
 import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useVirtualList } from "../hooks/useVirtualList";
@@ -15,14 +15,13 @@ import { TrackInfo } from "../components/utils/TrackInfo";
 import { ThumbGrid } from "../components/utils/ThumbGrid";
 import { SelectActions } from "../components/utils/SelectActions";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
+import { artistsStore, likedSongsStore, searchBox, selectMode } from "../stores";
 
 export function Artists() {
   type Row = ArtistRow | TrackRow;
   type ArtistRow = { type: "artists"; data: string[][] };
   type TrackRow = { type: "tracks"; data: NonNullable<(typeof artists)[keyof typeof artists]> };
 
-  const [data] = treeStore.use();
   const [methods] = playerMethods.use();
   const [query, setQuery] = searchBox.use();
   const [inSelectionMode] = selectMode.use();
@@ -32,17 +31,7 @@ export function Artists() {
 
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
 
-  const artists = useMemo(() => {
-    const flat = flatten(data);
-    const _artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
-
-    const T = Object.groupBy(flat, (e) => e.artists.join(", "));
-    for (const artist in T)
-      if (_artists[artist] === undefined) _artists[artist] = T[artist];
-      else _artists[artist] = Array.from(new Set([..._artists[artist], ...T[artist]!]));
-
-    return Object.fromEntries(Object.entries(_artists).sort((a, b) => a[0].localeCompare(b[0])));
-  }, [data]);
+  const [artists] = artistsStore.use();
 
   const [isTrackView, setIsTrackView] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });

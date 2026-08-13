@@ -1,9 +1,9 @@
 /** @format */
 
+import { memo, useEffect } from "react";
 import { Liked } from "../pages/Liked";
 import { motion } from "framer-motion";
 import { Queue } from "../pages/Queue";
-import { memo, useEffect } from "react";
 import { List } from "../pages/Explorer";
 import { Albums } from "../pages/Albums";
 import { Tracks } from "../pages/Tracks";

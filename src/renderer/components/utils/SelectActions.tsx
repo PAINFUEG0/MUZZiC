@@ -12,10 +12,10 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
   const [show, setShow] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   const [, setLiked] = likedSongsStore.use();
-  const [data, setData] = playlistDataStore.use();
   const [selections, setSelections] = selected.use();
-  const [playlists, setPlaylists] = playlistIndexStore.use();
   const [inSelectionMode, setInSelectionMode] = selectMode.use();
+  const [playlistData, setPlaylistData] = playlistDataStore.use();
+  const [playlistIndex, setPlaylistIndex] = playlistIndexStore.use();
 
   if (!inSelectionMode) return null;
 
@@ -78,12 +78,12 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
           </div>
 
           <div className="grid max-h-[35dvh] scrollbar-none grid-cols-2 gap-1 overflow-auto">
-            {[{ name: "Liked Songs", K: "liked" }, ...playlists].map(({ name, K }) => {
+            {[{ name: "Liked Songs", K: "liked" }, ...playlistIndex].map(({ name, K }) => {
               return (
                 <button
                   onClick={() => {
                     if (K === "liked") setLiked((liked) => Array.from(new Set([...liked, ...selections])));
-                    else setData((_) => ({ ..._, [K]: Array.from(new Set([...(data[K] || []), ...selections])) }));
+                    else setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections])) }));
                     setInSelectionMode(false);
                     setSelections([]);
                     setShow(false);
@@ -121,8 +121,8 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
                 if (!value) return;
                 const [name, K] = [value, Date.now().toString()];
 
-                setData((_) => ({ ..._, [K]: Array.from(new Set([...(data[K] || []), ...selections])) }));
-                setPlaylists((_) => [..._, { name, K }]);
+                setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections])) }));
+                setPlaylistIndex((_) => [..._, { name, K }]);
                 setInSelectionMode(false);
                 setSelections([]);
                 setShow(false);

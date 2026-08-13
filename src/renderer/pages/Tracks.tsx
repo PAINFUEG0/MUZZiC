@@ -1,7 +1,6 @@
 /** @format */
 
 import { playerMethods } from "../player";
-import { flatten } from "../../shared/helpers";
 import { LuDisc, LuInfo } from "react-icons/lu";
 import { generateIndex } from "../utils/helpers";
 import { Modal } from "../components/utils/Modal";
@@ -11,10 +10,9 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useMemo, useCallback, useState } from "react";
 import { SelectActions } from "../components/utils/SelectActions";
-import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
+import { flattenedTreeStore, likedSongsStore, searchBox, selectMode } from "../stores";
 
 export function Tracks() {
-  const [data] = treeStore.use();
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
   const [inSelectionMode] = selectMode.use();
@@ -22,7 +20,7 @@ export function Tracks() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
-  const flat = useMemo(() => flatten(data).sort((a, b) => a.title.localeCompare(b.title)), [data]);
+  const [flat] = flattenedTreeStore.use();
   const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
@@ -44,7 +42,7 @@ export function Tracks() {
           button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
           button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
           onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
-          onLike={() => setLiked((liked) => (liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id]))}
+          onLike={() => setLiked((_) => (_.includes(tracks[index]!.id) ? _.filter((e) => e !== tracks[index]!.id) : [..._, tracks[index]!.id]))}
         />
       ),
       [tracks, likedMap],

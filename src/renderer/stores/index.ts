@@ -1,7 +1,7 @@
 /** @format */
 
-import { Tree } from "../../shared/types";
 import { createGlobalStore } from "./create";
+import { Track, Tree } from "../../shared/types";
 
 export * from "./player";
 export const searchBox = createGlobalStore<string>("");
@@ -21,3 +21,7 @@ const data = Object.fromEntries(playlists.map((_) => [_.K, JSON.parse(localStora
 
 export const playlistDataStore = createGlobalStore(data);
 export const playlistIndexStore = createGlobalStore(playlists);
+
+export const artistsStore = createGlobalStore<Record<string, Track[]>>({});
+export const albumsStore = createGlobalStore<Partial<Record<string, Track[]>>>({});
+export const flattenedTreeStore = createGlobalStore<Track[]>([]);

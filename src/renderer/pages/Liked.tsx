@@ -3,7 +3,6 @@
 import { LuInfo } from "react-icons/lu";
 import { playerMethods } from "../player";
 import { RiHeartLine } from "react-icons/ri";
-import { flatten } from "../../shared/helpers";
 import { generateIndex } from "../utils/helpers";
 import { Modal } from "../components/utils/Modal";
 import { Track } from "../components/utils/Track";
@@ -12,27 +11,20 @@ import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
 import { useRef, useMemo, useCallback, useState } from "react";
 import { SelectActions } from "../components/utils/SelectActions";
-import { likedSongsStore, searchBox, selectMode, treeStore } from "../stores";
+import { flattenedTreeStore, likedSongsStore, searchBox, selectMode } from "../stores";
 
 export function Liked() {
-  const [data] = treeStore.use();
   const [query] = searchBox.use();
   const [methods] = playerMethods.use();
+  const [flat] = flattenedTreeStore.use();
   const [info, setInfo] = useState<any>(null);
   const [inSelectionMode] = selectMode.use();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
-
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
 
-  const flat = useMemo(
-    () =>
-      flatten(data)
-        .filter((e) => !!likedMap[e.id])
-        .sort((a, b) => a.title.localeCompare(b.title)),
-    [data, likedMap],
-  );
-  const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
+  const _ = useMemo(() => flat.filter((e) => !!likedMap[e.id]), [likedMap]);
+  const tracks = useMemo(() => (query ? _.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : _), [_, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
 
   const [list, virtualizer] = useVirtualList({
@@ -54,7 +46,7 @@ export function Liked() {
             button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
             end={index === tracks.length - 1}
             onLike={() => setLiked((liked) => liked.filter((e) => e !== track.id))}
-            onClick={() => (methods.destroy(), methods.jumpTo(flat.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(flat))}
+            onClick={() => (methods.destroy(), methods.jumpTo(_.findIndex((t) => t.id === tracks[index]!.id)), methods.enqueue(_))}
           />
         );
       },
@@ -71,7 +63,7 @@ export function Liked() {
         </div>
 
         {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{tracks.length} items</div>}
-        <SelectActions competeList={flat.map((_) => _.id)} />
+        <SelectActions competeList={_.map((_) => _.id)} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">
