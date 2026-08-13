@@ -36,6 +36,8 @@ export function List() {
   const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
   const goBack = (newPath: typeof path) => (setDirection(-1), setPath(newPath));
 
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
   const rows = useMemo(
     () => [
       ...(dirs.length ? ([{ type: "label", label: "Directories", count: dirs.length }] as const) : []),
@@ -79,7 +81,7 @@ export function List() {
               key={row.file.id}
               initial={row.index === 0}
               end={row.index === row.len - 1}
-              isLiked={liked.includes(row.file.id)}
+              isLiked={!!likedMap[row.file.id]}
               button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([row.file])} />}
               button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
               button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(row.file)} />}
@@ -97,7 +99,7 @@ export function List() {
           );
       }
     },
-    [liked, path, current],
+    [likedMap, path, current],
   );
 
   const [list, virtualizer] = useVirtualList({

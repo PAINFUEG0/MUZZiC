@@ -35,17 +35,19 @@ export function Albums() {
   }, [tree]);
 
   const [liked, setLiked] = likedSongsStore.use();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [isTrackView, setIsTrackView] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });
 
-  useEffect(() => setQuery(""), [selected]);
-  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
-  useEffect(() => setRows(selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) }), [selected]);
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
+  useEffect(() => setQuery(""), [isTrackView]);
+  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [isTrackView]);
+  useEffect(() => setRows(isTrackView ? { type: "tracks", data: albums[isTrackView]! } : { type: "albums", data: chunk(Object.keys(albums), 6) }), [isTrackView]);
   useEffect(
     () =>
       void setRows(() => {
-        if (!query) return selected ? { type: "tracks", data: albums[selected]! } : { type: "albums", data: chunk(Object.keys(albums), 6) };
-        if (selected) return { type: "tracks", data: albums[selected]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
+        if (!query) return isTrackView ? { type: "tracks", data: albums[isTrackView]! } : { type: "albums", data: chunk(Object.keys(albums), 6) };
+        if (isTrackView) return { type: "tracks", data: albums[isTrackView]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
 
         const keys = Object.keys(albums);
         const matchingAlbums = keys.filter((album) => album.toLowerCase().includes(query.toLowerCase()));
@@ -70,7 +72,7 @@ export function Albums() {
           <Card
             label1={album}
             thumb={albums[album]![0]!.thumb}
-            onClick={() => setSelected(album)}
+            onClick={() => setIsTrackView(album)}
             label2={
               albums[album]
                 ?.flatMap((track) => track.artists)
@@ -93,7 +95,7 @@ export function Albums() {
         key={data[index]!.id}
         initial={index === 0}
         end={index === data.length - 1}
-        isLiked={liked.includes(data[index]!.id)}
+        isLiked={!!likedMap[data[index]!.id]}
         button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
         button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
         button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
@@ -101,7 +103,7 @@ export function Albums() {
         onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
       />
     ),
-    [liked],
+    [likedMap],
   );
 
   const [list, virtualizer] = useVirtualList({
@@ -117,14 +119,14 @@ export function Albums() {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button
-            onClick={() => setSelected((_) => (_ === null ? null : ""))}
-            children={!selected ? <RiFolderMusicLine /> : <IoIosArrowBack />}
+            onClick={() => setIsTrackView((_) => (_ === null ? null : ""))}
+            children={!isTrackView ? <RiFolderMusicLine /> : <IoIosArrowBack />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
           <div className="flex flex-row items-center gap-1.5 font-medium">
-            <div className="cursor-pointer hover:underline" onClick={() => setSelected("")} children="Albums" />
-            {selected && <div className="shrink-0" children="/" />}
-            {selected && <div className="min-w-0 truncate" children={selected} />}
+            <div className="cursor-pointer hover:underline" onClick={() => setIsTrackView("")} children="Albums" />
+            {isTrackView && <div className="shrink-0" children="/" />}
+            {isTrackView && <div className="min-w-0 truncate" children={isTrackView} />}
           </div>
         </div>
 
@@ -135,11 +137,11 @@ export function Albums() {
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
-            key={selected}
+            key={isTrackView}
             children={list}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2 }}
-            initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
+            initial={isTrackView === null ? false : { x: isTrackView ? "20%" : "-20%", opacity: 0 }}
             style={{ height: rows.data.length ? virtualizer.getTotalSize() : "100%", position: "relative" }}
           />
         </AnimatePresence>

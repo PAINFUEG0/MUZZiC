@@ -25,6 +25,7 @@ export function Tracks() {
   const flat = useMemo(() => flatten(data).sort((a, b) => a.title.localeCompare(b.title)), [data]);
   const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
 
   const [list, virtualizer] = useVirtualList({
     scrollRef,
@@ -38,7 +39,7 @@ export function Tracks() {
           initial={index === 0}
           key={tracks[index]!.id}
           end={index === tracks.length - 1}
-          isLiked={liked.includes(tracks[index]!.id)}
+          isLiked={!!likedMap[tracks[index]!.id]}
           button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
           button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
           button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(tracks[index]!)} />}
@@ -46,7 +47,7 @@ export function Tracks() {
           onLike={() => setLiked((liked) => (liked.includes(tracks[index]!.id) ? liked.filter((e) => e !== tracks[index]!.id) : [...liked, tracks[index]!.id]))}
         />
       ),
-      [tracks, liked],
+      [tracks, likedMap],
     ),
   });
 

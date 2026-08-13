@@ -43,7 +43,7 @@ export function Queue() {
         button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(queue[index]!)} />}
       />
     ),
-    [queue, liked, currentIndex],
+    [queue, likedMap, currentIndex],
   );
 
   const [list, virtualizer] = useVirtualList({ scrollRef, list: queue, getItemKey: (index) => index.toString(), Component });

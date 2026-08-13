@@ -30,6 +30,8 @@ export function Artists() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
   const artists = useMemo(() => {
     const flat = flatten(data);
     const _artists = { ...Object.groupBy(flat, (e) => e.artists[0]!) };
@@ -42,7 +44,7 @@ export function Artists() {
     return Object.fromEntries(Object.entries(_artists).sort((a, b) => a[0].localeCompare(b[0])));
   }, [data]);
 
-  const [selected, setSelected] = useState<string | null>(null);
+  const [isTrackView, setIsTrackView] = useState<string | null>(null);
   const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
 
   const makeGrid = useCallback(
@@ -51,7 +53,7 @@ export function Artists() {
         index={index}
         len={data.length}
         children={data[index]!.map((artist) => (
-          <Card label1={artist} thumb={artists[artist]![0]!.thumb} onClick={() => setSelected(artist)} label2={`${artists[artist]?.length} track/s`} />
+          <Card label1={artist} thumb={artists[artist]![0]!.thumb} onClick={() => setIsTrackView(artist)} label2={`${artists[artist]?.length} track/s`} />
         ))}
       />
     ),
@@ -66,7 +68,7 @@ export function Artists() {
         key={data[index]!.id}
         initial={index === 0}
         end={index === data.length - 1}
-        isLiked={liked.includes(data[index]!.id)}
+        isLiked={!!likedMap[data[index]!.id]}
         button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
         button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
         button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
@@ -74,7 +76,7 @@ export function Artists() {
         onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
       />
     ),
-    [liked],
+    [likedMap],
   );
 
   const [list, virtualizer] = useVirtualList({
@@ -85,14 +87,14 @@ export function Artists() {
     getItemKey: useCallback((index) => (rows.type === "tracks" ? rows.data[index]!.id : rows.data[index]!.join(", ")), [rows]),
   });
 
-  useEffect(() => setQuery(""), [selected]);
-  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [selected]);
-  useEffect(() => setRows(selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }), [selected]);
+  useEffect(() => setQuery(""), [isTrackView]);
+  useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [isTrackView]);
+  useEffect(() => setRows(isTrackView ? { type: "tracks", data: artists[isTrackView]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }), [isTrackView]);
   useEffect(
     () =>
       void setRows(() => {
-        if (!query) return selected ? { type: "tracks", data: artists[selected]! } : { type: "artists", data: chunk(Object.keys(artists), 6) };
-        if (selected) return { type: "tracks", data: artists[selected]!.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) };
+        if (!query) return isTrackView ? { type: "tracks", data: artists[isTrackView]! } : { type: "artists", data: chunk(Object.keys(artists), 6) };
+        if (isTrackView) return { type: "tracks", data: artists[isTrackView]!.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) };
         const keys = Object.keys(artists).filter((e) => e.toLowerCase().includes(query.toLowerCase()));
         return { type: "artists", data: chunk(keys, 6) };
       }),
@@ -104,14 +106,14 @@ export function Artists() {
       <div className="flex h-fit w-full flex-row items-end justify-between border-(--border-color)/20">
         <div className="flex h-fit w-full flex-row gap-3">
           <button
-            onClick={() => setSelected((_) => (_ === null ? null : ""))}
-            children={!selected ? <TbMicrophone2 /> : <IoIosArrowBack />}
+            onClick={() => setIsTrackView((_) => (_ === null ? null : ""))}
+            children={!isTrackView ? <TbMicrophone2 /> : <IoIosArrowBack />}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
           <div className="flex flex-row items-center gap-1.5 font-medium">
-            <div className="cursor-pointer hover:underline" onClick={() => setSelected("")} children="Artists" />
-            {selected && <div className="shrink-0" children="/" />}
-            {selected && <div className="min-w-0 truncate" children={selected} />}
+            <div className="cursor-pointer hover:underline" onClick={() => setIsTrackView("")} children="Artists" />
+            {isTrackView && <div className="shrink-0" children="/" />}
+            {isTrackView && <div className="min-w-0 truncate" children={isTrackView} />}
           </div>
         </div>
         {!inSelectionMode && <div className="shrink-0 pr-3 text-xs text-(--accent-color) opacity-90">{rows.data.flat().length} items</div>}
@@ -121,11 +123,11 @@ export function Artists() {
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
-            key={selected}
+            key={isTrackView}
             children={list}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.2 }}
-            initial={selected === null ? false : { x: selected ? "20%" : "-20%", opacity: 0 }}
+            initial={isTrackView === null ? false : { x: isTrackView ? "20%" : "-20%", opacity: 0 }}
             style={{ height: rows.data.length ? virtualizer.getTotalSize() : "100%", position: "relative" }}
           />
         </AnimatePresence>

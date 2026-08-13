@@ -23,12 +23,14 @@ export function Liked() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
   const flat = useMemo(
     () =>
       flatten(data)
-        .filter((e) => liked.includes(e.id))
+        .filter((e) => !!likedMap[e.id])
         .sort((a, b) => a.title.localeCompare(b.title)),
-    [data, liked],
+    [data, likedMap],
   );
   const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);

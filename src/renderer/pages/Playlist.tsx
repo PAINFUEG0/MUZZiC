@@ -27,12 +27,14 @@ export const Playlist = memo(({ K }: { K: string }) => {
   const [data, setData] = playlistDataStore.use();
   const [playLists, setPlaylists] = playlistIndexStore.use();
 
+  const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
   const flat = useMemo(
     () =>
       flatten(tree)
         .filter((e) => data[K]!.includes(e.id))
         .sort((a, b) => a.title.localeCompare(b.title)),
-    [tree, data, K, liked],
+    [tree, data, K],
   );
   const tracks = useMemo(() => (query ? flat.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) : flat), [flat, query]);
   const index = useMemo(() => generateIndex(tracks), [tracks]);
@@ -50,7 +52,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
             index={index}
             key={track.id}
             initial={index === 0}
-            isLiked={liked.includes(track.id)}
+            isLiked={!!likedMap[track.id]}
             button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([tracks[index]!])} />}
             button2={
               <BiTrash className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setData((data) => ({ ...data, [K]: data[K]!.filter((t) => t !== track.id) }))} />
@@ -62,7 +64,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
           />
         );
       },
-      [tracks],
+      [tracks, likedMap],
     ),
   });
 
