@@ -6,7 +6,7 @@ export const DirectoryGrid = memo(({ index, len, children }: { index: number; le
   <div
     children={children}
     className={
-      `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 backdrop-blur-md ` +
+      `grid grid-cols-5 gap-x-3 border-(--border-color)/20 bg-(--hover-color)/5 px-5 ` +
       `${
         len === 1
           ? "rounded-md border-2 pt-5 pb-5"
