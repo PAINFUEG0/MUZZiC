@@ -10,14 +10,16 @@ import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import type { MakerDebConfig } from "@electron-forge/maker-deb";
+import type { MakerRpmConfig } from "@electron-forge/maker-rpm";
 
 const icon = pkg.icon;
 const name = pkg.productName;
 
-const options: MakerDebConfig["options"] = {
+const options: MakerDebConfig["options"] & MakerRpmConfig["options"] = {
   icon: icon.replace(".ico", ".png"),
   productName: name,
   version: pkg.version,
+  license: pkg.license,
   maintainer: pkg.author.name,
   description: pkg.description,
   categories: ["Audio", "AudioVideo"],

@@ -6,6 +6,7 @@
   "type": "commonjs",
   "icon": "./public/logo.ico",
   "main": "./.vite/build/muzzic.js",
+  "license": "CC-BY-NC-SA-4.0",
   "appUserModelId": "com.painfuego.music",
   "description": "A simple music player I guess",
   "author": {
