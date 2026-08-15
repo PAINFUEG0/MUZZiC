@@ -3,17 +3,56 @@
 import pkg from "./package.json";
 import { MakerWix } from "@electron-forge/maker-wix";
 import { MakerDeb } from "@electron-forge/maker-deb";
+import { MakerRpm } from "@electron-forge/maker-rpm";
 import { MakerDMG } from "@electron-forge/maker-dmg";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import type { ForgeConfig } from "@electron-forge/shared-types";
+import type { MakerDebConfig } from "@electron-forge/maker-deb";
 
 const icon = pkg.icon;
 const name = pkg.productName;
 
+const options: MakerDebConfig["options"] = {
+  icon: icon.replace(".ico", ".png"),
+  productName: name,
+  version: pkg.version,
+  maintainer: pkg.author.name,
+  description: pkg.description,
+  categories: ["Audio", "AudioVideo"],
+};
+
 export default {
-  packagerConfig: { icon, name, asar: true, overwrite: true, executableName: process.platform === "linux" ? pkg.name : name, osxSign: {} },
+  packagerConfig: {
+    icon,
+    name,
+    asar: true,
+    overwrite: true,
+    executableName: process.platform === "linux" ? pkg.name : name,
+    osxSign: {},
+  },
+
+  makers: [
+    new MakerDeb({ options }),
+    new MakerRpm({ options }),
+    new MakerDMG({
+      name,
+      title: name,
+      icon: icon.replace(".ico", ".icns"),
+    }),
+    new MakerWix({
+      icon,
+      name,
+      programFilesFolderName: name,
+      appUserModelId: pkg.appUserModelId,
+      upgradeCode: "89581fa5-b7e5-480b-bac5-5fdfb8d18944",
+      ui: { chooseDirectory: true },
+      beforeCreate(creator) {
+        creator.wixTemplate = creator.wixTemplate.replace(/(?<={{ApplicationName}})(\s+\((Machine|User).*\))/gi, "");
+      },
+    }),
+  ],
 
   plugins: [
     new FusesPlugin({
@@ -32,30 +71,5 @@ export default {
         { entry: "./src/preload/index.ts", config: "./configs/vite/vite.preload.config.ts" },
       ],
     }),
-  ],
-
-  makers: [
-    new MakerWix({
-      icon,
-      name,
-      programFilesFolderName: name,
-      appUserModelId: pkg.appUserModelId,
-      upgradeCode: "89581fa5-b7e5-480b-bac5-5fdfb8d18944",
-      ui: { chooseDirectory: true },
-      beforeCreate(creator) {
-        creator.wixTemplate = creator.wixTemplate.replace(/(?<={{ApplicationName}})(\s+\((Machine|User).*\))/gi, "");
-      },
-    }),
-    new MakerDeb({
-      options: {
-        icon: icon.replace(".ico", ".png"),
-        productName: name,
-        version: pkg.version,
-        maintainer: pkg.author.name,
-        description: pkg.description,
-        categories: ["Audio"],
-      },
-    }),
-    new MakerDMG({ name, title: name, icon: icon.replace(".ico", ".icns") }),
   ],
 } satisfies ForgeConfig;
