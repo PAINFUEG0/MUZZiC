@@ -25,7 +25,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           id="crossfeed-button"
           children={<LuRotate3D />}
           style={{ opacity: canCF ? 1 : 0 }}
-          onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 0.5 }))}
+          onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 30 }))}
           className={"active:scale-85" + (canCF ? " cursor-pointer" : "") + (fx.CF ? " text-(--accent-color)" : "")}
         />
 

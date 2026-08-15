@@ -113,8 +113,8 @@ export default function Player() {
   }, [fx.PG, fx.mute]);
 
   useEffect(() => {
-    CF.current!.cross.left.gain.value = fx.CF;
-    CF.current!.cross.right.gain.value = fx.CF;
+    CF.current!.cross.left.gain.value = fx.CF / 100;
+    CF.current!.cross.right.gain.value = fx.CF / 100;
     localStorage.setItem("CF", fx.CF.toString());
   }, [fx.CF]);
 
