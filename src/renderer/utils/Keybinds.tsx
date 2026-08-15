@@ -1,9 +1,9 @@
 /** @format */
 
-import { memo, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { sceneStore, playerMethods, playerState, playerEffects, selected, selectMode } from "../stores";
 
-export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boolean; setFullscreen: (arg: boolean) => void }) => {
+export function useKeybinds(fullscreen: boolean, setFullscreen: React.Dispatch<React.SetStateAction<boolean>>) {
   const [state] = playerState.use();
   const [, setFX] = playerEffects.use();
   const [, setScene] = sceneStore.use();
@@ -36,7 +36,7 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
       KeyM: () => document.getElementById("mute-unmute-button")!.click(),
 
       // fullscreen
-      KeyF: () => _state.current.current && setFullscreen(true),
+      KeyF: () => _state.current.current && setFullscreen((_) => !_),
       Escape: () => (_fullscreen.current ? setFullscreen(false) : _inSelectionMode.current ? (setInSelectionMode(false), setSelctions([])) : null),
 
       // volume
@@ -65,6 +65,4 @@ export const Keybinds = memo(({ fullscreen, setFullscreen }: { fullscreen: boole
     window.addEventListener("keydown", listener);
     return () => window.removeEventListener("keydown", listener);
   }, []);
-
-  return null;
-});
+}
