@@ -6,6 +6,8 @@ import Player from "../player/index.js";
 import { Root } from "../layouts/Root.js";
 import { useState, useEffect } from "react";
 import { themeStore } from "../stores/theme.js";
+import { Fullscreen } from "../components/fullscreen";
+import { AnimatePresence, motion } from "framer-motion";
 import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
 import { DirNode, MessagePayload, BaseTrack, Tree, API, Track } from "../../shared/types";
 import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
@@ -22,6 +24,7 @@ export function Preload() {
   const [, setPcmFormat] = pcmFormatStore.use();
   const [playlistData] = playlistDataStore.use();
   const [playlistIndex] = playlistIndexStore.use();
+  const [fullscreen, setFullscreen] = useState(false);
   const [, setNotifications] = notificationsStore.use();
   const [task, setTask] = useState<string>("Initializing");
   const [footer, setFooter] = useState<string | null>(null);
@@ -203,6 +206,21 @@ export function Preload() {
   return (
     <div className="relative flex h-screen w-full shrink-0 flex-col overflow-hidden p-1.5 text-(--text-color)">
       <Player />
+
+      <AnimatePresence>
+        {fullscreen && (
+          <motion.div
+            key={"FS"}
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            children={<Fullscreen setShow={setFullscreen} />}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="absolute inset-0 z-500 h-full w-full overflow-hidden bg-black"
+          />
+        )}
+      </AnimatePresence>
+
       <img src={theme.background} style={{ filter: `blur(${theme.overall.blur})` }} className="absolute inset-0 -z-50 h-full w-full scale-110 object-cover" />
 
       <div className="absolute inset-0 -z-30 h-full w-full" style={{ backgroundColor: hexToRgba(theme.overall.tint.color, theme.overall.tint.opacity) }} />
@@ -210,7 +228,7 @@ export function Preload() {
       <div className="absolute inset-0 h-7 w-full cursor-pointer" style={{ WebkitAppRegion: "drag" } as any} />
 
       {ready ? (
-        <Root />
+        <Root fullscreen={fullscreen} setFullscreen={setFullscreen} />
       ) : (
         <div className="relative flex h-full w-full shrink-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-(--border-color)/20 shadow-sm">
           <div className="absolute inset-0 -z-30 h-full w-full bg-(--hover-color)/20 backdrop-blur-lg" />

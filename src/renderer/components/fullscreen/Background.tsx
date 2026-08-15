@@ -1,10 +1,10 @@
 /** @format */
 
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
-const LAYER_COUNT = 3;
+const LAYER_COUNT = 5;
 const FRAME_INTERVAL = 1000 / 15;
-const BASE_LAYER_SCALES = [1, 1.26, 0.6];
+const BASE_LAYER_SCALES = [3, 1, 1.26, 0.6, 0.35];
 
 const randomAngle = () => Math.random() * Math.PI * 2;
 const randomRange = (min: number, max: number) => min + Math.random() * (max - min);
@@ -59,15 +59,7 @@ function createLayerState(i: number) {
 
 type LayerRef = { wrapper: HTMLDivElement | null; state: ReturnType<typeof createLayerState> };
 
-const STAGE_STYLE: React.CSSProperties = {
-  inset: "-25%",
-  width: "150%",
-  height: "150%",
-  position: "absolute",
-  filter: "var(--webgl-post-process, brightness(0.7) saturate(1.25) contrast(0.95))",
-};
-
-export default function DynamicBackground({ artworkUrl, alt }: { artworkUrl: string; alt: string }) {
+export const DynamicBackground = memo(({ artworkUrl, alt }: { artworkUrl: string; alt: string }) => {
   const layerRefs = useRef<LayerRef[]>(Array.from({ length: LAYER_COUNT }, (_, i) => ({ wrapper: null, state: createLayerState(i) })));
 
   const lastDrawTimeRef = useRef(0);
@@ -118,15 +110,10 @@ export default function DynamicBackground({ artworkUrl, alt }: { artworkUrl: str
       rafRef.current = requestAnimationFrame(tick);
     }
 
-    // Stop rendering while the tab/window isn't visible — the animation is purely
-    // decorative, so there's no reason to keep the compositor busy in the background.
     function handleVisibilityChange() {
-      if (document.hidden) {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      } else if (rafRef.current === null) {
-        rafRef.current = requestAnimationFrame(tick);
-      }
+      if (document.hidden)
+        if (rafRef.current) (cancelAnimationFrame(rafRef.current), (rafRef.current = null));
+        else rafRef.current = requestAnimationFrame(tick);
     }
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -140,8 +127,15 @@ export default function DynamicBackground({ artworkUrl, alt }: { artworkUrl: str
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden contain-[layout_paint_size]">
-      <div style={STAGE_STYLE}>
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden blur-[100px] contain-[layout_paint_size]">
+      <div
+        style={{
+          width: "150%",
+          height: "150%",
+          position: "absolute",
+          filter: "var(--webgl-post-process, brightness(0.7) saturate(1.25) contrast(0.95))",
+        }}
+      >
         {layerRefs.current.map((layer, i) => (
           <div
             key={i}
@@ -151,10 +145,10 @@ export default function DynamicBackground({ artworkUrl, alt }: { artworkUrl: str
             style={{ width: "60%", height: "60%", margin: "-30% 0 0 -30%" }}
             className="absolute top-1/2 left-1/2 origin-[50%_50%] will-change-transform"
           >
-            <img src={artworkUrl} onError={(e) => (e.currentTarget.src = alt)} className="absolute inset-0 h-full w-full object-cover opacity-50" />
+            <img src={artworkUrl} onError={(e) => (e.currentTarget.src = alt)} style={{ opacity: Math.random() }} className="absolute inset-0 h-full w-full object-cover opacity-50" />
           </div>
         ))}
       </div>
     </div>
   );
-}
+});

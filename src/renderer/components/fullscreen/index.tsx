@@ -1,13 +1,17 @@
 /** @format */
 
-import { memo, useState } from "react";
+import { memo } from "react";
+import { Lyrics } from "./Lyrics";
 import { BsPerson } from "react-icons/bs";
-import { themeStore } from "../stores/theme";
 import { FaAngleDown } from "react-icons/fa6";
-import DynamicBackground from "./DynamicBackground";
-import { Progressbar } from "../components/playbar/Progressbar";
-import { playerState, playerIndex, playerQueue } from "../stores";
-import { PlaybackControls } from "../components/playbar/PlaybackControls";
+import { themeStore } from "../../stores/theme";
+import { DynamicBackground } from "./Background";
+import { Progressbar } from "../playbar/Progressbar";
+import { createGlobalStore } from "../../stores/create";
+import { PlaybackControls } from "../playbar/PlaybackControls";
+import { playerState, playerIndex, playerQueue } from "../../stores";
+
+const _ = createGlobalStore<boolean>(false);
 
 export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }) => {
   const [theme] = themeStore.use();
@@ -15,14 +19,14 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
   const [state] = playerState.use();
   const [, setQueue] = playerQueue.use();
 
-  const [gradient, setGradient] = useState(false);
+  const [showLyrics, setShowLyrics] = _.use();
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden text-white">
       <div onClick={() => setShow(false)} className="absolute top-0 right-0 z-100 shrink-0 cursor-pointer p-5 text-xl opacity-10 hover:opacity-70" children={<FaAngleDown />} />
 
-      {gradient ? (
-        <div className="absolute inset-0 z-20 h-full w-full object-cover blur-[100px]">
+      {showLyrics ? (
+        <div className="absolute inset-0 z-20 h-full w-full object-cover">
           <DynamicBackground artworkUrl={state.current!.thumb.replace("thumbnail.", "artwork.")} alt={theme.background} />
         </div>
       ) : (
@@ -49,20 +53,13 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
         ]
       )}
 
-      <div className="z-50 flex h-[15dvh] w-full shrink-0 flex-row items-center justify-center gap-2 text-lg font-medium">
+      <div className="z-50 flex w-full shrink-0 flex-row items-center justify-center gap-2 pt-[7dvh] text-lg font-medium">
         <img src="./logo.png" className="h-5 shrink-0 invert" />
         <div>MUZZiC</div>
       </div>
 
-      <div className="z-50 flex h-full w-full flex-col items-center justify-center gap-5 overflow-hidden text-4xl font-bold font-stretch-200%">
-        {/* {state.current?.lyrics
-          .split("[")
-          .slice(0, 5)
-          .map((l, i) => (
-            <div key={i} className="flex h-fit w-full flex-row items-center justify-center">
-              {l}
-            </div>
-          ))} */}
+      <div style={{ opacity: +showLyrics }} className="z-50 flex h-full w-full flex-col items-center justify-center gap-5 overflow-hidden py-7">
+        <Lyrics lyrics={state.current!.lyrics} key={state.current?.id} />
       </div>
 
       <div className="z-50 flex h-[30dvh] w-full shrink-0 flex-col items-center justify-between pb-5">
@@ -76,7 +73,7 @@ export const Fullscreen = memo(({ setShow }: { setShow: (arg: boolean) => void }
         </div>
 
         <div className="flex h-fit w-xl flex-col items-center justify-center gap-6">
-          <PlaybackControls isFullscreen setGradient={setGradient} index={index} setQueue={setQueue} isPlaying={state.isPlaying} loading={!!(state.current && !state.duration)} />
+          <PlaybackControls isFullscreen setGradient={setShowLyrics} index={index} setQueue={setQueue} isPlaying={state.isPlaying} loading={!!(state.current && !state.duration)} />
           <Progressbar isFullscreen />
         </div>
       </div>
