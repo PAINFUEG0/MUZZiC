@@ -145,7 +145,7 @@ export const DynamicBackground = memo(({ artworkUrl, alt }: { artworkUrl: string
             style={{ width: "60%", height: "60%", margin: "-30% 0 0 -30%" }}
             className="absolute top-1/2 left-1/2 origin-[50%_50%] will-change-transform"
           >
-            <img src={artworkUrl} onError={(e) => (e.currentTarget.src = alt)} style={{ opacity: Math.random() }} className="absolute inset-0 h-full w-full object-cover opacity-50" />
+            <img src={artworkUrl} onError={(e) => (e.currentTarget.src = alt)} className="absolute inset-0 h-full w-full object-cover opacity-50" />
           </div>
         ))}
       </div>

@@ -3,12 +3,25 @@
 const syncedDotRegex = /^\[(\d{2}):(\d{2})\.(\d{1,3})\]/m;
 const syncedColonRegex = /^\[(\d{2}):(\d{2}):(\d{2,3})\]/m;
 
+const fmt = (str: string) =>
+  str
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .filter((l) => !isMetadata(l));
+
 function probe(lrc: string): "unsynced" | "colon" | "dot" {
-  const lines = lrc.split("\n").filter((l) => !!l.trim());
+  const lines = fmt(lrc);
 
   if (lines.every((l) => syncedDotRegex.test(l))) return "dot";
   else if (lines.every((l) => syncedColonRegex.test(l))) return "colon";
   else return "unsynced";
+}
+
+const metadataRegex = /^\[(?:ar|ti|al|by|re|ve|offset):/i;
+
+function isMetadata(line: string) {
+  return metadataRegex.test(line.trim());
 }
 
 export function parseLRC(lrc: string) {
@@ -18,11 +31,10 @@ export function parseLRC(lrc: string) {
     return {
       syncType: "None",
       leadingSilence: 0,
-      lines: lrc.split("\n").map((line) => ({ start: 0, end: 10e10, text: line.trim() || "..." })),
-    };
+      lines: fmt(lrc).map((line) => ({ start: 0, end: 10e10, text: line.trim() || "..." })),
+    } as const;
 
-  const lines = lrc
-    .split("\n")
+  const lines = fmt(lrc)
     .map((line) => {
       const match = line.match(type === "dot" ? syncedDotRegex : syncedColonRegex);
 
@@ -33,5 +45,5 @@ export function parseLRC(lrc: string) {
     })
     .map(({ start, text }, i, arr) => ({ start, text, end: arr[i + 1]?.start ?? 10e10 }));
 
-  return { lines, syncType: "Line", leadingSilence: lines[0]?.start ?? 0 };
+  return { lines, syncType: "Line", leadingSilence: lines[0]?.start ?? 0 } as const;
 }
