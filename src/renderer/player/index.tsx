@@ -87,12 +87,12 @@ export default function Player() {
 
     const splitter = ctx.current.createChannelSplitter(2);
 
+    PG.current.connect(ctx.current.destination);
+    PG.current.connect(analyserOverall.current);
     PG.current.connect(splitter);
+
     splitter.connect(analyserLeft.current, 0);
     splitter.connect(analyserRight.current, 1);
-
-    PG.current.connect(analyserOverall.current);
-    analyserOverall.current.connect(ctx.current.destination);
   }, []);
 
   useEffect(() => {
