@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths: [package.json]
 
+concurrency:
+  group: release
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
