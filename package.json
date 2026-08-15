@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "muzzic",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "productName": "MUZZiC",
   "type": "commonjs",
   "icon": "./public/logo.ico",
