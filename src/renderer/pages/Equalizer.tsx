@@ -5,8 +5,9 @@ import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
 import { presets } from "../utils/equalizerPresets";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
+import { PiMusicNoteFill } from "react-icons/pi";
 
 // I don't like the way this is done, but I'm too fcuked to change it
 
@@ -51,7 +52,7 @@ export const Equalizer = memo(() => {
     return () => observer.disconnect();
   }, [fx.EQ]);
 
-  const flat = useMemo(() => presets.find((p) => p.name === "Flat")!, [presets]);
+  const flat = { name: "Flat", EQ: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], icon: <PiMusicNoteFill className="text-sm" /> };
 
   const [show, setShow] = useState(false);
   const [preset, setPreset] = useState(presets.find((p) => p.name === localStorage.getItem("EQN")) ?? flat);
