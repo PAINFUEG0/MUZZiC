@@ -53,9 +53,6 @@ jobs:
           - os: macos-latest
             platform: darwin
             arch: x64
-          - os: macos-latest
-            platform: darwin
-            arch: arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,7 +95,6 @@ jobs:
           find out/make -type f \( \
             -name "*.msi" -o \
             -name "*.deb" -o \
-            -name "*.rpm" -o \
             -name "*.dmg" \
           \) -exec sh -c '
             for file do
@@ -110,7 +106,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.platform }}
+          name: artifacts-${{ matrix.platform }}-${{ matrix.arch }}
           path: ${{ runner.temp }}/upload/*
           if-no-files-found: error
 
