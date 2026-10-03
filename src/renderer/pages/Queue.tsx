@@ -7,7 +7,7 @@ import { LuInfo, LuListMusic } from "react-icons/lu";
 import { BiTrash, BiAddToQueue } from "react-icons/bi";
 import { useVirtualList } from "../hooks/useVirtualList";
 import { TrackInfo } from "../components/utils/TrackInfo";
-import { useRef, useCallback, useMemo, useState } from "react";
+import { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import { SelectActions } from "../components/utils/SelectActions";
 import { playerIndex, playerMethods, playerQueue } from "../player";
 
@@ -20,6 +20,8 @@ export function Queue() {
   const [info, setInfo] = useState<(typeof queue)[number] | null>(null);
 
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
+  useEffect(() => virtualizer.scrollToIndex(currentIndex - 1, { align: "start" }), []);
 
   const Component = useCallback(
     ({ index }: { index: number }) => (
