@@ -14,7 +14,7 @@ export const Item = memo(({ icon, label, onClick, highlighted = false }: ItemPro
         (highlighted ? "" : "hover:bg-(--hover-color)/25")
       }
     >
-      {highlighted && <div className="absolute inset-0 h-full w-full bg-(--accent-color) opacity-10 backdrop-blur-md" />}
+      {highlighted && <div className="absolute inset-0 h-full w-full bg-(--accent-color) opacity-10" />}
       <div className={"z-1 h-full w-1 rounded-sm " + (highlighted ? "bg-(--accent-color)" : "group-hover:bg-(--accent-color)")} />
       <div className={"z-1 text-base " + (highlighted ? "" : "group-hover:text-(--accent-color)")} children={icon} />
       <div className="z-1 min-w-0 truncate p-1 pr-2 text-[13px]" children={label} />
