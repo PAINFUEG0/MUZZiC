@@ -153,10 +153,10 @@ export function Preload() {
 
       setTree(populateTreeWithMeta(tree, await window.api.getAllMeta()));
 
-      let _ = flatten(tree as Tree).sort((a, b) => a.name.localeCompare(b.name));
+      let _ = flatten(tree as Tree).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
       setFlat(_);
 
-      _ = _.sort((a, b) => a.album.localeCompare(b.album));
+      _ = _.sort((a, b) => a.album.localeCompare(b.album, undefined, { sensitivity: "base", numeric: true }));
       setAlbums(Object.groupBy(_, (e) => e.album));
 
       const __: Record<string, Set<Track>> = {};
@@ -164,7 +164,7 @@ export function Preload() {
 
       const artists = Object.entries(__)
         .map(([K, V]): [string, Track[]] => [K, [...V]])
-        .sort((a, b) => a[0].localeCompare(b[0]));
+        .sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: "base", numeric: true }));
 
       setArtists(Object.fromEntries(artists));
 

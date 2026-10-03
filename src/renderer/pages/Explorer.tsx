@@ -29,8 +29,8 @@ export function List() {
   const [liked, setLiked] = likedSongsStore.use();
 
   const current = useMemo(() => path[path.length - 1]!, [path]);
-  const [dirs, setDirs] = useState(current.dirs.sort((a, b) => a.name.localeCompare(b.name)));
-  const [files, setFiles] = useState(current.files.sort((a, b) => a.title.localeCompare(b.title)));
+  const [dirs, setDirs] = useState(current.dirs.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })));
+  const [files, setFiles] = useState(current.files.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base", numeric: true })));
 
   const [direction, setDirection] = useState(1);
   const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
