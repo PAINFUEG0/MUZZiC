@@ -31,32 +31,17 @@ export function Albums() {
   const [albums] = albumsStore.use();
   const [liked, setLiked] = likedSongsStore.use();
   const [isTrackView, setIsTrackView] = useState<string | null>(null);
-  const [rows, setRows] = useState<Row>({ type: "albums", data: chunk(Object.keys(albums), 6) });
 
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
 
+  const rows = useMemo<Row>(() => {
+    const q = query.toLowerCase();
+    if (isTrackView) return { type: "tracks", data: query ? albums[isTrackView]!.filter((t) => t.title.toLowerCase().includes(q)) : albums[isTrackView]! };
+    return { type: "albums", data: chunk(query ? Object.keys(albums).filter((e) => e.toLowerCase().includes(q)) : Object.keys(albums), 6) };
+  }, [albums, isTrackView, query]);
+
   useEffect(() => setQuery(""), [isTrackView]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [isTrackView]);
-  useEffect(() => setRows(isTrackView ? { type: "tracks", data: albums[isTrackView]! } : { type: "albums", data: chunk(Object.keys(albums), 6) }), [isTrackView]);
-  useEffect(
-    () =>
-      void setRows(() => {
-        if (!query) return isTrackView ? { type: "tracks", data: albums[isTrackView]! } : { type: "albums", data: chunk(Object.keys(albums), 6) };
-        if (isTrackView) return { type: "tracks", data: albums[isTrackView]!.filter((track) => track.title.toLowerCase().includes(query.toLowerCase())) };
-
-        const keys = Object.keys(albums);
-        const matchingAlbums = keys.filter((album) => album.toLowerCase().includes(query.toLowerCase()));
-        const matchingArtists = keys.filter((album) =>
-          albums[album]!.flatMap((track) => track.artists)
-            .toString()
-            .toLowerCase()
-            .includes(query.toLowerCase()),
-        );
-
-        return { type: "albums", data: chunk([...matchingAlbums, ...matchingArtists], 6) };
-      }),
-    [query],
-  );
 
   const makeGrid = useCallback(
     (data: AlbumRow["data"], index: number) => (
@@ -98,7 +83,7 @@ export function Albums() {
         onClick={() => (methods.destroy(), methods.jumpTo(albums[isTrackView!]!.findIndex((t) => t.id === data[index]!.id)), methods.enqueue(albums[isTrackView!]!))}
       />
     ),
-    [likedMap],
+    [likedMap, isTrackView],
   );
 
   const [list, virtualizer] = useVirtualList({

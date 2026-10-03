@@ -34,7 +34,12 @@ export function Artists() {
   const [artists] = artistsStore.use();
 
   const [isTrackView, setIsTrackView] = useState<string | null>(null);
-  const [rows, setRows] = useState<Row>({ type: "artists", data: chunk(Object.keys(artists), 6) });
+
+  const rows = useMemo<Row>(() => {
+    const q = query.toLowerCase();
+    if (isTrackView) return { type: "tracks", data: query ? artists[isTrackView]!.filter((t) => t.title.toLowerCase().includes(q)) : artists[isTrackView]! };
+    return { type: "artists", data: chunk(query ? Object.keys(artists).filter((e) => e.toLowerCase().includes(q)) : Object.keys(artists), 6) };
+  }, [artists, isTrackView, query]);
 
   const makeGrid = useCallback(
     (data: ArtistRow["data"], index: number) => (
@@ -65,7 +70,7 @@ export function Artists() {
         onClick={() => (methods.destroy(), methods.jumpTo(artists[isTrackView!]!.findIndex((t) => t.id === data[index]!.id)), methods.enqueue(artists[isTrackView!]!))}
       />
     ),
-    [likedMap],
+    [likedMap, isTrackView],
   );
 
   const [list, virtualizer] = useVirtualList({
@@ -78,17 +83,6 @@ export function Artists() {
 
   useEffect(() => setQuery(""), [isTrackView]);
   useEffect(() => scrollRef.current?.scrollTo({ top: 0, behavior: "instant" }), [isTrackView]);
-  useEffect(() => setRows(isTrackView ? { type: "tracks", data: artists[isTrackView]! } : { type: "artists", data: chunk(Object.keys(artists), 6) }), [isTrackView]);
-  useEffect(
-    () =>
-      void setRows(() => {
-        if (!query) return isTrackView ? { type: "tracks", data: artists[isTrackView]! } : { type: "artists", data: chunk(Object.keys(artists), 6) };
-        if (isTrackView) return { type: "tracks", data: artists[isTrackView]!.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())) };
-        const keys = Object.keys(artists).filter((e) => e.toLowerCase().includes(query.toLowerCase()));
-        return { type: "artists", data: chunk(keys, 6) };
-      }),
-    [query],
-  );
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5 ease-in-out">
