@@ -20,23 +20,32 @@ import { treeStore, searchBox, likedSongsStore, needsRestart } from "../stores";
 
 export function List() {
   const [tree] = treeStore.use();
-  const [query] = searchBox.use();
   const [methods] = playerMethods.use();
   const [rs, setRs] = needsRestart.use();
   const [path, setPath] = useState([tree]);
+  const [query, setQuery] = searchBox.use();
   const [info, setInfo] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [liked, setLiked] = likedSongsStore.use();
 
   const current = useMemo(() => path[path.length - 1]!, [path]);
-  const [dirs, setDirs] = useState(current.dirs.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })));
-  const [files, setFiles] = useState(current.files.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base", numeric: true })));
 
   const [direction, setDirection] = useState(1);
   const goForward: typeof setPath = (v) => (setDirection(1), setPath(v));
   const goBack = (newPath: typeof path) => (setDirection(-1), setPath(newPath));
 
   const likedMap = useMemo(() => Object.fromEntries(liked.map((_) => [_, true])), [liked]);
+
+  const { dirs, files } = useMemo(() => {
+    if (!query) return current;
+
+    const q = query.toLowerCase();
+
+    return {
+      dirs: current.dirs.filter((e) => e.name.toLowerCase().includes(q)),
+      files: current.files.filter((e) => e.title.toLowerCase().includes(q)),
+    };
+  }, [current, query]);
 
   const rows = useMemo(
     () => [
@@ -49,15 +58,9 @@ export function List() {
   );
 
   useEffect(() => {
-    setDirs(current.dirs);
-    setFiles(current.files);
+    setQuery("");
     scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
   }, [current]);
-
-  useEffect(() => {
-    setDirs(!query ? current.dirs : current.dirs.filter((e) => e.name.toLowerCase().includes(query.toLowerCase())));
-    setFiles(!query ? current.files : current.files.filter((e) => e.title.toLowerCase().includes(query.toLowerCase())));
-  }, [query]);
 
   const make = useCallback(
     (r: typeof rows, index: number) => {

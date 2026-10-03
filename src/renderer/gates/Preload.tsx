@@ -139,6 +139,7 @@ export function Preload() {
       await sleep(100);
 
       const populateTreeWithMeta = (node: DirNode, metadata: { [K: string]: BaseTrack }) => {
+        node.files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
         for (let i = 0; i < node.files.length; i++)
           (node.files[i] as any) = {
             ...node.files[i],
@@ -146,17 +147,17 @@ export function Preload() {
             thumb: `file:///${thumbPath}/thumbnail.${node.files[i]!.id}.jpg`.replaceAll(/\\/g, "/").replaceAll(/%2F/g, "/"),
           } satisfies BaseTrack;
 
-        node.dirs.forEach((e) => populateTreeWithMeta(e, metadata));
+        node.dirs.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })).forEach((e) => populateTreeWithMeta(e, metadata));
 
         return node as unknown as Tree;
       };
 
       setTree(populateTreeWithMeta(tree, await window.api.getAllMeta()));
 
-      let _ = flatten(tree as Tree).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+      let _ = flatten(tree as Tree).toSorted((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
       setFlat(_);
 
-      _ = _.sort((a, b) => a.album.localeCompare(b.album, undefined, { sensitivity: "base", numeric: true }));
+      _ = _.toSorted((a, b) => a.album.localeCompare(b.album, undefined, { sensitivity: "base", numeric: true }));
       setAlbums(Object.groupBy(_, (e) => e.album));
 
       const __: Record<string, Set<Track>> = {};
@@ -164,7 +165,7 @@ export function Preload() {
 
       const artists = Object.entries(__)
         .map(([K, V]): [string, Track[]] => [K, [...V]])
-        .sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: "base", numeric: true }));
+        .toSorted((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: "base", numeric: true }));
 
       setArtists(Object.fromEntries(artists));
 
