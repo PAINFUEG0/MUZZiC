@@ -94,8 +94,8 @@ export function Albums() {
         button1={<BiAddToQueue className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => methods.enqueue([data[index]!])} />}
         button2={<BiTrash className="shrink-0 cursor-pointer opacity-40" />}
         button3={<LuInfo className="shrink-0 cursor-pointer transition-all duration-100 active:scale-90" onClick={() => setInfo(data[index]!)} />}
-        onClick={() => (methods.destroy(), methods.jumpTo(index), methods.enqueue(data))}
         onLike={() => setLiked((liked) => (liked.includes(data[index]!.id) ? liked.filter((e) => e !== data[index]!.id) : [...liked, data[index]!.id]))}
+        onClick={() => (methods.destroy(), methods.jumpTo(albums[isTrackView!]!.findIndex((t) => t.id === data[index]!.id)), methods.enqueue(albums[isTrackView!]!))}
       />
     ),
     [likedMap],
