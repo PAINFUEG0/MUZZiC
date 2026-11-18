@@ -3,6 +3,7 @@
 export * from "./volumeUnit";
 export * from "../stores/player";
 import { EqNodes } from "./equalizer";
+import { surround } from "./surround";
 import { sleepTimer } from "../stores";
 import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
@@ -35,6 +36,7 @@ export default function Player() {
   const IG = useRef<GainNode | null>(null); // Input gain
   const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
   const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
+  const SR = useRef<ReturnType<typeof surround> | null>(null);
 
   const _state = useRef(state);
   const _queue = useRef(queue);
@@ -71,6 +73,7 @@ export default function Player() {
 
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
+    SR.current = surround(ctx.current);
 
     (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
@@ -82,7 +85,8 @@ export default function Player() {
     source.current.connect(IG.current);
     IG.current.connect(EQ.current.initialEQNode);
 
-    EQ.current.finalEQNode.connect(CF.current.splitter);
+    EQ.current.finalEQNode.connect(SR.current.input);
+    SR.current.output.connect(CF.current.splitter);
     CF.current.merger.connect(PG.current);
 
     const splitter = ctx.current.createChannelSplitter(2);
@@ -119,10 +123,19 @@ export default function Player() {
   }, [fx.CF]);
 
   useEffect(() => {
-    safeAwait((async () => CF.current?.merger.disconnect())());
+    SR.current!.strength.value = fx.SR / 100;
+    localStorage.setItem("WD", fx.SR.toString());
+  }, [fx.SR]);
+
+  useEffect(() => {
     safeAwait((async () => EQ.current?.finalEQNode.disconnect())());
+    safeAwait((async () => SR.current?.output.disconnect())());
+    safeAwait((async () => CF.current?.merger.disconnect())());
+
     if (state.current?.channels !== 2) return void EQ.current!.finalEQNode.connect(PG.current!);
-    EQ.current!.finalEQNode.connect(CF.current!.splitter);
+
+    EQ.current!.finalEQNode.connect(SR.current!.input);
+    SR.current!.output.connect(CF.current!.splitter);
     CF.current!.merger.connect(PG.current!);
   }, [state.current?.channels]);
 

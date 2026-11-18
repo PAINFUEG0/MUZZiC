@@ -8,6 +8,7 @@ import { frequencies } from "../player/equalizer";
 const __ = {
   mute: false,
   CF: Number(localStorage.getItem("CF") || "0"),
+  SR: Number(localStorage.getItem("SR") || "0"),
   IG: Number(localStorage.getItem("IG") || "85"),
   PG: Number(localStorage.getItem("PG") || "100"),
   EQenabled: localStorage.getItem("EQenabled") === "true",

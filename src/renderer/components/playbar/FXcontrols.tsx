@@ -3,8 +3,10 @@
 import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
+import { SiDolby } from "react-icons/si";
+import { BiSolidSpeaker } from "react-icons/bi";
+import { LuSlidersVertical } from "react-icons/lu";
 import { playerEffects, playerState } from "../../player";
-import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
 import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 
@@ -20,15 +22,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
 
   return (
     <div className="flex h-full w-full flex-row items-center justify-end gap-10 px-7">
-      <div className="grid grid-cols-5 gap-5 xl:pr-3">
-        <div
-          id="crossfeed-button"
-          children={<LuRotate3D />}
-          style={{ opacity: canCF ? 1 : 0 }}
-          onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 30 }))}
-          className={"active:scale-85" + (canCF ? " cursor-pointer" : "") + (fx.CF ? " text-(--accent-color)" : "")}
-        />
-
+      <div className={"grid gap-5 xl:pr-3 " + (canCF ? "grid-cols-6" : "grid-cols-4")}>
         <div
           id="like-button"
           children={id && liked.includes(id) ? <RiHeartFill /> : <RiHeartLine />}
@@ -36,11 +30,29 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           onClick={() => id && setLiked((liked) => (liked.includes(id) ? liked.filter((e) => e !== id) : [...liked, id]))}
         />
 
+        {canCF && (
+          <div
+            id="surround-button"
+            children={<SiDolby />}
+            onClick={() => setFx((s) => ({ ...s, SR: s.SR ? 0 : 60 }))}
+            className={"cursor-pointer active:scale-85 " + (fx.SR ? "text-(--accent-color)" : "")}
+          />
+        )}
+
         <div
           onClick={() => setState((_) => ({ ..._, loop: !_.loop }))}
           children={repeatMode ? <RiLoopRightAiLine /> : <RiLoopRightFill />}
           className={"cursor-pointer active:scale-85 " + (repeatMode ? " text-(--accent-color)" : "")}
         />
+
+        {canCF && (
+          <div
+            id="crossfeed-button"
+            children={<BiSolidSpeaker />}
+            onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 35 }))}
+            className={"cursor-pointer active:scale-85 " + (fx.CF ? "text-(--accent-color)" : "")}
+          />
+        )}
 
         <div id="sleep-button" onClick={() => setShowSleepTimerModal(true)} children={<RiMoonFill />} className={"cursor-pointer active:scale-85 " + (sleepTime ? "text-(--accent-color)" : "")} />
 
