@@ -162,7 +162,7 @@ export const Equalizer = memo(() => {
                     setFX((_) => {
                       const EQ = [..._.EQ];
                       EQ[i] = Number(e.target.value) - lim;
-                      localStorage.setItem("CEQ", JSON.stringify(_.EQ));
+                      localStorage.setItem("CEQ", JSON.stringify(EQ));
                       preset?.name !== "Custom" && localStorage.setItem("EQN", "Custom");
                       preset?.name !== "Custom" && setPreset(presets.find((p) => p.name === "Custom")!);
                       return { ..._, EQ };
