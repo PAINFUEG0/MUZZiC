@@ -7,7 +7,6 @@ import { frequencies } from "../player/equalizer";
 import { presets } from "../utils/equalizerPresets";
 import { memo, useEffect, useRef, useState } from "react";
 import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
-import { PiMusicNoteFill } from "react-icons/pi";
 
 // I don't like the way this is done, but I'm too fcuked to change it
 
@@ -52,12 +51,11 @@ export const Equalizer = memo(() => {
     return () => observer.disconnect();
   }, [fx.EQ]);
 
-  const flat = { name: "Flat", EQ: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], icon: <PiMusicNoteFill className="text-sm" /> };
-
   const [show, setShow] = useState(false);
+  const flat = presets.find((p) => p.name === "Flat")!;
   const [preset, setPreset] = useState(presets.find((p) => p.name === localStorage.getItem("EQN")) ?? flat);
 
-  useEffect(() => setFX((_) => ({ ..._, EQ: [...preset!.EQ] })), []);
+  useEffect(() => setFX((_) => ({ ..._, EQ: preset!.EQ })), []);
 
   return (
     <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
@@ -162,13 +160,12 @@ export const Equalizer = memo(() => {
                   className="h-[42dvh] [&::-webkit-slider-thumb]:opacity-100"
                   onChange={(e) => {
                     setFX((_) => {
-                      _.EQ[i] = Number(e.target.value) - lim;
+                      const EQ = [..._.EQ];
+                      EQ[i] = Number(e.target.value) - lim;
                       localStorage.setItem("CEQ", JSON.stringify(_.EQ));
-                      if (preset?.name !== "Custom") {
-                        localStorage.setItem("EQN", "Custom");
-                        setPreset(presets.find((p) => p.name === "Custom")!);
-                      }
-                      return { ..._, EQ: [..._.EQ] };
+                      preset?.name !== "Custom" && localStorage.setItem("EQN", "Custom");
+                      preset?.name !== "Custom" && setPreset(presets.find((p) => p.name === "Custom")!);
+                      return { ..._, EQ };
                     });
                   }}
                 />
