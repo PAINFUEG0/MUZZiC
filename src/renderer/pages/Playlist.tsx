@@ -78,7 +78,7 @@ export const Playlist = memo(({ K }: { K: string }) => {
         {!inSelectionMode && (
           <div children="Delete Playlist" onClick={() => setShow(true)} className="shrink-0 cursor-pointer pr-3 text-xs text-(--accent-color) opacity-90 hover:text-red-500 active:scale-95" />
         )}
-        <SelectActions competeList={_.map((_) => _.id)} />
+        <SelectActions list={_} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

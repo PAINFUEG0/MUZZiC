@@ -149,7 +149,7 @@ export function List() {
               ))}
         </div>
 
-        <SelectActions competeList={files.map((_) => _.id)} />
+        <SelectActions list={files} />
       </div>
 
       <div ref={scrollRef} className="h-full min-h-0 w-full scrollbar-none overflow-y-auto">

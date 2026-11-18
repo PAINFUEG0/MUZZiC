@@ -43,9 +43,9 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
         <div className="relative flex h-full w-full flex-row items-center justify-between px-0.5">
           {inSelectionMode ? (
             <div
-              onClick={() => setSelctions((_) => (_.includes(file.id) ? _.filter((e) => e !== file.id) : [..._, file.id]))}
+              onClick={() => setSelctions((_) => (_.find((t) => t.id === file.id) ? _.filter((t) => t.id !== file.id) : [..._, file]))}
               className={
-                (selections.includes(file.id) ? "bg-(--accent-color)" : "") +
+                (selections.find((t) => t.id === file.id) ? "bg-(--accent-color)" : "") +
                 " hover:bg(--accent-color) z-10 flex h-4 w-4 shrink-0 cursor-pointer justify-end rounded-sm border-2 border-(--border-color)/20 text-xs"
               }
             />
@@ -53,7 +53,7 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
             <div
               children={index + 1}
               className="z-10 flex w-4 shrink-0 cursor-pointer justify-center text-xs opacity-50"
-              onClick={() => (setInSelectionMode((_) => true), setSelctions((_) => [..._, file.id]))}
+              onClick={() => (setInSelectionMode((_) => true), setSelctions((_) => [..._, file]))}
             />
           )}
 

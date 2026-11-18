@@ -13,7 +13,7 @@ export const pcmFormatStore = createGlobalStore<"pcm_s16le" | "pcm_s24le" | "pcm
 export const likedSongsStore = createGlobalStore<string[]>(JSON.parse(localStorage.getItem("liked") ?? "[]"));
 export const notificationsStore = createGlobalStore<{ id: string; title: string; seen?: boolean; body?: React.ReactNode }[]>([]);
 
-export const selected = createGlobalStore<string[]>([]);
+export const selected = createGlobalStore<Track[]>([]);
 export const selectMode = createGlobalStore<boolean>(false);
 
 const playlists = JSON.parse(localStorage.getItem("playlists") ?? "[]") as { name: string; K: string }[];

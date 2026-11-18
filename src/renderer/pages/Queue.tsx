@@ -59,6 +59,12 @@ export function Queue() {
         </div>
 
         <div
+          children="Dedupe"
+          onClick={() => setQueue((_) => [..._.slice(0, currentIndex + 1), ...Array.from(new Set(_.slice(currentIndex + 1)))])}
+          className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
+        />
+
+        <div
           onClick={() => virtualizer.scrollToIndex(currentIndex - 1, { align: "start" })}
           className="mx-1 flex h-fit w-fit cursor-pointer items-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
         >
@@ -71,18 +77,12 @@ export function Queue() {
         </div>
 
         <div
-          children="Dedupe Queue"
-          onClick={() => setQueue((_) => [..._.slice(0, currentIndex + 1), ...Array.from(new Set(_.slice(currentIndex + 1)))])}
-          className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
-        />
-
-        <div
-          children="Clear Queue"
+          children="Clear"
           onClick={methods.destroy}
           className="mx-1 flex h-fit w-fit cursor-pointer rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
         />
 
-        <SelectActions competeList={queue.map((_) => _.id)} />
+        <SelectActions list={queue} />
       </div>
 
       <div className="flex h-full w-full flex-row gap-2 overflow-hidden">

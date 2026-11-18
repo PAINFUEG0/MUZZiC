@@ -5,9 +5,12 @@ import { LuInfo } from "react-icons/lu";
 import { RiHeartLine } from "react-icons/ri";
 import { memo, useRef, useState } from "react";
 import { PiMusicNoteBold } from "react-icons/pi";
-import { likedSongsStore, playlistDataStore, playlistIndexStore, selected, selectMode } from "../../stores";
+import { likedSongsStore, playerMethods, playlistDataStore, playlistIndexStore, selected, selectMode } from "../../stores";
 
-export const SelectActions = memo(({ competeList }: { competeList?: string[] }) => {
+import type { Track } from "../../../shared/types";
+
+export const SelectActions = memo(({ list: itemList }: { list?: Track[] }) => {
+  const [methods] = playerMethods.use();
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
@@ -26,34 +29,31 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
         style={{ opacity: selections.length ? 1 : 0.5 }}
         className="mx-1 flex h-fit w-fit cursor-pointer items-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
       >
-        <div>Add to playlist</div>
-        <div className="text-center text-[10px]" children="(" />
-        <div className="mt-px text-center text-[10px]" children={selections.length} />
-        <div className="text-center text-[10px]" children=")" />
+        <div>Add </div>
+        {selections.length > 1 && <div className="mt-px text-center text-[10px]" children={selections.length} />}
+        <div>item{selections.length > 1 && "s"} to playlist</div>
       </div>
 
       <div
-        onClick={() => setSelections((_) => [])}
+        onClick={() => {
+          methods.enqueue(selections);
+          setInSelectionMode(false);
+          setSelections([]);
+        }}
         style={{ opacity: selections.length ? 1 : 0.5 }}
         className="mx-1 flex h-fit w-fit cursor-pointer items-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
       >
-        <div>Unselect all</div>
-        <div className="text-center text-[10px]" children="(" />
-        <div className="mt-px text-center text-[10px]" children={selections.length} />
-        <div className="text-center text-[10px]" children=")" />
-        <div>items</div>
+        <div>Add </div>
+        {selections.length > 1 && <div className="mt-px text-center text-[10px]" children={selections.length} />}
+        <div>item{selections.length > 1 && "s"} to queue</div>
       </div>
 
-      {!!competeList?.length && (
+      {!!itemList?.length && (
         <div
-          onClick={() => setSelections((_) => Array.from(new Set([..._, ...competeList])))}
+          onClick={() => setSelections((_) => Array.from(new Set([..._, ...itemList])))}
           className="mx-1 flex h-fit w-fit cursor-pointer items-center gap-1 rounded-sm border-2 border-(--border-color)/15 bg-(--accent-color)/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-94"
         >
           <div>Select all</div>
-          <div className="text-center text-[10px]" children="(" />
-          <div className="mt-px text-center text-[10px]" children={competeList.length} />
-          <div className="text-center text-[10px]" children=")" />
-          <div>items</div>
         </div>
       )}
 
@@ -65,31 +65,34 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
 
       <Modal open={show} setOpen={setShow} className="z-100 h-fit w-fit max-w-[50dvw] border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)">
         <div className="flex flex-col">
-          <div className="mb-3 text-lg font-medium">Select sleep mode timeout</div>
+          <div className="mb-3 text-lg font-medium">Add tracks to playlist</div>
 
           <div className="flex flex-row items-center gap-1.5 py-2 text-xs">
             <LuInfo className="text-(--accent-color)" />
-            <div className="opacity-70">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum, quidem!</div>
+            <div className="opacity-70">Click on the playlist name to add to an existing playlist</div>
           </div>
 
           <div className="mb-5 flex flex-row items-center gap-1.5 text-xs">
             <LuInfo className="text-(--accent-color)" />
-            <div className="opacity-70">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque, itaque!</div>
+            <div className="opacity-70">Enter the name for the new playlist and click the button to create a new playlist</div>
           </div>
 
-          <div className="grid max-h-[35dvh] scrollbar-none grid-cols-2 gap-1 overflow-auto">
+          <div className="grid max-h-[35dvh] scrollbar-none grid-cols-2 gap-x-2 gap-y-2 overflow-auto">
             {[{ name: "Liked Songs", K: "liked" }, ...playlistIndex].map(({ name, K }) => {
               return (
                 <button
                   onClick={() => {
-                    if (K === "liked") setLiked((liked) => Array.from(new Set([...liked, ...selections])));
-                    else setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections])) }));
+                    if (K === "liked") setLiked((liked) => Array.from(new Set([...liked, ...selections.map((_) => _.id)])));
+                    else setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections.map((_) => _.id)])) }));
                     setInSelectionMode(false);
                     setSelections([]);
                     setShow(false);
                     setValue("");
                   }}
-                  className="flex h-full w-full cursor-pointer flex-row items-center gap-2 rounded-md border-2 border-(--border-color)/20 p-1 text-xs transition-all duration-150 active:scale-90"
+                  className={
+                    "flex h-full w-full cursor-pointer flex-row items-center gap-2 rounded-md border-2 border-(--border-color)/20 p-1 text-xs transition-all duration-150 active:scale-90 " +
+                    (K === "liked" ? "col-span-full" : "")
+                  }
                 >
                   {K === "liked" ? <RiHeartLine className="ml-1 shrink-0" /> : <PiMusicNoteBold className="ml-1 shrink-0" />}
                   <div children={name} className="min-w-0 flex-1 truncate text-start" />
@@ -98,7 +101,7 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
             })}
           </div>
 
-          <div className="flex h-10 w-full flex-row items-center gap-1 pt-2">
+          <div className="mt-5 flex h-10 w-full flex-row items-center gap-1 pt-2">
             <div className="relative flex h-full w-full rounded-md border-2 border-(--border-color)/20">
               <input
                 ref={ref}
@@ -120,8 +123,7 @@ export const SelectActions = memo(({ competeList }: { competeList?: string[] }) 
               onClick={() => {
                 if (!value) return;
                 const [name, K] = [value, Date.now().toString()];
-
-                setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections])) }));
+                setPlaylistData((_) => ({ ..._, [K]: Array.from(new Set([...(playlistData[K] || []), ...selections.map((_) => _.id)])) }));
                 setPlaylistIndex((_) => [..._, { name, K }]);
                 setInSelectionMode(false);
                 setSelections([]);
