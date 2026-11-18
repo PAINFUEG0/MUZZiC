@@ -47,7 +47,7 @@ export const Viewport = memo(() => {
       page = <Equalizer />;
       break;
     case "playlist":
-      page = <Playlist K={scene.K!} />;
+      page = <Playlist K={scene.K!} key={scene.K!} />;
       break;
   }
 
