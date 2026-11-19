@@ -10,9 +10,9 @@ import { Tracks } from "../pages/Tracks";
 import { Artists } from "../pages/Artists";
 import { themeStore } from "../stores/theme";
 import { Playlist } from "../pages/Playlist";
-import { Equalizer } from "../pages/Equalizer";
 import { hexToRgba } from "../../shared/helpers";
 import { sceneStore, searchBox, selected, selectMode } from "../stores";
+import { Equalizer } from "../pages/Equalizer";
 
 export const Viewport = memo(() => {
   let page;

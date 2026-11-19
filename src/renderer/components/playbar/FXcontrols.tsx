@@ -4,11 +4,11 @@ import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
 import { SiDolby } from "react-icons/si";
-import { BiSolidSpeaker } from "react-icons/bi";
 import { LuSlidersVertical } from "react-icons/lu";
 import { playerEffects, playerState } from "../../player";
 import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
+import { BiSolidSpeaker } from "react-icons/bi";
 
 type T = ReturnType<(typeof playerState)["use"]>;
 type Props = { id: string | null; repeatMode?: boolean; canCF: boolean; setState: T[1] };
@@ -49,8 +49,8 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           <div
             id="crossfeed-button"
             children={<BiSolidSpeaker />}
-            onClick={() => canCF && setFx((s) => ({ ...s, CF: s.CF ? 0 : 35 }))}
-            className={"cursor-pointer active:scale-85 " + (fx.CF ? "text-(--accent-color)" : "")}
+            className={"cursor-pointer active:scale-85 " + (fx.CF.enabled ? "text-(--accent-color)" : "")}
+            onClick={() => canCF && setFx((_) => ({ ..._, CF: { ..._.CF, enabled: !_.CF.enabled } }))}
           />
         )}
 

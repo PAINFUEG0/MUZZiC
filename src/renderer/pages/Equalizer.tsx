@@ -1,5 +1,6 @@
 /** @format */
 
+import { Effects } from "./Effects";
 import { playerEffects } from "../stores";
 import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
@@ -58,7 +59,7 @@ export const Equalizer = memo(() => {
   useEffect(() => setFX((_) => ({ ..._, EQ: preset!.EQ })), []);
 
   return (
-    <div className="flex h-full w-full flex-col gap-10 overflow-hidden p-10 pb-5">
+    <div className="flex h-full w-full scrollbar-none flex-col gap-10 overflow-auto p-10 pb-5">
       <div className="flex h-fit items-center justify-between">
         <div className="flex h-fit w-fit items-center gap-3">
           <button children={<LuSlidersVertical />} className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95" />
@@ -180,6 +181,8 @@ export const Equalizer = memo(() => {
           ))}
         </div>
       </div>
+
+      <Effects />
     </div>
   );
 });

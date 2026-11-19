@@ -7,12 +7,12 @@ import { frequencies } from "../player/equalizer";
 
 const __ = {
   mute: false,
-  CF: Number(localStorage.getItem("CF") || "0"),
   SR: Number(localStorage.getItem("SR") || "0"),
   IG: Number(localStorage.getItem("IG") || "85"),
   PG: Number(localStorage.getItem("PG") || "100"),
   EQenabled: localStorage.getItem("EQenabled") === "true",
   EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!) as number[],
+  CF: JSON.parse(localStorage.getItem("CF") || JSON.stringify({ amount: 0.3, frequency: 650, enabled: false })) as { amount: number; frequency: number; enabled: boolean },
 };
 
 const _ = { duration: 0, loop: false, shuffle: false, isPlaying: false, current: null as Track | null };
