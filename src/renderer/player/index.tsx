@@ -3,13 +3,12 @@
 export * from "./volumeUnit";
 export * from "../stores/player";
 import { EqNodes } from "./equalizer";
-import { crossfeedSettings, equalizerSettings, sleepTimer, volumeSettings } from "../stores";
 import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
 import { useCallback, useEffect, useRef } from "react";
 import { dbToGain, safeAwait } from "../../shared/helpers";
-import { surroundSettings, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./index";
-import { SurroundEffects } from "./surround";
+import { crossfeedSettings, equalizerSettings, sleepTimer, volumeSettings } from "../stores";
+import { playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./index";
 
 export default function Player() {
   const ctx = useRef<AudioContext | null>(null);
@@ -17,7 +16,6 @@ export default function Player() {
   const source = useRef<MediaElementAudioSourceNode | null>(null);
 
   const [volume] = volumeSettings.use();
-  const [surround] = surroundSettings.use();
   const [, setMethods] = playerMethods.use();
   const [equalizer] = equalizerSettings.use();
   const [crossfeed] = crossfeedSettings.use();
@@ -37,7 +35,6 @@ export default function Player() {
   const PG = useRef<GainNode | null>(null); // Post gain
   const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
   const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
-  const SR = useRef<ReturnType<typeof SurroundEffects> | null>(null);
 
   const _state = useRef(state);
   const _queue = useRef(queue);
@@ -74,7 +71,6 @@ export default function Player() {
 
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
-    SR.current = SurroundEffects(ctx.current);
 
     (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
@@ -84,9 +80,8 @@ export default function Player() {
 
     source.current.connect(EQ.current.initialEQNode);
 
-    EQ.current.finalEQNode.connect(SR.current.input);
-    SR.current.output.connect(CF.current.splitter);
-    CF.current.merger.connect(PG.current);
+    EQ.current!.finalEQNode.connect(CF.current!.splitter);
+    CF.current!.merger.connect(PG.current!);
 
     const splitter = ctx.current.createChannelSplitter(2);
 
@@ -119,26 +114,12 @@ export default function Player() {
   }, [crossfeed]);
 
   useEffect(() => {
-    SR.current!.master.offset.value = surround.enabled ? surround.intensity : 0;
-
-    SR.current!.nodes.widen.gain.value = surround.enabled ? surround.widen : 0;
-    SR.current!.nodes.height.gain.value = surround.enabled ? surround.height : 0;
-    SR.current!.nodes.reverb.gain.value = surround.enabled ? surround.reverb : 0;
-    SR.current!.nodes.virtualSpeakers.gain.value = surround.enabled ? surround.virtualSpeakers : 0;
-    SR.current!.nodes.earlyReflections.gain.value = surround.enabled ? surround.earlyReflections : 0;
-
-    localStorage.setItem("surround", JSON.stringify(surround));
-  }, [surround]);
-
-  useEffect(() => {
     safeAwait((async () => EQ.current?.finalEQNode.disconnect())());
-    safeAwait((async () => SR.current?.output.disconnect())());
     safeAwait((async () => CF.current?.merger.disconnect())());
 
     if (state.current?.channels !== 2) return void EQ.current!.finalEQNode.connect(PG.current!);
 
-    EQ.current!.finalEQNode.connect(SR.current!.input);
-    SR.current!.output.connect(CF.current!.splitter);
+    EQ.current!.finalEQNode.connect(CF.current!.splitter);
     CF.current!.merger.connect(PG.current!);
   }, [state.current?.channels]);
 

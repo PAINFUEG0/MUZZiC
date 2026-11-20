@@ -5,7 +5,7 @@ import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
 import { presets } from "../utils/equalizerPresets";
 import { memo, useEffect, useRef, useState } from "react";
-import { crossfeedSettings, equalizerSettings, surroundSettings } from "../stores";
+import { crossfeedSettings, equalizerSettings } from "../stores";
 import { LuPower, LuRotateCcw, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
 
 export const Equalizer = memo(() => {
@@ -17,7 +17,6 @@ export const Equalizer = memo(() => {
   const [containerHeight, setContainerHeight] = useState(0);
   const sliderRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [surround, setSurround] = surroundSettings.use();
   const [equalizer, setEqualizer] = equalizerSettings.use();
   const [crossfeed, setCrossfeed] = crossfeedSettings.use();
 
@@ -200,26 +199,6 @@ export const Equalizer = memo(() => {
           <div className="w-10 shrink-0 text-xs text-nowrap">{crossfeed.frequency} Hz</div>
           <LuRotateCcw className="mt-0.5 shrink-0 cursor-pointer text-xs transition-all active:scale-95" onClick={() => setCrossfeed((_) => ({ ..._, frequency: 650 }))} />
         </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-5 gap-y-10">
-        {(
-          [
-            { K: "height", V: 0.4 },
-            { K: "widen", V: 0.6 },
-            { K: "reverb", V: 0.6 },
-            { K: "virtualSpeakers", V: 0.5 },
-            { K: "earlyReflections", V: 0.5 },
-            { K: "intensity", V: 0.5 },
-          ] as const
-        ).map(({ K, V }) => (
-          <div className="flex w-full flex-row items-center justify-between gap-3" style={{ opacity: surround.enabled ? 1 : 0.5 }}>
-            <div className="text-xs text-nowrap">Surround {K}</div>
-            <Slider min={0} step={0.1} max={2} value={surround[K]} disabled={!surround.enabled} onChange={(e) => setSurround((_) => ({ ..._, [K]: Number(e.target.value) }))} />
-            <div className="w-6 shrink-0 text-xs text-nowrap">{surround[K]}</div>
-            <LuRotateCcw className="mt-0.5 shrink-0 cursor-pointer text-xs transition-all active:scale-95" onClick={() => setSurround((_) => ({ ..._, [K]: V }))} />
-          </div>
-        ))}
       </div>
     </div>
   );

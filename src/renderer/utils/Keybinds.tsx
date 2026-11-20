@@ -32,7 +32,6 @@ export function useKeybinds(fullscreen: boolean, setFullscreen: React.Dispatch<R
       KeyE: () => document.getElementById("eq-button")!.click(),
       KeyL: () => document.getElementById("like-button")!.click(),
       KeyS: () => document.getElementById("sleep-button")!.click(),
-      KeyD: () => document.getElementById("surround-button")!.click(),
       KeyC: () => document.getElementById("crossfeed-button")!.click(),
       KeyM: () => document.getElementById("mute-unmute-button")!.click(),
 

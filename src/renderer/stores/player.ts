@@ -16,4 +16,3 @@ export const volumeSettings = createGlobalStore(T("volume", { volume: 85, muted:
 export const analyzersNodes = createGlobalStore({} as { [K in "left" | "right" | "overall"]: AnalyserNode });
 export const crossfeedSettings = createGlobalStore(T("crossfeed", { amount: 0.3, frequency: 650, enabled: false }));
 export const equalizerSettings = createGlobalStore(T("equalizer", { enabled: false, gains: new Array(15).fill(0), multiplier: 1 }));
-export const surroundSettings = createGlobalStore(T("surround", { widen: 0.6, height: 0.4, reverb: 0.6, virtualSpeakers: 0.5, earlyReflections: 0.5, intensity: 0.5, enabled: false }));
