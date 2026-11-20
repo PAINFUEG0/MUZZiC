@@ -163,6 +163,7 @@ export default function Player() {
   useEffect(() => {
     audioRef.current!.src = "";
     if (!state.current?.path) return;
+    navigator.mediaSession.metadata = new MediaMetadata({ title: state.current.title, album: state.current.album, artist: state.current.artists.join(", "), artwork: [{ src: state.current.thumb }] });
     window.api.transcode(state.current.path).then((res) => void (res && ((audioRef.current!.src = res), audioRef.current!.play())));
   }, [state.current?.path]);
 
