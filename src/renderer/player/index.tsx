@@ -119,7 +119,14 @@ export default function Player() {
   }, [crossfeed]);
 
   useEffect(() => {
-    SR.current!.strength.value = surround.intensity / 100;
+    SR.current!.master.offset.value = surround.enabled ? surround.intensity : 0;
+
+    SR.current!.nodes.widen.gain.value = surround.enabled ? surround.widen : 0;
+    SR.current!.nodes.height.gain.value = surround.enabled ? surround.height : 0;
+    SR.current!.nodes.reverb.gain.value = surround.enabled ? surround.reverb : 0;
+    SR.current!.nodes.virtualSpeakers.gain.value = surround.enabled ? surround.virtualSpeakers : 0;
+    SR.current!.nodes.earlyReflections.gain.value = surround.enabled ? surround.earlyReflections : 0;
+
     localStorage.setItem("surround", JSON.stringify(surround));
   }, [surround]);
 

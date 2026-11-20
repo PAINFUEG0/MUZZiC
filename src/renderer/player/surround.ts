@@ -364,31 +364,23 @@ export function SurroundEffects(ctx: AudioContext) {
   const input = stereo(ctx.createGain());
   const output = ctx.createGain();
 
-  const W = widen(ctx);
-  const S = virtualSpeakers(ctx);
   const R = earlyReflections(ctx);
+  const S = virtualSpeakers(ctx);
   const V = reverb(ctx);
   const H = height(ctx);
+  const W = widen(ctx);
 
-  // Master strength: a constant signal fed into every feature's amount param
+  const nodes = { widen: ctx.createGain(), reverb: ctx.createGain(), height: ctx.createGain(), virtualSpeakers: ctx.createGain(), earlyReflections: ctx.createGain() };
+  const mix = { widen: W.amount, virtualSpeakers: S.amount, earlyReflections: R.amount, reverb: V.amount, height: H.amount };
+  const strength = { widen: 0.6, reverb: 0.5, height: 0.4, virtualSpeakers: 0.5, earlyReflections: 0.5, master: 0 };
   const master = ctx.createConstantSource();
-  master.offset.value = 0;
+  master.offset.value = strength.master;
   master.start();
 
-  // [feature amount param, weight at strength = 1]
-  const mix: [AudioParam, number][] = [
-    [W.amount, 0.6],
-    [S.amount, 0.5],
-    [R.amount, 0.6],
-    [V.amount, 0.5],
-    [H.amount, 0.4],
-  ];
-
-  mix.forEach(([param, weight]) => {
-    const g = ctx.createGain();
-    g.gain.value = weight;
-    master.connect(g);
-    g.connect(param);
+  Object.entries(nodes).forEach(([name, node]) => {
+    node.gain.value = strength[name as keyof typeof strength];
+    master.connect(node);
+    node.connect(mix[name as keyof typeof mix]);
   });
 
   // Safety limiter: wet layers add energy
@@ -412,5 +404,5 @@ export function SurroundEffects(ctx: AudioContext) {
 
   limiter.connect(output);
 
-  return { input, output, strength: master.offset }; // 0 = off, 1 = full
+  return { input, output, nodes, master };
 }

@@ -35,7 +35,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           <div
             id="surround-button"
             children={<SiDolby />}
-            onClick={() => setSurround((s) => ({ enabled: !s.enabled, intensity: s.enabled ? 0 : 60 }))}
+            onClick={() => setSurround((s) => ({ ...s, enabled: !s.enabled }))}
             className={"cursor-pointer active:scale-85 " + (surround.enabled ? "text-(--accent-color)" : "")}
           />
         )}
