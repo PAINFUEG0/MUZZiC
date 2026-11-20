@@ -26,15 +26,12 @@ export default function Player() {
   const [sleepTime, setSleepTime] = sleepTimer.use();
   const [progress, setProgress] = playerProgress.use();
 
-  const initialVolume = useRef(volume.volume);
-
+  const LG = useRef<GainNode | null>(null);
+  const RG = useRef<GainNode | null>(null);
+  const PG = useRef<GainNode | null>(null);
   const analyserLeft = useRef<AnalyserNode | null>(null);
   const analyserRight = useRef<AnalyserNode | null>(null);
   const analyserOverall = useRef<AnalyserNode | null>(null);
-
-  const PG = useRef<GainNode | null>(null); // Post gain
-  const LG = useRef<GainNode | null>(null); // Post gain
-  const RG = useRef<GainNode | null>(null); // Post gain
   const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
   const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
 
@@ -81,7 +78,7 @@ export default function Player() {
     (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
 
-    (PG.current = ctx.current.createGain()).gain.value = dbToGain(initialVolume.current);
+    (PG.current = ctx.current.createGain()).gain.value = dbToGain(volume.volume);
 
     source.current.connect(EQ.current.initialEQNode);
 
