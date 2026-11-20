@@ -107,10 +107,10 @@ export default function Player() {
 
   useEffect(() => {
     localStorage.setItem("crossfeed", JSON.stringify(crossfeed));
-    CF.current!.lowpass.left.gain.value = crossfeed.enabled ? crossfeed.frequency : 0;
     CF.current!.cross.left.gain.value = crossfeed.enabled ? crossfeed.amount / 100 : 0;
-    CF.current!.lowpass.right.gain.value = crossfeed.enabled ? crossfeed.frequency : 0;
     CF.current!.cross.right.gain.value = crossfeed.enabled ? crossfeed.amount / 100 : 0;
+    CF.current!.lowpass.left.frequency.value = crossfeed.enabled ? crossfeed.frequency : 0;
+    CF.current!.lowpass.right.frequency.value = crossfeed.enabled ? crossfeed.frequency : 0;
   }, [crossfeed]);
 
   useEffect(() => {
