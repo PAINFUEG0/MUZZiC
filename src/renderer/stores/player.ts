@@ -3,24 +3,17 @@
 import { Track } from "../../shared/types";
 import { createGlobalStore } from "./create";
 import { PlayerMethods } from "../player/types";
-import { frequencies } from "../player/equalizer";
 
-const __ = {
-  mute: false,
-  SR: Number(localStorage.getItem("SR") || "0"),
-  IG: Number(localStorage.getItem("IG") || "85"),
-  PG: Number(localStorage.getItem("PG") || "100"),
-  EQenabled: localStorage.getItem("EQenabled") === "true",
-  EQ: JSON.parse(localStorage.getItem("EQ") || (localStorage.setItem("EQ", JSON.stringify(frequencies.map(() => 0))), localStorage.getItem("EQ"))!) as number[],
-  CF: JSON.parse(localStorage.getItem("CF") || JSON.stringify({ amount: 0.3, frequency: 650, enabled: false })) as { amount: number; frequency: number; enabled: boolean },
-};
-
+const T = <X>(K: string, V: X) => JSON.parse(localStorage.getItem(K) || JSON.stringify(V)) as X;
 const _ = { duration: 0, loop: false, shuffle: false, isPlaying: false, current: null as Track | null };
 
 export const playerState = createGlobalStore(_);
-export const playerEffects = createGlobalStore(__);
 export const playerIndex = createGlobalStore<number>(0);
 export const playerQueue = createGlobalStore<Track[]>([]);
 export const playerProgress = createGlobalStore<number>(0);
 export const playerMethods = createGlobalStore({} as PlayerMethods);
+export const volumeSettings = createGlobalStore(T("volume", { volume: 85, muted: false }));
+export const surroundSettings = createGlobalStore(T("surround", { intensity: 0, enabled: false }));
 export const analyzersNodes = createGlobalStore({} as { [K in "left" | "right" | "overall"]: AnalyserNode });
+export const crossfeedSettings = createGlobalStore(T("crossfeed", { amount: 0.3, frequency: 650, enabled: false }));
+export const equalizerSettings = createGlobalStore(T("equalizer", { enabled: false, gains: new Array(15).fill(0), multiplier: 1 }));

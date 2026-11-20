@@ -3,21 +3,24 @@
 export * from "./volumeUnit";
 export * from "../stores/player";
 import { EqNodes } from "./equalizer";
-import { surround } from "./surround";
-import { sleepTimer } from "../stores";
+import { crossfeedSettings, equalizerSettings, sleepTimer, volumeSettings } from "../stores";
 import { CrossFeed } from "./crossfeed";
 import { Track } from "../../shared/types";
 import { useCallback, useEffect, useRef } from "react";
 import { dbToGain, safeAwait } from "../../shared/helpers";
-import { playerEffects, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./index";
+import { surroundSettings, playerMethods, playerQueue, playerIndex, playerState, playerProgress, analyzersNodes } from "./index";
+import { SurroundEffects } from "./surround";
 
 export default function Player() {
   const ctx = useRef<AudioContext | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const source = useRef<MediaElementAudioSourceNode | null>(null);
 
-  const [fx] = playerEffects.use();
+  const [volume] = volumeSettings.use();
+  const [surround] = surroundSettings.use();
   const [, setMethods] = playerMethods.use();
+  const [equalizer] = equalizerSettings.use();
+  const [crossfeed] = crossfeedSettings.use();
   const [queue, setQueue] = playerQueue.use();
   const [index, setIndex] = playerIndex.use();
   const [state, setState] = playerState.use();
@@ -25,18 +28,16 @@ export default function Player() {
   const [sleepTime, setSleepTime] = sleepTimer.use();
   const [progress, setProgress] = playerProgress.use();
 
-  const initialVolume = useRef(fx.PG);
-  const initialInputGain = useRef(fx.IG);
+  const initialVolume = useRef(volume.volume);
 
   const analyserLeft = useRef<AnalyserNode | null>(null);
   const analyserRight = useRef<AnalyserNode | null>(null);
   const analyserOverall = useRef<AnalyserNode | null>(null);
 
   const PG = useRef<GainNode | null>(null); // Post gain
-  const IG = useRef<GainNode | null>(null); // Input gain
   const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
   const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
-  const SR = useRef<ReturnType<typeof surround> | null>(null);
+  const SR = useRef<ReturnType<typeof SurroundEffects> | null>(null);
 
   const _state = useRef(state);
   const _queue = useRef(queue);
@@ -73,17 +74,15 @@ export default function Player() {
 
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
-    SR.current = surround(ctx.current);
+    SR.current = SurroundEffects(ctx.current);
 
     (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
 
-    (IG.current = ctx.current.createGain()).gain.value = dbToGain(initialInputGain.current);
     (PG.current = ctx.current.createGain()).gain.value = dbToGain(initialVolume.current);
 
-    source.current.connect(IG.current);
-    IG.current.connect(EQ.current.initialEQNode);
+    source.current.connect(EQ.current.initialEQNode);
 
     EQ.current.finalEQNode.connect(SR.current.input);
     SR.current.output.connect(CF.current.splitter);
@@ -107,27 +106,22 @@ export default function Player() {
   }, []);
 
   useEffect(() => {
-    IG.current!.gain.value = Math.pow(fx.IG / 100, 2);
-    localStorage.setItem("IG", fx.IG.toString());
-  }, [fx.IG]);
+    PG.current!.gain.value = volume.muted ? 0 : Math.pow(volume.volume / 100, 2);
+    localStorage.setItem("volume", JSON.stringify(volume));
+  }, [volume]);
 
   useEffect(() => {
-    PG.current!.gain.value = fx.mute ? 0 : Math.pow(fx.PG / 100, 2);
-    localStorage.setItem("PG", fx.PG.toString());
-  }, [fx.PG, fx.mute]);
+    localStorage.setItem("crossfeed", JSON.stringify(crossfeed));
+    CF.current!.lowpass.left.gain.value = crossfeed.enabled ? crossfeed.frequency : 0;
+    CF.current!.cross.left.gain.value = crossfeed.enabled ? crossfeed.amount / 100 : 0;
+    CF.current!.lowpass.right.gain.value = crossfeed.enabled ? crossfeed.frequency : 0;
+    CF.current!.cross.right.gain.value = crossfeed.enabled ? crossfeed.amount / 100 : 0;
+  }, [crossfeed]);
 
   useEffect(() => {
-    CF.current!.cross.left.gain.value = fx.CF.enabled ? fx.CF.amount / 100 : 0;
-    CF.current!.cross.right.gain.value = fx.CF.enabled ? fx.CF.amount / 100 : 0;
-    CF.current!.lowpass.left.gain.value = fx.CF.enabled ? fx.CF.frequency : 0;
-    CF.current!.lowpass.right.gain.value = fx.CF.enabled ? fx.CF.frequency : 0;
-    localStorage.setItem("CF", JSON.stringify(fx.CF));
-  }, [fx.CF]);
-
-  useEffect(() => {
-    SR.current!.strength.value = fx.SR / 100;
-    localStorage.setItem("WD", fx.SR.toString());
-  }, [fx.SR]);
+    SR.current!.strength.value = surround.intensity / 100;
+    localStorage.setItem("surround", JSON.stringify(surround));
+  }, [surround]);
 
   useEffect(() => {
     safeAwait((async () => EQ.current?.finalEQNode.disconnect())());
@@ -142,10 +136,9 @@ export default function Player() {
   }, [state.current?.channels]);
 
   useEffect(() => {
-    localStorage.setItem("EQ", JSON.stringify(fx.EQ));
-    localStorage.setItem("EQenabled", fx.EQenabled.toString());
-    EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = fx.EQenabled ? fx.EQ[i]! : 0));
-  }, [fx.EQ, fx.EQenabled]);
+    localStorage.setItem("equalizer", JSON.stringify(equalizer));
+    EQ.current!.equalizerNodes.forEach((n, i) => (n.gain.value = equalizer.enabled ? equalizer.gains[i]! * equalizer.multiplier : 0));
+  }, [equalizer]);
 
   useEffect(
     () =>

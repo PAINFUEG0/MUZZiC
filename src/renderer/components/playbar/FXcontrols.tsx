@@ -5,8 +5,8 @@ import { Volume } from "./Volume";
 import { memo, useState } from "react";
 import { SiDolby } from "react-icons/si";
 import { LuSlidersVertical } from "react-icons/lu";
-import { playerEffects, playerState } from "../../player";
-import { likedSongsStore, sceneStore, sleepTimer } from "../../stores";
+import { surroundSettings, playerState } from "../../player";
+import { crossfeedSettings, likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
 import { BiSolidSpeaker } from "react-icons/bi";
 
@@ -15,9 +15,10 @@ type Props = { id: string | null; repeatMode?: boolean; canCF: boolean; setState
 
 export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
   const [, setScene] = sceneStore.use();
-  const [fx, setFx] = playerEffects.use();
   const [liked, setLiked] = likedSongsStore.use();
   const [sleepTime, setSleepTime] = sleepTimer.use();
+  const [surround, setSurround] = surroundSettings.use();
+  const [crossfeed, setCrossfeed] = crossfeedSettings.use();
   const [showSleepTimerModal, setShowSleepTimerModal] = useState(false);
 
   return (
@@ -34,8 +35,8 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           <div
             id="surround-button"
             children={<SiDolby />}
-            onClick={() => setFx((s) => ({ ...s, SR: s.SR ? 0 : 60 }))}
-            className={"cursor-pointer active:scale-85 " + (fx.SR ? "text-(--accent-color)" : "")}
+            onClick={() => setSurround((s) => ({ enabled: !s.enabled, intensity: s.enabled ? 0 : 60 }))}
+            className={"cursor-pointer active:scale-85 " + (surround.enabled ? "text-(--accent-color)" : "")}
           />
         )}
 
@@ -49,8 +50,8 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
           <div
             id="crossfeed-button"
             children={<BiSolidSpeaker />}
-            className={"cursor-pointer active:scale-85 " + (fx.CF.enabled ? "text-(--accent-color)" : "")}
-            onClick={() => canCF && setFx((_) => ({ ..._, CF: { ..._.CF, enabled: !_.CF.enabled } }))}
+            onClick={() => canCF && setCrossfeed((_) => ({ ..._, enabled: !_.enabled }))}
+            className={"cursor-pointer active:scale-85 " + (crossfeed.enabled ? "text-(--accent-color)" : "")}
           />
         )}
 
@@ -59,7 +60,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
         <div id="eq-button" onClick={() => setScene({ scene: "equalizer" })} children={<LuSlidersVertical />} className="cursor-pointer hover:text-(--accent-color) active:scale-85" />
       </div>
 
-      <Volume FX={fx} setFX={setFx} />
+      <Volume />
 
       <Sleep show={showSleepTimerModal} setShow={setShowSleepTimerModal} sleepTime={sleepTime} setSleepTime={setSleepTime} />
     </div>

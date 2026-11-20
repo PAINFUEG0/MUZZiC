@@ -360,7 +360,7 @@ export function height(ctx: AudioContext) {
 /*                   +-> reverb --------------------+                  */
 /*                   +-> height --------------------+                  */
 /* ------------------------------------------------------------------ */
-export function surround(ctx: AudioContext) {
+export function SurroundEffects(ctx: AudioContext) {
   const input = stereo(ctx.createGain());
   const output = ctx.createGain();
 

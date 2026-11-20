@@ -1,15 +1,12 @@
 /** @format */
 
-import { Effects } from "./Effects";
-import { playerEffects } from "../stores";
 import { FaCaretDown } from "react-icons/fa6";
 import Slider from "../components/utils/Slider";
 import { frequencies } from "../player/equalizer";
 import { presets } from "../utils/equalizerPresets";
 import { memo, useEffect, useRef, useState } from "react";
-import { LuPower, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
-
-// I don't like the way this is done, but I'm too fcuked to change it
+import { crossfeedSettings, equalizerSettings } from "../stores";
+import { LuPower, LuRotateCcw, LuRotateCw, LuSlidersVertical } from "react-icons/lu";
 
 export const Equalizer = memo(() => {
   const lim = 12;
@@ -20,7 +17,8 @@ export const Equalizer = memo(() => {
   const [containerHeight, setContainerHeight] = useState(0);
   const sliderRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [fx, setFX] = playerEffects.use();
+  const [equalizer, setEqualizer] = equalizerSettings.use();
+  const [crossfeed, setCrossfeed] = crossfeedSettings.use();
 
   const updatePoints = () => {
     if (!containerRef.current) return;
@@ -31,7 +29,7 @@ export const Equalizer = memo(() => {
       .map((slider, i) => {
         if (!slider) return null;
         const rect = slider.getBoundingClientRect();
-        const percent = (fx.EQ[i]! + lim) / (lim * 2);
+        const percent = (equalizer.gains[i]! + lim) / (lim * 2);
         const x = rect.left + rect.width / 2 - containerRect.left;
         const y = rect.bottom - percent * rect.height - containerRect.top;
         return { x, y };
@@ -50,13 +48,13 @@ export const Equalizer = memo(() => {
     const observer = new ResizeObserver(updatePoints);
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [fx.EQ]);
+  }, [equalizer.gains]);
 
   const [show, setShow] = useState(false);
   const flat = presets.find((p) => p.name === "Flat")!;
   const [preset, setPreset] = useState(presets.find((p) => p.name === localStorage.getItem("EQN")) ?? flat);
 
-  useEffect(() => setFX((_) => ({ ..._, EQ: preset!.EQ })), []);
+  useEffect(() => setEqualizer((_) => ({ ..._, gains: preset!.EQ })), []);
 
   return (
     <div className="flex h-full w-full scrollbar-none flex-col gap-10 overflow-auto p-10 pb-5">
@@ -81,7 +79,7 @@ export const Equalizer = memo(() => {
               {presets.map((preset, i, arr) => (
                 <div
                   key={preset.name}
-                  onClick={() => (setFX((_) => ({ ..._, EQ: preset.EQ })), setPreset(preset), setShow(false), localStorage.setItem("EQN", preset.name))}
+                  onClick={() => (setEqualizer((_) => ({ ..._, gains: preset.EQ })), setPreset(preset), setShow(false), localStorage.setItem("EQN", preset.name))}
                   className={
                     "flex w-full cursor-pointer items-center gap-1.5 border-(--border-color)/20 bg-(--hover-color)/5 px-2 py-0.5 text-sm hover:bg-(--hover-color)/20 " +
                     (i === arr.length - 1 ? "" : "border-b")
@@ -96,8 +94,8 @@ export const Equalizer = memo(() => {
 
           <button
             children={<LuPower />}
-            style={{ opacity: fx.EQenabled ? 1 : 0.5 }}
-            onClick={() => setFX((_) => ({ ..._, EQenabled: !fx.EQenabled }))}
+            style={{ opacity: equalizer.enabled ? 1 : 0.5 }}
+            onClick={() => setEqualizer((_) => ({ ..._, enabled: !equalizer.enabled }))}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
 
@@ -106,17 +104,17 @@ export const Equalizer = memo(() => {
             onClick={() => {
               if (preset?.name === "Custom") localStorage.setItem("CEQ", JSON.stringify(flat.EQ));
               else (localStorage.setItem("EQN", "Flat"), setPreset(flat));
-              setFX((_) => ({ ..._, EQ: flat.EQ }));
+              setEqualizer((_) => ({ ..._, gains: flat.EQ }));
             }}
             className="flex cursor-pointer items-center justify-center rounded-full border-2 p-1 text-sm text-(--accent-color) active:scale-95"
           />
         </div>
       </div>
 
-      <div className="flex h-full w-full flex-col items-center justify-center gap-5" style={{ opacity: fx.EQenabled ? 1 : 0.5 }}>
+      <div className="flex h-full w-full flex-col items-center justify-center gap-5" style={{ opacity: equalizer.enabled ? 1 : 0.5 }}>
         <div className="grid w-full grid-cols-15">
           {frequencies.map((_, i) => (
-            <div className="text-center text-xs font-bold text-nowrap opacity-70" children={`${fx.EQ[i]!.toFixed(1)} dB`} />
+            <div className="text-center text-xs font-bold text-nowrap opacity-70" children={`${equalizer.gains[i]!.toFixed(1)} dB`} />
           ))}
         </div>
 
@@ -155,18 +153,18 @@ export const Equalizer = memo(() => {
                   vertical
                   step={0.1}
                   max={lim * 2}
-                  value={fx.EQ[i]! + lim}
-                  disabled={!fx.EQenabled}
+                  disabled={!equalizer.enabled}
+                  value={equalizer.gains[i]! + lim}
                   ref={(el) => void (sliderRefs.current[i] = el)}
                   className="h-[42dvh] [&::-webkit-slider-thumb]:opacity-100"
                   onChange={(e) => {
-                    setFX((_) => {
-                      const EQ = [..._.EQ];
-                      EQ[i] = Number(e.target.value) - lim;
-                      localStorage.setItem("CEQ", JSON.stringify(EQ));
+                    setEqualizer((_) => {
+                      const gains = [..._.gains];
+                      gains[i] = Number(e.target.value) - lim;
+                      localStorage.setItem("CEQ", JSON.stringify(gains));
                       preset?.name !== "Custom" && localStorage.setItem("EQN", "Custom");
                       preset?.name !== "Custom" && setPreset(presets.find((p) => p.name === "Custom")!);
-                      return { ..._, EQ };
+                      return { ..._, gains };
                     });
                   }}
                 />
@@ -182,7 +180,28 @@ export const Equalizer = memo(() => {
         </div>
       </div>
 
-      <Effects />
+      <div className="grid grid-cols-3 gap-5">
+        <div className="flex w-full flex-row items-center justify-between gap-3" style={{ opacity: equalizer.enabled ? 1 : 0.5 }}>
+          <div className="text-xs text-nowrap">Equalizer gain multiplier</div>
+          <Slider min={0} max={3} step={0.01} value={equalizer.multiplier} disabled={!equalizer.enabled} onChange={(e) => setEqualizer((_) => ({ ..._, multiplier: Number(e.target.value) }))} />
+          <div className="w-7 shrink-0 text-xs text-nowrap">{equalizer.multiplier.toFixed(2)} x</div>
+          <LuRotateCcw className="mt-0.5 shrink-0 cursor-pointer text-xs transition-all active:scale-95" onClick={() => setEqualizer((_) => ({ ..._, multiplier: 1 }))} />
+        </div>
+
+        <div className="flex w-full flex-row items-center justify-between gap-3" style={{ opacity: crossfeed.enabled ? 1 : 0.5 }}>
+          <div className="text-xs text-nowrap">Crossfeed intensity</div>
+          <Slider min={0} step={1} max={100} value={crossfeed.amount} disabled={!crossfeed.enabled} onChange={(e) => setCrossfeed((_) => ({ ..._, amount: Number(e.target.value) }))} />
+          <div className="w-6 shrink-0 text-xs text-nowrap">{crossfeed.amount} %</div>
+          <LuRotateCcw className="mt-0.5 shrink-0 cursor-pointer text-xs transition-all active:scale-95" onClick={() => setCrossfeed((_) => ({ ..._, amount: 30 }))} />
+        </div>
+
+        <div className="flex w-full flex-row items-center justify-between gap-3" style={{ opacity: crossfeed.enabled ? 1 : 0.5 }}>
+          <div className="text-xs text-nowrap">Crossfeed frequency</div>
+          <Slider min={0} step={1} max={2000} value={crossfeed.frequency} disabled={!crossfeed.enabled} onChange={(e) => setCrossfeed((_) => ({ ..._, frequency: Number(e.target.value) }))} />
+          <div className="w-10 shrink-0 text-xs text-nowrap">{crossfeed.frequency} Hz</div>
+          <LuRotateCcw className="mt-0.5 shrink-0 cursor-pointer text-xs transition-all active:scale-95" onClick={() => setCrossfeed((_) => ({ ..._, frequency: 650 }))} />
+        </div>
+      </div>
     </div>
   );
 });

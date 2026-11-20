@@ -1,14 +1,14 @@
 /** @format */
 
 import { useEffect, useRef } from "react";
-import { sceneStore, playerMethods, playerState, playerEffects, selected, selectMode } from "../stores";
+import { sceneStore, playerMethods, playerState, selected, selectMode, volumeSettings } from "../stores";
 
 export function useKeybinds(fullscreen: boolean, setFullscreen: React.Dispatch<React.SetStateAction<boolean>>) {
   const [state] = playerState.use();
-  const [, setFX] = playerEffects.use();
   const [, setScene] = sceneStore.use();
   const [, setSelctions] = selected.use();
   const [{ seekTo }] = playerMethods.use();
+  const [, setVolume] = volumeSettings.use();
   const [inSelectionMode, setInSelectionMode] = selectMode.use();
 
   const _state = useRef(state);
@@ -41,12 +41,10 @@ export function useKeybinds(fullscreen: boolean, setFullscreen: React.Dispatch<R
       Escape: () => (_fullscreen.current ? setFullscreen(false) : _inSelectionMode.current ? (setInSelectionMode(false), setSelctions([])) : null),
 
       // volume
-      ArrowUp: () => setFX((_) => ({ ..._, PG: Math.min(150, _.PG + 5) })),
-      ArrowDown: () => setFX((_) => ({ ..._, PG: Math.max(0, _.PG - 5) })),
-      _ArrowUp: () => setFX((_) => ({ ..._, IG: Math.min(100, _.IG + 5) })),
-      _ArrowDown: () => setFX((_) => ({ ..._, IG: Math.max(0, _.IG - 5) })),
+      ArrowUp: () => setVolume((_) => ({ ..._, volume: Math.min(150, _.volume + 5) })),
+      ArrowDown: () => setVolume((_) => ({ ..._, volume: Math.max(0, _.volume - 5) })),
 
-      // layback controls
+      // playback controls
       Space: () => document.getElementById("play-pause-button")!.click(),
       ArrowLeft: () => document.getElementById("seekBackward-button")!.click(),
       ArrowRight: () => document.getElementById("seekForward-button")!.click(),

@@ -1,39 +1,30 @@
 /** @format */
 
 import Slider from "../utils/Slider";
-import { memo, useState } from "react";
-import { playerEffects } from "../../player";
+import { memo } from "react";
+import { volumeSettings } from "../../player";
 import { LuVolumeOff, LuVolume, LuVolume1, LuVolume2 } from "react-icons/lu";
 
-type _ = ReturnType<(typeof playerEffects)["use"]>;
-
-export const Volume = memo(({ FX, setFX }: { FX: _[0]; setFX: _[1] }) => {
-  const [gainType, setGainType] = useState<"IG" | "PG">("PG");
+export const Volume = memo(() => {
+  const [volume, setVolume] = volumeSettings.use();
 
   return (
     <div className="flex h-fit flex-col">
-      <div className="-mt-4 flex h-fit w-full flex-row items-center justify-center gap-1.5 text-[10px]">
-        <div children="PRE" className={"cursor-pointer " + (gainType === "IG" ? "text-(--accent-color)" : "opacity-70")} onClick={() => setGainType("IG")} />
-        <div children="/" />
-        <div children="POST" className={"cursor-pointer " + (gainType === "PG" ? "text-(--accent-color)" : "opacity-70")} onClick={() => setGainType("PG")} />
-      </div>
-
       <div className="flex h-fit w-fit flex-row items-center gap-1.5">
-        <div id="mute-unmute-button" onClick={() => setFX((_) => ({ ..._, mute: !_.mute }))} className="w-5 cursor-pointer">
-          {FX.mute || FX[gainType] === 0 ? <LuVolumeOff /> : FX[gainType] > 0 && FX[gainType] <= 30 ? <LuVolume /> : FX[gainType] > 30 && FX[gainType] <= 60 ? <LuVolume1 /> : <LuVolume2 />}
+        <div id="mute-unmute-button" onClick={() => setVolume((_) => ({ ..._, muted: !_.muted }))} className="w-5 cursor-pointer">
+          {volume.muted || volume.volume === 0 ? <LuVolumeOff /> : volume.volume > 0 && volume.volume <= 30 ? <LuVolume /> : volume.volume > 30 && volume.volume <= 60 ? <LuVolume1 /> : <LuVolume2 />}
         </div>
 
         <Slider
           min={0}
           step={1}
-          value={FX[gainType]}
+          max={150}
           className="h-1 w-25"
-          max={gainType === "PG" ? 150 : 100}
+          value={volume.volume}
           thumb={{ height: "0.70rem", width: "0.70rem" }}
-          onChange={(e) => setFX((s: any) => ({ ...s, [gainType]: Number(e.target.value) }))}
+          onChange={(e) => setVolume((_) => ({ ..._, volume: Number(e.target.value) }))}
         />
-
-        <div className="flex w-7 flex-row items-center justify-start text-xs">{FX[gainType]}%</div>
+        <div className="flex w-7 flex-row items-center justify-start text-xs">{volume.volume}%</div>
       </div>
     </div>
   );
