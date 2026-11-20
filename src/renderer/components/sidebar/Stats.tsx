@@ -29,10 +29,10 @@ export const Stats = memo(() => {
   const usages = useMemo(
     () =>
       [
-        { K: "gpu", label: "Gpu", hex: `${theme.accent.substring(0, 7)}FF` },
-        { K: "tab", label: "Win", hex: `${theme.accent.substring(0, 7)}99` },
-        { K: "utility", label: "Util", hex: `${theme.accent.substring(0, 7)}66` },
-        { K: "browser", label: "Main", hex: `${theme.accent.substring(0, 7)}33` },
+        { K: "gpu", label: "Gpu", hex: `${theme.accentColor.substring(0, 7)}FF` },
+        { K: "tab", label: "Win", hex: `${theme.accentColor.substring(0, 7)}99` },
+        { K: "utility", label: "Util", hex: `${theme.accentColor.substring(0, 7)}66` },
+        { K: "browser", label: "Main", hex: `${theme.accentColor.substring(0, 7)}33` },
       ] as const,
     [theme],
   );
@@ -71,8 +71,8 @@ export const Stats = memo(() => {
 
         {(
           [
-            { K: "CPU", label: "%", hex: `${theme.accent.substring(0, 7)}` },
-            { K: "RAM", label: "MB", hex: `${theme.accent.substring(0, 7)}` },
+            { K: "CPU", label: "%", hex: `${theme.accentColor.substring(0, 7)}` },
+            { K: "RAM", label: "MB", hex: `${theme.accentColor.substring(0, 7)}` },
           ] as const
         ).map((_) => (
           <div key={_.label} className="mb-px flex h-fit w-full flex-col items-center gap-1.5">

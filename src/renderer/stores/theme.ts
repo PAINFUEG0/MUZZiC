@@ -6,8 +6,11 @@ type Theme = {
   name: string;
   preview: string;
   background: string;
-  accent: `#${string}`;
   type: "dark" | "light";
+  textColor?: `#${string}`;
+  hoverColor?: `#${string}`;
+  accentColor: `#${string}`;
+  borderColor?: `#${string}`;
   navbar: { tint: { color: `#${string}`; opacity: number }; blur: string };
   sidebar: { tint: { color: `#${string}`; opacity: number }; blur: string };
   playbar: { tint: { color: `#${string}`; opacity: number }; blur: string };
@@ -19,7 +22,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#82B4C9",
+    accentColor: "#82B4C9",
     name: "brook",
     background: "brook.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "15px" },
@@ -31,7 +34,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#FF7722",
+    accentColor: "#FF7722",
     name: "pumpkin orange",
     background: "pumpkin-orange.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "15px" },
@@ -43,7 +46,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#FF9922",
+    accentColor: "#FF9922",
     name: "pumpkin yellow",
     background: "pumpkin-yellow.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "15px" },
@@ -55,19 +58,20 @@ export const themes = [
   {
     preview: "",
     type: "light",
-    accent: "#588888",
+    accentColor: "#588888",
     name: "white flowers",
+    textColor: "#003f3f",
     background: "white-flowers.jpg",
     navbar: { tint: { color: "#ABBBBB", opacity: 0.1 }, blur: "10px" },
     sidebar: { tint: { color: "#ABBBBB", opacity: 0.1 }, blur: "10px" },
     playbar: { tint: { color: "#ABBBBB", opacity: 0.1 }, blur: "10px" },
-    overall: { tint: { color: "#FFFFFF", opacity: 0.5 }, blur: "10px" },
+    overall: { tint: { color: "#FFFFFF", opacity: 0.2 }, blur: "10px" },
     viewport: { tint: { color: "#FFFFFF", opacity: 0.0 }, blur: "00px" },
   },
   {
     preview: "",
     type: "dark",
-    accent: "#FF88BB",
+    accentColor: "#FF88BB",
     name: "cherry blossom",
     background: "cherry-blossom.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.2 }, blur: "10px" },
@@ -79,7 +83,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#99CC22",
+    accentColor: "#99CC22",
     name: "green leaves",
     background: "green-leaves.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.2 }, blur: "10px" },
@@ -91,7 +95,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#AA53BB",
+    accentColor: "#AA53BB",
     name: "violet flowers",
     background: "violet-flowers.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.2 }, blur: "10px" },
@@ -103,7 +107,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#82FFC9",
+    accentColor: "#82FFC9",
     name: "kuroshitsuji",
     background: "kuroshitsuji.png",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "10px" },
@@ -115,7 +119,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#9988FF",
+    accentColor: "#9988FF",
     name: "purple blue leaves",
     background: "purple-blue-leaves.png",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "10px" },
@@ -127,7 +131,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#AA88CC",
+    accentColor: "#AA88CC",
     name: "boobs",
     background: "https://cdn.hentaigifz.com/82570/anime-boobs.gif",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "10px" },
@@ -139,7 +143,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#FF2222",
+    accentColor: "#FF2222",
     name: "red guitarist",
     background: "red-guitarist.png",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "10px" },
@@ -151,7 +155,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#83BDF4",
+    accentColor: "#83BDF4",
     name: "sakata gintoki",
     background: "sakata-gintoki.jpg",
     navbar: { tint: { color: "#83BDF4", opacity: 0.05 }, blur: "10px" },
@@ -163,7 +167,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#83BDF4CC",
+    accentColor: "#83BDF4CC",
     name: "sakata gintoki 2",
     background: "https://images7.alphacoders.com/137/thumb-1920-1374435.png",
     navbar: { tint: { color: "#83BDF4", opacity: 0.05 }, blur: "0px" },
@@ -175,7 +179,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#F4BF50",
+    accentColor: "#F4BF50",
     name: "sakata kintoki 3",
     background: "https://images5.alphacoders.com/113/thumb-1920-1137590.png",
     navbar: { tint: { color: "#F4BF50", opacity: 0.05 }, blur: "00px" },
@@ -187,7 +191,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#F4BF50",
+    accentColor: "#F4BF50",
     name: "sakata kintoki",
     background: "sakata-kintoki.png",
     navbar: { tint: { color: "#F4BF50", opacity: 0.05 }, blur: "10px" },
@@ -200,7 +204,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#82FFC9",
+    accentColor: "#82FFC9",
     name: "emerald",
     background: "emerald.png",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "5px" },
@@ -212,7 +216,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#ffffff",
+    accentColor: "#ffffff",
     name: "skeleton",
     background: "skeleton.png",
     navbar: { tint: { color: "#000000", opacity: 0.25 }, blur: "0px" },
@@ -224,7 +228,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#e27ca8",
+    accentColor: "#e27ca8",
     name: "sakura",
     background: "sakura.png",
     navbar: { tint: { color: "#000000", opacity: 0.2 }, blur: "3px" },
@@ -236,7 +240,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#bb86df",
+    accentColor: "#bb86df",
     name: "money",
     background: "money.png",
     navbar: { tint: { color: "#050005", opacity: 0.3 }, blur: "5px" },
@@ -248,7 +252,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#9695f0",
+    accentColor: "#9695f0",
     name: "blurple eyes",
     background: "eyes.png",
     navbar: { tint: { color: "#000000", opacity: 0.3 }, blur: "0px" },
@@ -260,7 +264,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#e79bdb",
+    accentColor: "#e79bdb",
     name: "pink mountains",
     background: "pink-mount.png",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "0px" },
@@ -272,7 +276,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#B4B886",
+    accentColor: "#B4B886",
     name: "forest",
     background: "forest.gif",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "0px" },
@@ -284,7 +288,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#83d4fac4",
+    accentColor: "#83d4fac4",
     name: "blue forest",
     background: "blue-forest.png",
     navbar: { tint: { color: "#111115", opacity: 0.4 }, blur: "0px" },
@@ -296,7 +300,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#0bff71c4",
+    accentColor: "#0bff71c4",
     name: "zoro",
     background: "https://www.wallsnapy.com/img_gallery/one-piece-zoro-minimal-dark-emerald-background-957276.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "0px" },
@@ -308,7 +312,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#aeb3b0",
+    accentColor: "#aeb3b0",
     name: "undertaker",
     background: "und.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "0px" },
@@ -320,7 +324,7 @@ export const themes = [
   {
     preview: "",
     type: "dark",
-    accent: "#7dbe84",
+    accentColor: "#7dbe84",
     name: "lithe",
     background: "lithe.jpg",
     navbar: { tint: { color: "#000000", opacity: 0.4 }, blur: "0px" },
@@ -331,4 +335,4 @@ export const themes = [
   },
 ] satisfies Theme[];
 
-export const themeStore = createGlobalStore<(typeof themes)[number]>(themes[Number(localStorage.getItem("theme")) || 0]!);
+export const themeStore = createGlobalStore<Theme>(themes[Number(localStorage.getItem("theme")) || 0]!);

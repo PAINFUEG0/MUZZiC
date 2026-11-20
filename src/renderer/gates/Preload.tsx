@@ -36,10 +36,10 @@ export function Preload() {
   });
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--accent-color", theme.accent);
-    document.documentElement.style.setProperty("--text-color", theme.type === "dark" ? "#ffffff" : "#000000");
-    document.documentElement.style.setProperty("--hover-color", theme.type === "dark" ? "#000000" : "#ffffff");
-    document.documentElement.style.setProperty("--border-color", theme.type === "dark" ? "#ffffff" : "#000000");
+    document.documentElement.style.setProperty("--accent-color", theme.accentColor);
+    document.documentElement.style.setProperty("--text-color", theme.textColor || (theme.type === "dark" ? "#ffffff" : "#000000"));
+    document.documentElement.style.setProperty("--hover-color", theme.hoverColor || (theme.type === "dark" ? "#000000" : "#ffffff"));
+    document.documentElement.style.setProperty("--border-color", theme.borderColor || (theme.type === "dark" ? "#ffffff" : "#000000"));
   }, [theme]);
 
   useEffect(() => localStorage.setItem("liked", JSON.stringify(liked)), [liked]);
