@@ -33,6 +33,8 @@ export default function Player() {
   const analyserOverall = useRef<AnalyserNode | null>(null);
 
   const PG = useRef<GainNode | null>(null); // Post gain
+  const LG = useRef<GainNode | null>(null); // Post gain
+  const RG = useRef<GainNode | null>(null); // Post gain
   const EQ = useRef<ReturnType<typeof EqNodes> | null>(null);
   const CF = useRef<ReturnType<typeof CrossFeed> | null>(null);
 
@@ -72,6 +74,9 @@ export default function Player() {
     EQ.current = EqNodes(ctx.current);
     CF.current = CrossFeed(ctx.current);
 
+    (RG.current = ctx.current.createGain()).gain.value = 1;
+    (LG.current = ctx.current.createGain()).gain.value = 1;
+
     (analyserLeft.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserRight.current = ctx.current.createAnalyser()).fftSize = 2048;
     (analyserOverall.current = ctx.current.createAnalyser()).fftSize = 2048;
@@ -83,14 +88,22 @@ export default function Player() {
     EQ.current!.finalEQNode.connect(CF.current!.splitter);
     CF.current!.merger.connect(PG.current!);
 
+    const merger = ctx.current.createChannelMerger(2);
     const splitter = ctx.current.createChannelSplitter(2);
 
-    PG.current.connect(ctx.current.destination);
     PG.current.connect(analyserOverall.current);
     PG.current.connect(splitter);
 
-    splitter.connect(analyserLeft.current, 0);
-    splitter.connect(analyserRight.current, 1);
+    splitter.connect(LG.current, 0);
+    splitter.connect(RG.current, 1);
+
+    LG.current.connect(analyserLeft.current);
+    RG.current.connect(analyserRight.current);
+
+    LG.current.connect(merger, 0, 0);
+    RG.current.connect(merger, 0, 1);
+
+    merger.connect(ctx.current.destination);
   }, []);
 
   useEffect(() => {
@@ -102,6 +115,8 @@ export default function Player() {
 
   useEffect(() => {
     PG.current!.gain.value = volume.muted ? 0 : Math.pow(volume.volume / 100, 2);
+    RG.current!.gain.value = volume.right / 100;
+    LG.current!.gain.value = volume.left / 100;
     localStorage.setItem("volume", JSON.stringify(volume));
   }, [volume]);
 
