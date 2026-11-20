@@ -3,11 +3,10 @@
 import { Sleep } from "./Sleep";
 import { Volume } from "./Volume";
 import { memo, useState } from "react";
-import { LuSlidersVertical } from "react-icons/lu";
+import { LuRotate3D, LuSlidersVertical } from "react-icons/lu";
 import { playerState } from "../../player";
 import { crossfeedSettings, likedSongsStore, sceneStore, sleepTimer } from "../../stores";
 import { RiHeartFill, RiHeartLine, RiLoopRightFill, RiLoopRightAiLine, RiMoonFill } from "react-icons/ri";
-import { BiSolidSpeaker } from "react-icons/bi";
 
 type T = ReturnType<(typeof playerState)["use"]>;
 type Props = { id: string | null; repeatMode?: boolean; canCF: boolean; setState: T[1] };
@@ -38,7 +37,7 @@ export const FXControls = memo(({ id, repeatMode, canCF, setState }: Props) => {
         {canCF && (
           <div
             id="crossfeed-button"
-            children={<BiSolidSpeaker />}
+            children={<LuRotate3D />}
             onClick={() => canCF && setCrossfeed((_) => ({ ..._, enabled: !_.enabled }))}
             className={"cursor-pointer active:scale-85 " + (crossfeed.enabled ? "text-(--accent-color)" : "")}
           />
