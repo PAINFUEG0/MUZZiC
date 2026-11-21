@@ -32,7 +32,6 @@ export function Queue() {
         key={queue[index]!.id}
         end={index === queue.length - 1}
         isLiked={!!likedMap[queue[index]!.id]}
-        isCurrentlyPlaying={index === currentIndex}
         onClick={() => methods.jumpTo(queue.findIndex((t) => t.id === queue[index]!.id))}
         onLike={() => setLiked((liked) => (liked.includes(queue[index]!.id) ? liked.filter((e) => e !== queue[index]!.id) : [...liked, queue[index]!.id]))}
         button1={<BiAddToQueue className="shrink-0 cursor-pointer opacity-40" />}

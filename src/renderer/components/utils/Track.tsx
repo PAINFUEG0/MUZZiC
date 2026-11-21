@@ -2,7 +2,7 @@
 
 import { memo, ReactNode } from "react";
 import { Tree } from "../../../shared/types";
-import { LuDisc, LuDisc3 } from "react-icons/lu";
+import { themeStore } from "../../stores/theme";
 import { selected, selectMode } from "../../stores";
 import { RiHeartFill, RiHeartLine } from "react-icons/ri";
 
@@ -17,10 +17,10 @@ type Props = {
   button3: ReactNode;
   onClick: () => void;
   file: Tree["files"][number];
-  isCurrentlyPlaying?: boolean;
 };
 
-export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike, button1, button2, button3, isCurrentlyPlaying }: Props) => {
+export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike, button1, button2, button3 }: Props) => {
+  const [theme] = themeStore.use();
   const [selections, setSelctions] = selected.use();
   const [inSelectionMode, setInSelectionMode] = selectMode.use();
 
@@ -39,8 +39,8 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
         }`
       }
     >
-      <div className="grid w-full shrink-0 grid-cols-15 rounded-md px-2 py-1 transition-transform duration-50 hover:bg-(--hover-color)/20">
-        <div className="relative flex h-full w-full flex-row items-center justify-between px-0.5">
+      <div className="grid w-full shrink-0 grid-cols-30 rounded-md px-2 py-1 transition-transform duration-50 hover:bg-(--hover-color)/20">
+        <div className="relative col-span-3 flex h-full w-full flex-row items-center justify-between px-0.5">
           {inSelectionMode ? (
             <div
               onClick={() => setSelctions((_) => (_.find((t) => t.id === file.id) ? _.filter((t) => t.id !== file.id) : [..._, file]))}
@@ -52,18 +52,24 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
           ) : (
             <div
               children={index + 1}
-              className="z-10 flex w-4 shrink-0 cursor-pointer justify-center text-xs opacity-50"
               onClick={() => (setInSelectionMode((_) => true), setSelctions((_) => [..._, file]))}
+              className="z-10 flex w-4 shrink-0 cursor-pointer justify-center text-xs opacity-50"
             />
           )}
 
-          <div
-            className="cursor-pointer text-(--accent-color)"
-            children={isCurrentlyPlaying ? <LuDisc3 className="aspect-square h-8 w-8 shrink-0 animate-spin" /> : <LuDisc className="aspect-square h-8 w-8 shrink-0" />}
-          />
+          <div className="flex w-full items-center justify-center">
+            <div className="rounded-full border-2">
+              <img
+                key={file?.id + theme.type}
+                src={file?.thumb || "./logo.png"}
+                onError={(e) => (e.currentTarget.src = theme.background)}
+                className="aspect-square h-7 rounded-full border-3 border-transparent object-cover xl:h-9"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="group col-span-8 flex w-full cursor-pointer flex-col px-3" onClick={onClick}>
+        <div className="group col-span-17 flex w-full cursor-pointer flex-col pr-3" onClick={onClick}>
           <div className="text-no-wrap min-w-0 truncate text-xs" children={file.title} />
           <div className="flex w-full flex-row gap-3 text-[10px] opacity-50">
             <div className="text-no-wrap min-w-0 truncate" children={file.artists?.join(", ")} />
@@ -86,14 +92,14 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
                 ? `EAC3 - ${Math.round(file.resolution.bitrate / 1000)} kb/s`
                 : `${file.resolution.bitDepth} bit - ${file.resolution.sampleRate / 1000} kHz`
           }
-          className="text-no-wrap col-span-2 flex min-w-0 shrink-0 items-center justify-center truncate text-xs font-medium opacity-100"
+          className="text-no-wrap col-span-3 flex min-w-0 shrink-0 items-center justify-center truncate text-xs font-medium opacity-100"
         />
 
-        <div className="text-no-wrap col-span-1 flex min-w-0 shrink-0 items-center justify-center truncate text-xs">
+        <div className="text-no-wrap col-span-2 flex min-w-0 shrink-0 items-center justify-center truncate text-xs">
           {`${Math.floor(file.duration / 60)}`.padStart(2, "0")}:{`${Math.floor(file.duration % 60)}`.padStart(2, "0")}
         </div>
 
-        <div className="col-span-2 flex pr-1 pl-5">
+        <div className="col-span-4 flex pr-1 pl-5">
           <div className="flex h-full w-full flex-row items-center justify-between opacity-90">
             {button1}
             {button2}

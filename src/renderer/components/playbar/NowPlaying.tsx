@@ -16,7 +16,7 @@ export const NowPlaying = memo(({ index, queueLength, track, setFullscreen }: { 
         <img
           key={track?.id + theme.type}
           src={track?.thumb || "./logo.png"}
-          className="-z-1 h-full w-full object-contain"
+          className="-z-1 h-full w-full object-cover"
           onError={(e) => (e.currentTarget.src = "./logo.png")}
           onLoad={(e) => (e.currentTarget.style.filter = theme.type === "dark" && e.currentTarget.src.includes("logo.png") ? "invert(100%)" : "invert(0%)")}
         />
