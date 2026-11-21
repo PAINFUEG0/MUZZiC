@@ -69,7 +69,7 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
           </div>
         </div>
 
-        <div className="group col-span-17 flex w-full cursor-pointer flex-col pr-3" onClick={onClick}>
+        <div className="group col-span-17 flex w-full cursor-pointer flex-col justify-center gap-1 pr-3" onClick={onClick}>
           <div className="text-no-wrap min-w-0 truncate text-xs" children={file.title} />
           <div className="flex w-full flex-row gap-3 text-[10px] opacity-50">
             <div className="text-no-wrap min-w-0 truncate" children={file.artists?.join(", ")} />
