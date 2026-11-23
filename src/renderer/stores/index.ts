@@ -18,10 +18,11 @@ export const selectMode = createGlobalStore<boolean>(false);
 
 const playlists = JSON.parse(localStorage.getItem("playlists") ?? "[]") as { name: string; K: string }[];
 const data = Object.fromEntries(playlists.map((_) => [_.K, JSON.parse(localStorage.getItem(_.K) ?? "[]") as string[]]));
-
 export const playlistDataStore = createGlobalStore(data);
 export const playlistIndexStore = createGlobalStore(playlists);
 
+export const flattenedTreeStore = createGlobalStore<Track[]>([]);
 export const artistsStore = createGlobalStore<Record<string, Track[]>>({});
 export const albumsStore = createGlobalStore<Partial<Record<string, Track[]>>>({});
-export const flattenedTreeStore = createGlobalStore<Track[]>([]);
+
+export const nodeStore = createGlobalStore<Awaited<ReturnType<typeof window.api.getNodes>>>([]);

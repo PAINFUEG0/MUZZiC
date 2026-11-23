@@ -10,6 +10,10 @@ export type File = { path: string; name: string; id: string };
 export type Tree = { name: string; path: string; files: Track[]; dirs: Tree[] };
 export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode[] };
 
+export type Node<T extends boolean = false> = { host: string; secure: boolean; password: string; port: number; type: "custom" | "fetched" } & (T extends true
+  ? { youtube: boolean; downloadSpeed: number; resolutionTime: number }
+  : {});
+
 export type BaseTrack = {
   id: string;
   thumb: string;
@@ -62,9 +66,12 @@ export type API = {
   deleteThumbnails: (ids: string[]) => Promise<void>;
   extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
 
-  removeNode: (index: number) => Promise<void>;
-  getNodes: () => Promise<{ host: string; secure: boolean; password: string; port: number }[]>;
-  addNode: (config: { host: string; secure: boolean; password: string; port: number }) => Promise<void>;
+  getNodes: () => Promise<Node[]>;
+  addNode: (config: Node) => Promise<void>;
+  removeNode: (url: string) => Promise<void>;
+
+  fetchLavalinkNodes: () => Promise<Node<true>[]>;
+  checkNode: (node: Node) => Promise<Node<true> | undefined>;
 
   close: () => Promise<void>;
   minimize: () => Promise<void>;

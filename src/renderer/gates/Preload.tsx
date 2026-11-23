@@ -10,11 +10,12 @@ import { Fullscreen } from "../components/fullscreen";
 import { AnimatePresence, motion } from "framer-motion";
 import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
 import { DirNode, MessagePayload, BaseTrack, Tree, API, Track } from "../../shared/types";
-import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
+import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, nodeStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
 
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
+  const [, setNodes] = nodeStore.use();
   const [liked] = likedSongsStore.use();
   const [, setAlbums] = albumsStore.use();
   const [, setArtists] = artistsStore.use();
@@ -122,18 +123,18 @@ export function Preload() {
           if (data.type !== "PROGRESS") return;
           setTask("Extracting metadata and thumbnails");
           setFooter(`Processed ${data.current} / ${data.total} files`);
-          setProgress(Math.floor(40 * (data.current / data.total)) + 50);
+          setProgress(Math.floor(30 * (data.current / data.total)) + 50);
         };
         await window.api.extractAndSaveMetadata(needsExtraction);
         ws.onmessage = null;
       }
 
-      setProgress(90);
+      setProgress(80);
       setTask(`Cleaning up residual data and files`);
       needsDeletion.length && (await window.api.deleteMeta(needsDeletion));
       needsDeletion.length && (await window.api.deleteThumbnails(needsDeletion));
 
-      setProgress(95);
+      setProgress(85);
       setTask(`Syncing changes and generating tree`);
       setFooter(`Indexed ${needsExtraction.length} files and removed index for ${needsDeletion.length} files`);
       await sleep(100);
@@ -169,8 +170,18 @@ export function Preload() {
 
       setArtists(Object.fromEntries(artists));
 
+      setTask("Getting lavalink nodes");
+      ws.onmessage = (m: MessageEvent) => {
+        const data = JSON.parse(m.data) as MessagePayload;
+        if (data.type !== "MESSAGE") return;
+        setFooter(data.data);
+      };
+      setNodes(await window.api.fetchLavalinkNodes());
+      ws.onmessage = null;
+      setProgress(90);
+
+      setTask("Finishing things up");
       setFooter("Hope you enjoy your music");
-      setTask("All done!");
       setProgress(100);
       await sleep(200);
       setReady(true);

@@ -2,12 +2,17 @@
 
 import { memo, useState } from "react";
 import { Modal } from "../utils/Modal";
+import { nodeStore } from "../../stores";
 
 export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm: boolean; setShowNodeForm: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [host, setHost] = useState("");
   const [port, setPort] = useState("");
+  const [nodes, setNodes] = nodeStore.use();
   const [secure, setSecure] = useState(false);
   const [password, setPassword] = useState("");
+
+  const [ok, setOk] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   return (
     <Modal open={showNodeForm} setOpen={setShowNodeForm} className="z-100 max-h-fit w-md border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)">
@@ -22,6 +27,7 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
             id="Host"
             type="text"
             value={host}
+            disabled={ok}
             spellCheck={false}
             onChange={(e) => setHost(e.target.value)}
             placeholder="Hostname ( without http:// or https:// )"
@@ -32,6 +38,7 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
             id="Port"
             type="text"
             value={port}
+            disabled={ok}
             spellCheck={false}
             placeholder="Port"
             onChange={(e) => setPort(e.target.value)}
@@ -43,15 +50,16 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
           <input
             type="text"
             id="Password"
+            disabled={ok}
             value={password}
             spellCheck={false}
             placeholder="Password"
-            onChange={(e) => setHost(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="flex h-fit w-full flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0"
           />
-          <label htmlFor="secure" className="flex cursor-pointer items-center gap-3 text-sm font-medium">
-            <input id="secure" type="checkbox" checked={secure} onChange={(e) => setSecure(e.target.checked)} className="sr-only" />
 
+          <label htmlFor="secure" className="flex cursor-pointer items-center gap-3 text-sm font-medium">
+            <input disabled={ok} id="secure" type="checkbox" checked={secure} onChange={(e) => setSecure(e.target.checked)} className="sr-only" />
             <span className={`relative h-5 w-9 rounded-full transition-colors ${secure ? "bg-green-500" : "bg-red-500"}`}>
               <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${secure ? "translate-x-4" : "translate-x-0"}`} />
             </span>
@@ -65,11 +73,37 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
             onClick={() => setShowNodeForm(false)}
             className="w-full cursor-pointer rounded-md border-2 border-[#ff1116] bg-[#ff111622] pt-1 pb-1.5 text-[#ff3333] transition-all duration-150 active:scale-98"
           />
-          <button
-            children="Verify and add node"
-            onClick={async () => await window.api.addNode({} as any)}
-            className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98"
-          />
+          {!ok ? (
+            <button
+              disabled={!host || !port || !password || nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1}
+              children={checking ? "Checking" : nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1 ? "Node already exists" : "Verify node"}
+              onClick={async () => {
+                setChecking(true);
+                const node = { host, port: Number(port), password, secure, type: "custom" } as const;
+                const res = await window.api.checkNode(node);
+                setChecking(false);
+                setOk(!!res);
+              }}
+              className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98 disabled:opacity-50"
+            />
+          ) : (
+            <button
+              children="Add node"
+              onClick={async () => {
+                setChecking(true);
+                const node = { host, port: Number(port), password, secure, type: "custom" } as const;
+                await window.api.addNode(node);
+                setNodes((_) => [..._, node]);
+                setShowNodeForm(false);
+                setChecking(false);
+                setPassword("");
+                setOk(false);
+                setHost("");
+                setPort("");
+              }}
+              className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98 disabled:opacity-50"
+            />
+          )}
         </div>
       </div>
     </Modal>

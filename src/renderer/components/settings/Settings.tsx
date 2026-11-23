@@ -10,12 +10,13 @@ import { useBlurMask } from "../../hooks/useBlurMask";
 import { PcmDepthSelector } from "./PcmDepthSelector";
 import { DirectoryActions } from "./DirectoryActions";
 import { themes, themeStore } from "../../stores/theme";
-import { needsRestart, pcmFormatStore, treeStore } from "../../stores";
+import { needsRestart, nodeStore, pcmFormatStore, treeStore } from "../../stores";
 
 export function Settings() {
   const ref = useRef<HTMLDivElement>(null);
 
   const [tree] = treeStore.use();
+  const [nodes, setNodes] = nodeStore.use();
   const [theme, setTheme] = themeStore.use();
   const [, setRestartRequired] = needsRestart.use();
   const [pcmFormat, setPcmFormat] = pcmFormatStore.use();
@@ -58,18 +59,26 @@ export function Settings() {
             <div className="-mt-1 text-[10px] opacity-70">This will provide no benefit unless your source audio is already 24-bit / 32-bit.</div>
 
             <div className="mt-1 grid w-full grid-cols-5 gap-2">
-              {new Array(0).fill(null).map((n) => (
-                <div className="group relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden rounded-md border-2 border-(--border-color)/20 p-1 pb-1.5 text-xs transition-all active:scale-96">
-                  <div className="group-hover:opacity-15">http{n?.secure && "s"}://gs1.ca.qficloud.com:56551</div>
-                  <div className="absolute inset-0 z-5 flex h-full w-full items-center justify-center bg-red-700/30 text-sm opacity-0 group-hover:opacity-100">
-                    <LuTrash2 />
-                  </div>
+              {nodes.map((n) => (
+                <div className="group relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden rounded-md border-2 border-(--border-color)/20 p-1 pb-1.5 text-xs text-(--accent-color) transition-all active:scale-96">
+                  {n.type !== "fetched" && (
+                    <div
+                      children={<LuTrash2 />}
+                      className="absolute inset-0 z-5 flex h-full w-full items-center justify-center bg-red-700/30 text-sm opacity-0 group-hover:opacity-100"
+                      onClick={() => window.api.removeNode(`${n.host}:${n.port}`).then(() => setNodes((_) => [..._.filter((__) => `${n.host}:${n.port}` !== `${__.host}:${__.port}`)]))}
+                    />
+                  )}
+                  <div
+                    className={"w-full min-w-0 flex-1 truncate px-2 text-center " + (n.type !== "fetched" ? " group-hover:opacity-15" : "")}
+                    children={`http${(n?.secure && "s") || ""}://${n.host}:${n.port}`}
+                  />
                 </div>
               ))}
-              {new Array(5).fill(null).map((n) => (
+
+              {new Array((5 - (nodes.length % 5)) % 5 || 5).fill(null).map(() => (
                 <button
-                  children={[<LuPlus className="text-sm" />, "Add Lavalink Node"]}
                   onClick={() => setShowNodeForm(true)}
+                  children={[<LuPlus className="text-sm" />, "Add Lavalink Node"]}
                   className="flex h-full w-full cursor-pointer flex-row items-center justify-center gap-1 rounded-sm border-2 border-(--border-color)/20 bg-black/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-95"
                 />
               ))}
