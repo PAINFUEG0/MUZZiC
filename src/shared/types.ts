@@ -62,6 +62,10 @@ export type API = {
   deleteThumbnails: (ids: string[]) => Promise<void>;
   extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
 
+  removeNode: (index: number) => Promise<void>;
+  getNodes: () => Promise<{ host: string; secure: boolean; password: string; port: number }[]>;
+  addNode: (config: { host: string; secure: boolean; password: string; port: number }) => Promise<void>;
+
   close: () => Promise<void>;
   minimize: () => Promise<void>;
   openExternal: (url: string) => Promise<void>;

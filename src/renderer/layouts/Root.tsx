@@ -7,7 +7,7 @@ import { Sidebar } from "../components/sidebar";
 import { Playbar } from "../components/playbar";
 import { useKeybinds } from "../utils/Keybinds";
 import { Modal } from "../components/utils/Modal";
-import { Settings } from "../components/utils/Settings";
+import { Settings } from "../components/settings/Settings";
 
 export const Root = memo(({ fullscreen, setFullscreen }: { fullscreen: boolean; setFullscreen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

@@ -44,6 +44,10 @@ export function registerHandles(win: eˉ.BrowserWindow) {
     deleteThumbnails: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteThumbnails(...args),
     extractAndSaveMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractAndSaveMetadata(...args),
 
+    addNode: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.addNode(...args),
+    getNodes: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.getNodes(...args),
+    removeNode: (_: eˉ.IpcMainInvokeEvent, ...args) => settings.removeNode(...args),
+
     close: () => Promise.resolve(eˉ.app.quit()),
     minimize: () => Promise.resolve(win.minimize()),
     usage: (_: eˉ.IpcMainInvokeEvent, ...args) => getResourceUsages(...args),

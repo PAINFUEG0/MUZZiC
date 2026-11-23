@@ -2,7 +2,7 @@
 
 import { createGlobalStore } from "./create";
 
-type Theme = {
+export type Theme = {
   name: string;
   preview: string;
   background: string;
