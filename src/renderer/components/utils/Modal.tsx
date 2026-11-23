@@ -47,9 +47,17 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
           onClick={(e) => e.stopPropagation()}
           transition={{ duration: 0.2, ease: "easeInOut" }}
         >
-          <div className="relative flex h-full w-full items-center justify-center bg-(--hover-color)/45 backdrop-blur-[14px]">
+          <div className="relative flex h-full w-full items-center justify-center bg-(--hover-color)/55 backdrop-blur-[14px]">
             <div className="absolute inset-0 h-full w-full" onClick={close} />
-            <div ref={navRef} className={twMerge("relative mx-3 flex max-h-[95%] w-md flex-col gap-3 rounded-xl bg-[#151515] px-3 py-4 shadow-lg md:px-5", className)}>
+            <div
+              ref={navRef}
+              className={twMerge("relative mx-3 flex max-h-[95%] w-md flex-col gap-3 rounded-xl bg-[#151515] px-3 py-4 shadow-xl shadow-black/60 md:px-5", className)}
+              style={{ borderWidth: 0 }}
+            >
+              <div className="absolute inset-0 -z-1 h-full w-full overflow-hidden rounded-xl">
+                <div className="-mt-5 h-full w-full border-10 border-(--accent-color) blur-[50px]" />
+              </div>
+
               <div className="flex h-full w-full scrollbar-none overflow-auto">{children}</div>
               <div className="absolute top-5 right-5 z-100 cursor-pointer" children={<RxCross1 onClick={close} />} />
             </div>

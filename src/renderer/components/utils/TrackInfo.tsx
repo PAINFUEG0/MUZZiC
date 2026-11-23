@@ -13,12 +13,10 @@ export const TrackInfo = memo(({ track }: { track: Track }) => {
 
   return (
     <div className="flex h-full w-full flex-col gap-3">
-      <img src={track.thumb} className="pointer-events-none absolute inset-0 -z-1 h-full w-full opacity-50 blur-lg" />
-
       <div className="flex h-fit w-full shrink-0 pr-30" children={<div className="w-full min-w-0 flex-1 truncate font-semibold" children={track.title} />} />
 
       <div className="flex h-fit w-full flex-row gap-3">
-        <img src={track.thumb} className="aspect-square h-[30dvh] shrink-0 overflow-hidden rounded-md border-2 border-(--border-color)/20 object-cover" />
+        <img src={track.thumb} className="aspect-square h-[30dvh] shrink-0 overflow-hidden rounded-md border-(--border-color)/20 object-cover" />
         <div ref={scrollRef} className="flex h-[30dvh] w-full scrollbar-none flex-col gap-1 overflow-auto">
           {[
             { K: "ID", V: track.id },
