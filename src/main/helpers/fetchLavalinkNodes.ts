@@ -14,7 +14,7 @@ export async function fetchLavalinkNodes() {
   api.broadcast({ type: "MESSAGE", data: "Fetching Lavalink nodes . . ." });
 
   const [res] = await safeAwait(axios<Node[]>(LIST_URL));
-  const nodes = [...(res?.data || []).map((n) => ((n.type = "fetched"), n)), ...(settings.get("settings")?.nodes || [])];
+  const nodes = [...(res?.data || []).map((n) => ((n.type = "public"), n)), ...(settings.get("settings")?.nodes || [])];
 
   api.broadcast({ type: "MESSAGE", data: `Checking ${nodes.length} nodes for /youtube/stream/id endpoint` });
   const checked = await Promise.all(nodes.map((n) => checkNode(n)));

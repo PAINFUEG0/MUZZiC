@@ -10,7 +10,7 @@ export type File = { path: string; name: string; id: string };
 export type Tree = { name: string; path: string; files: Track[]; dirs: Tree[] };
 export type DirNode = { name: string; path: string; files: File[]; dirs: DirNode[] };
 
-export type Node<T extends boolean = false> = { host: string; secure: boolean; password: string; port: number; type: "custom" | "fetched" } & (T extends true
+export type Node<T extends boolean = false> = { host: string; secure: boolean; password: string; port: number; type: "custom" | "public" } & (T extends true
   ? { youtube: boolean; downloadSpeed: number; resolutionTime: number }
   : {});
 
