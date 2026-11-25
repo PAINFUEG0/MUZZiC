@@ -13,6 +13,7 @@ import { Playlist } from "../pages/Playlist";
 import { hexToRgba } from "../../shared/helpers";
 import { sceneStore, searchBox, selected, selectMode } from "../stores";
 import { Equalizer } from "../pages/Equalizer";
+import { Online } from "../pages/Online";
 
 export const Viewport = memo(() => {
   let page;
@@ -48,6 +49,9 @@ export const Viewport = memo(() => {
       break;
     case "playlist":
       page = <Playlist K={scene.K!} key={scene.K!} />;
+      break;
+    case "downloads":
+      page = <Online />;
       break;
   }
 
