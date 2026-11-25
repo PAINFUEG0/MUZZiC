@@ -176,7 +176,7 @@ export function Preload() {
         if (data.type !== "MESSAGE") return;
         setFooter(data.data);
       };
-      setNodes(await window.api.fetchLavalinkNodes());
+      setNodes(await window.api.fetchLavalinkNodes(JSON.parse(localStorage.getItem("usePublicNodes") || "true")));
       ws.onmessage = null;
       setProgress(90);
 
