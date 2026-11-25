@@ -66,12 +66,13 @@ export type API = {
   deleteThumbnails: (ids: string[]) => Promise<void>;
   extractAndSaveMetadata: (flat: File[]) => Promise<{ key: string; value: BaseTrack }[]>;
 
-  getNodes: () => Promise<Node[]>;
-  addNode: (config: Node) => Promise<void>;
-  removeNode: (url: string) => Promise<void>;
+  removeNode: (url: string) => Promise<Node<true>[]>;
+  addNode: (config: Node) => Promise<Node<true>[] | undefined>;
 
   checkNode: (node: Node) => Promise<Node<true> | undefined>;
   fetchLavalinkNodes: (usePublicNodes?: boolean) => Promise<Node<true>[]>;
+
+  search: (query: string) => Promise<Track[]>;
 
   close: () => Promise<void>;
   minimize: () => Promise<void>;
