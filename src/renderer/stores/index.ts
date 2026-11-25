@@ -1,7 +1,7 @@
 /** @format */
 
 import { createGlobalStore } from "./create";
-import { Track, Tree } from "../../shared/types";
+import { Node, Track, Tree } from "../../shared/types";
 
 export * from "./player";
 export const searchBox = createGlobalStore<string>("");
@@ -25,4 +25,4 @@ export const flattenedTreeStore = createGlobalStore<Track[]>([]);
 export const artistsStore = createGlobalStore<Record<string, Track[]>>({});
 export const albumsStore = createGlobalStore<Partial<Record<string, Track[]>>>({});
 
-export const nodeStore = createGlobalStore<Awaited<ReturnType<typeof window.api.getNodes>>>([]);
+export const nodeStore = createGlobalStore<Node<true>[]>([]);
