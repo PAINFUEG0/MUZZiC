@@ -1,12 +1,15 @@
 /** @format */
 
-import { searchBox } from "../../stores";
+import { sceneStore, searchBox } from "../../stores";
 import { TbSearch, TbX } from "react-icons/tb";
 import { memo, useRef } from "react";
 
 export const Search = memo(() => {
+  const [scene] = sceneStore.use();
   const [value, setValue] = searchBox.use();
   const ref = useRef<HTMLInputElement>(null);
+
+  if (scene.scene === "downloads") return <div className="flex w-[65%]" />;
 
   return (
     <div className="relative flex w-[65%]">
