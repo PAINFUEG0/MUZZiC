@@ -10,10 +10,10 @@ import { setTimeout } from "node:timers/promises";
 const VIDEO_ID = "dQw4w9WgXcQ";
 const LIST_URL = "https://lavalink-list.ajieblogs.eu.org/All";
 
-export async function fetchLavalinkNodes() {
+export async function fetchLavalinkNodes(usePublicNodes = true) {
   api.broadcast({ type: "MESSAGE", data: "Fetching Lavalink nodes . . ." });
 
-  const [res] = await safeAwait(axios<Node[]>(LIST_URL));
+  const [res] = usePublicNodes ? await safeAwait(axios<Node[]>(LIST_URL)) : [undefined];
   const nodes = [...(res?.data || []).map((n) => ((n.type = "public"), n)), ...(settings.get("settings")?.nodes || [])];
 
   api.broadcast({ type: "MESSAGE", data: `Checking ${nodes.length} nodes for /youtube/stream/id endpoint` });

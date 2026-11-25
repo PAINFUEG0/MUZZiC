@@ -70,8 +70,8 @@ export type API = {
   addNode: (config: Node) => Promise<void>;
   removeNode: (url: string) => Promise<void>;
 
-  fetchLavalinkNodes: () => Promise<Node<true>[]>;
   checkNode: (node: Node) => Promise<Node<true> | undefined>;
+  fetchLavalinkNodes: (usePublicNodes?: boolean) => Promise<Node<true>[]>;
 
   close: () => Promise<void>;
   minimize: () => Promise<void>;
