@@ -55,7 +55,7 @@ export const Modal = ({ open, children, onClose, setOpen, className }: ModalProp
               style={{ borderWidth: 0 }}
             >
               <div className="absolute inset-0 -z-1 h-full w-full overflow-hidden rounded-xl">
-                <div className="-mt-5 h-full w-full border-10 border-(--accent-color) blur-[50px]" />
+                <div className="h-full w-full border-10 border-(--accent-color) blur-[50px]" />
               </div>
 
               <div className="flex h-full w-full scrollbar-none overflow-auto">{children}</div>

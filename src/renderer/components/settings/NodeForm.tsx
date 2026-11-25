@@ -1,8 +1,10 @@
 /** @format */
 
-import { memo, useState } from "react";
 import { Modal } from "../utils/Modal";
+import { memo, useState } from "react";
 import { nodeStore } from "../../stores";
+import { Node } from "../../../shared/types";
+import { LuInfo } from "react-icons/lu";
 
 export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm: boolean; setShowNodeForm: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [host, setHost] = useState("");
@@ -19,8 +21,16 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
       <div className="flex w-full flex-col gap-3">
         <div className="mb-3 text-base font-medium">Lavalink node configuration</div>
 
-        <div className="-mt-3 text-[10px] opacity-70">PCM bit depth used for decoding. Higher bit depths consume more memory.</div>
-        <div className="-mt-2 text-[10px] opacity-70">This will provide no benefit unless your source audio is already 24-bit / 32-bit.</div>
+        <div className="-mt-3 text-[11px] opacity-70">
+          <LuInfo className="mr-1 mb-px inline shrink-0 text-(--accent-color)" />
+          Connect a custom Lavalink server to enable track searching and audio stream retrieval through your own node.Enter the server hostname, port, authentication password, and connection security
+          settings
+        </div>
+
+        <div className="text-[11px] opacity-70">
+          <LuInfo className="mr-1 mb-px inline shrink-0 text-(--accent-color)" />
+          The node must have an endpoint <span className="rounded-md bg-gray-200/20 px-1.5 pb-0.5">/youtube/stream/id</span> which returns a stream.
+        </div>
 
         <div className="mt-1 flex w-full flex-row gap-3">
           <input
@@ -73,37 +83,29 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
             onClick={() => setShowNodeForm(false)}
             className="w-full cursor-pointer rounded-md border-2 border-[#ff1116] bg-[#ff111622] pt-1 pb-1.5 text-[#ff3333] transition-all duration-150 active:scale-98"
           />
-          {!ok ? (
-            <button
-              disabled={!host || !port || !password || nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1}
-              children={checking ? "Checking" : nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1 ? "Node already exists" : "Verify node"}
-              onClick={async () => {
-                setChecking(true);
-                const node = { host, port: Number(port), password, secure, type: "custom" } as const;
-                const res = await window.api.checkNode(node);
-                setChecking(false);
-                setOk(!!res);
-              }}
-              className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98 disabled:opacity-50"
-            />
-          ) : (
-            <button
-              children="Add node"
-              onClick={async () => {
-                setChecking(true);
-                const node = { host, port: Number(port), password, secure, type: "custom" } as const;
-                await window.api.addNode(node);
-                setNodes((_) => [..._, node]);
-                setShowNodeForm(false);
-                setChecking(false);
-                setPassword("");
-                setOk(false);
-                setHost("");
-                setPort("");
-              }}
-              className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98 disabled:opacity-50"
-            />
-          )}
+
+          <button
+            disabled={!host || !port || !password || nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1}
+            children={checking ? "Checking" : nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1 ? "Node already exists" : "Verify and add node"}
+            onClick={async () => {
+              setChecking(true);
+              const node = { host, port: Number(port), password, secure, type: "custom" } as const;
+              const res = await window.api.checkNode(node);
+              setChecking(false);
+
+              if (!res) return alert("Please check the details you've entered and try again !");
+
+              await window.api.addNode(res);
+              setNodes((_) => ([..._, res] as Node<true>[]).sort((a, b) => b.downloadSpeed - a.downloadSpeed));
+              setShowNodeForm(false);
+              setChecking(false);
+              setPassword("");
+              setOk(false);
+              setHost("");
+              setPort("");
+            }}
+            className="w-full cursor-pointer rounded-md border-2 border-[#31aa16] bg-[#31aa1622] pt-1 pb-1.5 text-[#31ee16] transition-all duration-150 active:scale-98 disabled:opacity-50"
+          />
         </div>
       </div>
     </Modal>
