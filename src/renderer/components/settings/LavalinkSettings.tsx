@@ -2,9 +2,8 @@
 
 import { memo, useState } from "react";
 import { nodeStore } from "../../stores";
-import { PiWaveformBold } from "react-icons/pi";
 import { MessagePayload } from "../../../shared/types";
-import { LuRotateCcw, LuPlus, LuTrash2, LuCheck, LuX } from "react-icons/lu";
+import { LuRotateCcw, LuPlus, LuTrash2, LuCheck, LuX, LuFlameKindling } from "react-icons/lu";
 
 export const LavalinkSettings = memo(({ setShowNodeForm }: { setShowNodeForm: React.Dispatch<React.SetStateAction<boolean>> }) => {
   const [nodes, setNodes] = nodeStore.use();
@@ -16,7 +15,7 @@ export const LavalinkSettings = memo(({ setShowNodeForm }: { setShowNodeForm: Re
     <>
       <div className="col-span-3 flex flex-col gap-2">
         <div className="flex flex-row items-center gap-1 text-sm font-medium">
-          <PiWaveformBold className="text-base text-(--accent-color)" />
+          <LuFlameKindling className="text-base text-(--accent-color)" />
           Lavalink Configuration
         </div>
 
@@ -52,8 +51,8 @@ export const LavalinkSettings = memo(({ setShowNodeForm }: { setShowNodeForm: Re
 
         <button
           disabled={refreshing}
-          children={[<LuPlus className="text-sm" />, "Add Node"]}
           onClick={() => setShowNodeForm(true)}
+          children={[<LuPlus className="text-sm" />, "Add Node"]}
           className="flex h-fit w-fit cursor-pointer flex-row items-center justify-center gap-1 rounded-sm border-2 border-(--border-color)/20 bg-black/10 px-2 pt-0.5 pb-1 text-xs text-nowrap transition-all duration-100 active:scale-95 disabled:opacity-50"
         />
 
@@ -122,10 +121,7 @@ export const LavalinkSettings = memo(({ setShowNodeForm }: { setShowNodeForm: Re
 
                 <td className="border-2 border-(--border-color)/20 px-2">
                   <div className="flex h-full w-full items-center justify-center">
-                    <LuTrash2
-                      className="cursor-pointer active:scale-90"
-                      onClick={() => window.api.removeNode(`${node.host}:${node.port}`).then(() => setNodes((_) => [..._.filter((__) => `${node.host}:${node.port}` !== `${__.host}:${__.port}`)]))}
-                    />
+                    <LuTrash2 className="cursor-pointer active:scale-90" onClick={async () => setNodes(await window.api.removeNode(`${node.host}:${node.port}`))} />
                   </div>
                 </td>
               </tr>

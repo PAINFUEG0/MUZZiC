@@ -3,18 +3,17 @@
 import { Modal } from "../utils/Modal";
 import { memo, useState } from "react";
 import { nodeStore } from "../../stores";
-import { Node } from "../../../shared/types";
 import { LuInfo } from "react-icons/lu";
 
 export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm: boolean; setShowNodeForm: React.Dispatch<React.SetStateAction<boolean>> }) => {
+  const [err, setErr] = useState("");
   const [host, setHost] = useState("");
   const [port, setPort] = useState("");
   const [nodes, setNodes] = nodeStore.use();
   const [secure, setSecure] = useState(false);
   const [password, setPassword] = useState("");
 
-  const [ok, setOk] = useState(false);
-  const [checking, setChecking] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   return (
     <Modal open={showNodeForm} setOpen={setShowNodeForm} className="z-100 max-h-fit w-md border-2 border-(--border-color)/20 bg-(--hover-color)/45 text-(--text-color)">
@@ -37,22 +36,22 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
             id="Host"
             type="text"
             value={host}
-            disabled={ok}
+            disabled={adding}
             spellCheck={false}
             onChange={(e) => setHost(e.target.value)}
             placeholder="Hostname ( without http:// or https:// )"
-            className="flex h-fit w-[80%] flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0"
+            className="flex h-fit w-[80%] flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0 disabled:opacity-60"
           />
 
           <input
             id="Port"
             type="text"
             value={port}
-            disabled={ok}
+            disabled={adding}
             spellCheck={false}
             placeholder="Port"
             onChange={(e) => setPort(e.target.value)}
-            className="flex h-fit w-[20%] flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0"
+            className="flex h-fit w-[20%] flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0 disabled:opacity-60"
           />
         </div>
 
@@ -60,16 +59,16 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
           <input
             type="text"
             id="Password"
-            disabled={ok}
+            disabled={adding}
             value={password}
             spellCheck={false}
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
-            className="flex h-fit w-full flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0"
+            className="flex h-fit w-full flex-row items-center rounded-md bg-gray-300/10 px-2 py-1.25 text-sm focus:outline-0 disabled:opacity-60"
           />
 
           <label htmlFor="secure" className="flex cursor-pointer items-center gap-3 text-sm font-medium">
-            <input disabled={ok} id="secure" type="checkbox" checked={secure} onChange={(e) => setSecure(e.target.checked)} className="sr-only" />
+            <input disabled={adding} id="secure" type="checkbox" checked={secure} onChange={(e) => setSecure(e.target.checked)} className="sr-only" />
             <span className={`relative h-5 w-9 rounded-full transition-colors ${secure ? "bg-green-500" : "bg-red-500"}`}>
               <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${secure ? "translate-x-4" : "translate-x-0"}`} />
             </span>
@@ -77,7 +76,9 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
           </label>
         </div>
 
-        <div className="mt-2 flex flex-row gap-4 text-xs font-semibold">
+        <div className="-mt-2 mb-0.5 h-2 w-full text-center text-[10px] font-medium text-red-500">{err}</div>
+
+        <div className="flex flex-row gap-4 text-xs font-semibold">
           <button
             children="Cancel operation"
             onClick={() => setShowNodeForm(false)}
@@ -86,21 +87,21 @@ export const NodeForm = memo(({ showNodeForm, setShowNodeForm }: { showNodeForm:
 
           <button
             disabled={!host || !port || !password || nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1}
-            children={checking ? "Checking" : nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1 ? "Node already exists" : "Verify and add node"}
+            children={adding ? "Checking" : nodes.findIndex((n) => n.host === host && n.port === Number(port)) !== -1 ? "Node already exists" : "Verify and add node"}
             onClick={async () => {
-              setChecking(true);
-              const node = { host, port: Number(port), password, secure, type: "custom" } as const;
-              const res = await window.api.checkNode(node);
-              setChecking(false);
+              setAdding(true);
+              const res = await window.api.addNode({ host, port: Number(port), password, secure, type: "custom" });
+              setAdding(false);
 
-              if (!res) return alert("Please check the details you've entered and try again !");
+              if (!res) {
+                setErr("Please check the details you've entered and try again !");
+                setTimeout(() => setErr(""), 2500);
+                return;
+              }
 
-              await window.api.addNode(res);
-              setNodes((_) => ([..._, res] as Node<true>[]).sort((a, b) => b.downloadSpeed - a.downloadSpeed));
               setShowNodeForm(false);
-              setChecking(false);
               setPassword("");
-              setOk(false);
+              setNodes(res);
               setHost("");
               setPort("");
             }}
