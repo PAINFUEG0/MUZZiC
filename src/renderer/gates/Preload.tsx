@@ -170,16 +170,6 @@ export function Preload() {
 
       setArtists(Object.fromEntries(artists));
 
-      setTask("Getting lavalink nodes");
-      ws.onmessage = (m: MessageEvent) => {
-        const data = JSON.parse(m.data) as MessagePayload;
-        if (data.type !== "MESSAGE") return;
-        setFooter(data.data);
-      };
-      setNodes(await window.api.fetchLavalinkNodes(JSON.parse(localStorage.getItem("usePublicNodes") || "true")));
-      ws.onmessage = null;
-      setProgress(90);
-
       setTask("Finishing things up");
       setFooter("Hope you enjoy your music");
       setProgress(100);

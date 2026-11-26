@@ -1,10 +1,8 @@
 /** @format */
 
-import { NodeForm } from "./NodeForm";
-import { memo, useRef, useState } from "react";
 import { ReIndexModal } from "./ReIndexModal";
+import { memo, useRef, useState } from "react";
 import { ThemeSelector } from "./ThemeSelector";
-import { LavalinkSettings } from "./LavalinkSettings";
 import { useBlurMask } from "../../hooks/useBlurMask";
 import { PcmDepthSelector } from "./PcmDepthSelector";
 import { DirectoryActions } from "./DirectoryActions";
@@ -24,7 +22,6 @@ export const Settings = memo(() => {
   const [_pcmFormat, _setPcmFormat] = useState(pcmFormat);
   const [_mediaFolder, _setMediaFolder] = useState(mediaFolder);
 
-  const [showNodeForm, setShowNodeForm] = useState(false);
   const [showReIndexModal, setShowReIndexModal] = useState(false);
 
   useBlurMask(ref);
@@ -46,8 +43,6 @@ export const Settings = memo(() => {
             <DirectoryActions mediaFolder={_mediaFolder} setMediaFolder={_setMediaFolder} setShowReIndexModal={setShowReIndexModal} />
             <ThemeSelector theme={_theme} setTheme={_setTheme} />
           </div>
-
-          <LavalinkSettings setShowNodeForm={setShowNodeForm} />
         </div>
       </div>
 
@@ -96,7 +91,6 @@ export const Settings = memo(() => {
         )}
       </div>
 
-      <NodeForm showNodeForm={showNodeForm} setShowNodeForm={setShowNodeForm} />
       <ReIndexModal showReIndexModal={showReIndexModal} setShowReIndexModal={setShowReIndexModal} />
     </div>
   );

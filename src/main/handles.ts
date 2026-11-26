@@ -11,7 +11,6 @@ import { transcode } from "./helpers/transcode";
 import { getResourceUsages } from "./helpers/usages";
 
 import type { AxiosProgressEvent } from "axios";
-import { lavalinkHelper } from "./Lavalink";
 
 export function registerHandles(win: eˉ.BrowserWindow) {
   Object.entries({
@@ -44,12 +43,6 @@ export function registerHandles(win: eˉ.BrowserWindow) {
     transcode: (_: eˉ.IpcMainInvokeEvent, ...args) => transcode(...args),
     deleteThumbnails: (_: eˉ.IpcMainInvokeEvent, ...args) => local.deleteThumbnails(...args),
     extractAndSaveMetadata: (_: eˉ.IpcMainInvokeEvent, ...args) => local.extractAndSaveMetadata(...args),
-
-    search: (_: eˉ.IpcMainInvokeEvent, ...args) => lavalinkHelper.search(...args),
-    addNode: (_: eˉ.IpcMainInvokeEvent, ...args) => lavalinkHelper.addNode(...args),
-    checkNode: (_: eˉ.IpcMainInvokeEvent, ...args) => lavalinkHelper.checkNode(...args),
-    removeNode: (_: eˉ.IpcMainInvokeEvent, ...args) => lavalinkHelper.removeNode(...args),
-    fetchLavalinkNodes: (_: eˉ.IpcMainInvokeEvent, ...args) => lavalinkHelper.fetchLavalinkNodes(...args),
 
     close: () => Promise.resolve(eˉ.app.quit()),
     minimize: () => Promise.resolve(win.minimize()),
