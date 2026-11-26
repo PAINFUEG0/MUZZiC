@@ -10,12 +10,11 @@ import { Fullscreen } from "../components/fullscreen";
 import { AnimatePresence, motion } from "framer-motion";
 import { flatten, hexToRgba, safeAwait, sleep } from "../../shared/helpers.js";
 import { DirNode, MessagePayload, BaseTrack, Tree, API, Track } from "../../shared/types";
-import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, nodeStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
+import { albumsStore, artistsStore, flattenedTreeStore, likedSongsStore, notificationsStore, pcmFormatStore, playlistDataStore, playlistIndexStore, treeStore } from "../stores";
 
 export function Preload() {
   const [theme] = themeStore.use();
   const [, setTree] = treeStore.use();
-  const [, setNodes] = nodeStore.use();
   const [liked] = likedSongsStore.use();
   const [, setAlbums] = albumsStore.use();
   const [, setArtists] = artistsStore.use();
