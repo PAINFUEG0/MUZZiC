@@ -37,7 +37,7 @@ export function Queue() {
         button1={<BiAddToQueue className="shrink-0 cursor-pointer opacity-40" />}
         button2={
           <BiTrash
-            onClick={() => index > currentIndex && setQueue((_) => _.filter((__) => __.id !== _[index]!.id))}
+            onClick={() => index > currentIndex && setQueue((_) => _.filter((_, i) => i !== index))}
             className={"shrink-0 transition-all duration-100 active:scale-90 " + (index > currentIndex ? "cursor-pointer opacity-100" : "opacity-40")}
           />
         }
