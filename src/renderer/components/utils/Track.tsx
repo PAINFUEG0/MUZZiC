@@ -87,9 +87,9 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
         <div
           children={
             file.resolution.name === "SR"
-              ? `${Math.round(file.resolution.bitrate / 1000)} kb/s`
+              ? `${Math.round(file.resolution.bitrate / 1024)} kb/s`
               : file.resolution.name === "DD"
-                ? `EAC3 - ${Math.round(file.resolution.bitrate / 1000)} kb/s`
+                ? `EAC3 - ${Math.round(file.resolution.bitrate / 1024)} kb/s`
                 : `${file.resolution.bitDepth} bit - ${file.resolution.sampleRate / 1000} kHz`
           }
           className="text-no-wrap col-span-3 flex min-w-0 shrink-0 items-center justify-center truncate text-xs font-medium opacity-100"
