@@ -1,14 +1,63 @@
 /** @format */
 
+import axios from "axios";
 import { TbSearch } from "react-icons/tb";
-import { MdDownloading } from "react-icons/md";
-import { Track as TrackComponent } from "../components/utils/Track";
-import { useBlurMask } from "../hooks/useBlurMask";
+import { util, cipher } from "node-forge";
 import { playerMethods } from "../stores";
+import { MdDownloading } from "react-icons/md";
 import { memo, useRef, useState } from "react";
+import { useBlurMask } from "../hooks/useBlurMask";
 import { LuInfo, LuLoaderCircle } from "react-icons/lu";
 import { BiAddToQueue, BiDownload } from "react-icons/bi";
+import { Track as TrackComponent } from "../components/utils/Track";
+
 import type { Track } from "../../shared/types";
+
+const iv = util.createBuffer("00000000");
+const key = util.createBuffer("38346591");
+const baseAPI = "https://www.jiosaavn.com/api.php?api_version=4&_format=json&_marker=0&ctx=web6dot0";
+
+function createDownloadLink(encryptedMediaUrl: string) {
+  const decipher = cipher.createDecipher("DES-ECB", key);
+  decipher.start({ iv });
+  decipher.update(util.createBuffer(atob(encryptedMediaUrl)));
+  decipher.finish();
+
+  return decipher.output.getBytes().replace("_96", "_320");
+}
+
+async function fetchChunks(url: string) {
+  const perChunk = 30;
+  const maxCount = 300;
+  const { data } = await axios(url + "&n=" + maxCount);
+  const chunksCount = Math.ceil(Math.min(data.total, maxCount) / perChunk);
+  return await Promise.all(Array.from({ length: chunksCount }, (_, i) => axios(`${url}&n=${perChunk}&p=${i + 1}`).catch(() => ({ data: { results: [] } }))));
+}
+
+async function searchTracks(query: string) {
+  return (await fetchChunks(`${baseAPI}&__call=search.getResults&q=${query}`))
+    .flatMap((r) => r.data.results)
+    .map(
+      (track) =>
+        ({
+          channels: 2,
+          id: track.id,
+          codec: "aac",
+          layout: "stereo",
+          name: track.title,
+          title: track.title,
+          lyrics: "No lyrics found",
+          album: track.more_info.album,
+          duration: track.more_info.duration,
+          explicit: track.explicit_content !== "0",
+          path: createDownloadLink(track.more_info.encrypted_media_url),
+          resolution: { bitDepth: 0, bitrate: 320000, name: "SR", sampleFormat: "s16p", sampleRate: 44100 },
+          // prettier-ignore
+          artists: Array.from(new Set(Object.values(track.more_info.artistMap).flat().map((a: any) => a.name))),
+          thumb: track.image.replace("150x150", "500x500").replaceAll("50x50", "500x500").replaceAll("http://", "https://"),
+        }) satisfies Track,
+    );
+}
 
 export const Online = memo(() => {
   const [methods] = playerMethods.use();
@@ -20,10 +69,7 @@ export const Online = memo(() => {
   async function search() {
     if (!query.trim()) return;
     setSearching(true);
-    // const url = `http${secure ? "s" : ""}://${host}:${port}/v4/loadtracks`;
-    // const [res, error] = await safeAwait(axios.get(url, { params: { identifier: `ytsearch:${query}` }, headers: { Authorization: password } }));
-    // setResults(error ? [] : res.data.loadType === "search" ? res.data.data : []);
-    setResults(await window.api.search(query));
+    setResults(await searchTracks(query).catch(() => []));
     setSearching(false);
   }
 
