@@ -32,10 +32,10 @@ export const Track = memo(({ end, file, index, initial, onClick, isLiked, onLike
           initial && end
             ? "rounded-md border-2 pt-5 pb-5"
             : initial
-              ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.75"
+              ? "rounded-md rounded-b-none border-2 border-b-0 pt-5 pb-0.5"
               : end
-                ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.75 pb-5"
-                : "border-x-2 pt-0.75 pb-0.75"
+                ? "rounded-md rounded-t-none border-2 border-t-0 pt-0.5 pb-5"
+                : "border-x-2 pt-0.5 pb-0.5"
         }`
       }
     >
